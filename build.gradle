@@ -1,0 +1,75 @@
+buildscript {
+  project.ext {
+
+    uploadRepo = { project ->
+      nexusRoot = 'https://s01.oss.sonatype.org/content/repositories'
+      return {
+        url "$nexusRoot/${project.version.endsWith('-SNAPSHOT') ? 'snapshots' : 'releases'}"
+        //credentials { username ossrhUsername; password ossrhPassword }
+      }
+    }
+    repoClosure = {
+      mavenLocal()
+      maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+      maven { url "https://repo.spring.io/snapshot/" }
+      maven { url "https://repo1.maven.org/maven2/" }
+      mavenCentral()
+
+
+    }
+    versionTail = new Date().format('yyMMddHHmm')
+  }
+  repositories repoClosure
+}
+
+
+allprojects { project ->
+
+  project.repositories rootProject.repoClosure
+
+  group = 'io.github.helium-cloud'
+  //version = "1.0.0-SNAPSHOT"
+  version = "1.0.0-release"
+}
+
+def mavenPublishIgnoreList = ['helium-sample']
+
+subprojects { project ->
+
+  apply plugin: 'java'
+
+  apply plugin: 'maven-publish'
+
+  tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+  }
+
+  tasks.withType(Test) {
+    defaultCharacterEncoding = "UTF-8"
+  }
+
+  dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: slf4j_version
+    testCompile "junit:junit:$junit_version"
+  }
+
+
+  task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+  }
+
+  if (!(project.name in mavenPublishIgnoreList)) {
+    publishing {
+      repositories {
+        maven uploadRepo(project)
+      }
+      publications {
+        maven(MavenPublication) {
+          from components.java
+          artifact sourceJar
+        }
+      }
+    }
+  }
+}

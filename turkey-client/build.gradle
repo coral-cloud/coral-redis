@@ -1,0 +1,8 @@
+dependencies {
+  // https://mvnrepository.com/artifact/org.rocksdb/rocksdbjni
+  implementation group: 'org.rocksdb', name: 'rocksdbjni', version: '6.20.3'
+// https://mvnrepository.com/artifact/redis.clients/jedis
+  implementation group: 'redis.clients', name: 'jedis', version: '3.6.0'
+
+  testCompile group: 'junit', name: 'junit', version: '4.12'
+}

@@ -1,125 +1,69 @@
 package org.turkey.test;
 
-import org.rocksdb.*;
+import org.rocksdb.Options;
+import org.rocksdb.RocksDB;
+import org.rocksdb.RocksDBException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.nio.charset.StandardCharsets;
 
 public class RocksDBExample {
 
-	private static final String dbPath = "./rocksdb-data/";
-	private static final String cfdbPath = "./rocksdb-data-cf/";
+	private static final String DB_PATH = "./rocksdb-data/";
+	private static final String CF_DB_PATH = "./rocksdb-data-cf/";
+	private static RocksDB rocksDB;
 
 	static {
 		RocksDB.loadLibrary();
 	}
 
-	//  RocksDB.DEFAULT_COLUMN_FAMILY
-	public void testDefaultColumnFamily() {
-		System.out.println("testDefaultColumnFamily begin...");
-		// 文件不存在，则先创建文件
-		try (final Options options = new Options().setCreateIfMissing(true)) {
-			try (final RocksDB rocksDB = RocksDB.open(options, dbPath)) {
-				// 简单key-value
-				byte[] key = "Hello".getBytes();
-				rocksDB.put(key, "World".getBytes());
-				//rocksDB.r
+	public RocksDBExample() throws RocksDBException {
+		Options options = new Options();
+		options.setCreateIfMissing(true);
+		rocksDB = RocksDB.open(options, DB_PATH);
+	}
 
-				System.out.println(new String(rocksDB.get(key)));
+	public void set(String key, String value) {
+		set(key.getBytes(StandardCharsets.UTF_8), value.getBytes(StandardCharsets.UTF_8));
+	}
 
-				rocksDB.put("SecondKey".getBytes(), "SecondValue".getBytes());
-
-				// 通过List做主键查询
-				List<byte[]> keys = Arrays.asList(key, "SecondKey".getBytes(), "missKey".getBytes());
-				List<byte[]> values = rocksDB.multiGetAsList(keys);
-				for (int i = 0; i < keys.size(); i++) {
-					System.out.println("multiGet " + new String(keys.get(i)) + ":" + (values.get(i) != null ? new String(values.get(i)) : null));
-				}
-
-				// 打印全部[key - value]
-				RocksIterator iter = rocksDB.newIterator();
-				for (iter.seekToFirst(); iter.isValid(); iter.next()) {
-					System.out.println("iterator key:" + new String(iter.key()) + ", iter value:" + new String(iter.value()));
-				}
-
-				// 删除一个key
-				rocksDB.delete(key);
-				System.out.println("after remove key:" + new String(key));
-
-				iter = rocksDB.newIterator();
-				for (iter.seekToFirst(); iter.isValid(); iter.next()) {
-					System.out.println("iterator key:" + new String(iter.key()) + ", iter value:" + new String(iter.value()));
-				}
-			}
+	public void set(byte[] key, byte[] value) {
+		try {
+			rocksDB.put(key, value);
 		} catch (RocksDBException e) {
 			e.printStackTrace();
 		}
 	}
 
-	// 使用特定的列族打开数据库，可以把列族理解为关系型数据库中的表(table)
-	public void testCertainColumnFamily() {
-		System.out.println("\ntestCertainColumnFamily begin...");
-		try (final ColumnFamilyOptions cfOpts = new ColumnFamilyOptions().optimizeUniversalStyleCompaction()) {
-			String cfName = "my-first-columnfamily";
-			// list of column family descriptors, first entry must always be default column family
-			final List<ColumnFamilyDescriptor> cfDescriptors = Arrays.asList(
-					new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, cfOpts),
-					new ColumnFamilyDescriptor(cfName.getBytes(), cfOpts)
-			);
+	public byte[] get(String key) {
+		return get(key.getBytes(StandardCharsets.UTF_8));
+	}
 
-			List<ColumnFamilyHandle> cfHandles = new ArrayList<>();
-			try (final DBOptions dbOptions = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
-				 final RocksDB rocksDB = RocksDB.open(dbOptions, cfdbPath, cfDescriptors, cfHandles)) {
-				ColumnFamilyHandle cfHandle = cfHandles.stream().filter(x -> {
-					try {
-						return (new String(x.getName())).equals(cfName);
-					} catch (RocksDBException e) {
-						return false;
-					}
-				}).collect(Collectors.toList()).get(0);
-
-				// 写入key/value
-				String key = "FirstKey";
-				rocksDB.put(cfHandle, key.getBytes(), "FirstValue".getBytes());
-				// 查询单key
-				byte[] getValue = rocksDB.get(cfHandle, key.getBytes());
-				System.out.println("get Value : " + new String(getValue));
-				// 写入第2个key/value
-				rocksDB.put(cfHandle, "SecondKey".getBytes(), "SecondValue".getBytes());
-
-				List<byte[]> keys = Arrays.asList(key.getBytes(), "SecondKey".getBytes());
-				List<ColumnFamilyHandle> cfHandleList = Arrays.asList(cfHandle, cfHandle);
-				// 查询多个key
-				List<byte[]> values = rocksDB.multiGetAsList(cfHandleList, keys);
-				for (int i = 0; i < keys.size(); i++) {
-					System.out.println("multiGet:" + new String(keys.get(i)) + "--" + (values.get(i) == null ? null : new String(values.get(i))));
-				}
-
-				// 删除单key
-				rocksDB.delete(cfHandle, key.getBytes());
-
-				// 打印全部key
-				RocksIterator iter = rocksDB.newIterator(cfHandle);
-				for (iter.seekToFirst(); iter.isValid(); iter.next()) {
-					System.out.println("iterator:" + new String(iter.key()) + ":" + new String(iter.value()));
-				}
-			} finally {
-				// NOTE frees the column family handles before freeing the db
-				for (final ColumnFamilyHandle cfHandle : cfHandles) {
-					cfHandle.close();
-				}
-			}
+	public byte[] get(byte[] key) {
+		try {
+			return rocksDB.get(key);
 		} catch (RocksDBException e) {
 			e.printStackTrace();
-		} // frees the column family options
+		}
+		return null;
 	}
 
 	public static void main(String[] args) throws Exception {
-		RocksDBExample test = new RocksDBExample();
-		test.testDefaultColumnFamily();
-		test.testCertainColumnFamily();
+		testcache(10000, 16);
 	}
+
+	public static void testcache(int count, int dataSize) throws RocksDBException {
+		RocksDBExample rocksDBExample = new RocksDBExample();
+		long cur = System.currentTimeMillis();
+		for (int i = 0; i < count; i++) {
+			rocksDBExample.set((i + "").getBytes(StandardCharsets.UTF_8), new byte[dataSize]);
+		}
+		System.out.println("set " + (System.currentTimeMillis() - cur));
+		cur = System.currentTimeMillis();
+		for (int i = 0; i < count; i++) {
+			rocksDBExample.get(i + "");
+		}
+		System.out.println("get " + (System.currentTimeMillis() - cur));
+	}
+
 
 }

@@ -1,5 +1,8 @@
 rootProject.name = 'turkey'
 //helium-common
 include 'turkey-common'
+include 'turkey-cluster'
 include 'turkey-storage'
+include 'turkey-client'
+include 'turkey-db'
 

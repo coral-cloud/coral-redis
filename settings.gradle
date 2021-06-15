@@ -1,8 +1,8 @@
-rootProject.name = 'turkey'
+rootProject.name = 'greap'
 //helium-common
-include 'turkey-common'
-include 'turkey-cluster'
-include 'turkey-storage'
-include 'turkey-client'
-include 'turkey-db'
+include 'greap-common'
+include 'greap-cluster'
+include 'greap-storage'
+include 'greap-client'
+include 'greap-redis'
 

@@ -5,4 +5,5 @@ include 'greap-cluster'
 include 'greap-storage'
 include 'greap-client'
 include 'greap-redis'
+include 'greap-mqtt'
 

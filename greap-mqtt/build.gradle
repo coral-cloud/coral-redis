@@ -1,10 +1,5 @@
 dependencies {
-  // https://mvnrepository.com/artifact/org.rocksdb/rocksdbjni
-  implementation group: 'org.rocksdb', name: 'rocksdbjni', version: '6.20.3'
-// https://mvnrepository.com/artifact/redis.clients/jedis
-  implementation group: 'redis.clients', name: 'jedis', version: '3.6.0'
-// https://mvnrepository.com/artifact/io.netty/netty-all
+  compile project(":greap-storage");
   implementation group: 'io.netty', name: 'netty-all', version: '4.1.65.Final'
-
   testCompile group: 'junit', name: 'junit', version: '4.12'
 }

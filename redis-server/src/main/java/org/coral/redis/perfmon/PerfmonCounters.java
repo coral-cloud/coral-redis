@@ -25,12 +25,12 @@ public class PerfmonCounters {
 	@PerformanceCounter(name = "tx", type = PerformanceCounterType.TRANSACTION)
 	private SmartCounter tx;
 
-	@PerformanceCounter(name = "qps", type = PerformanceCounterType.QPS)
-	private SmartCounter qps;
+//	@PerformanceCounter(name = "qps", type = PerformanceCounterType.QPS)
+//	private SmartCounter qps;
 
-	public SmartCounter getQps() {
-		return qps;
-	}
+//	public SmartCounter getQps() {
+//		return qps;
+//	}
 
 	public SmartCounter getTx() {
 		return tx;

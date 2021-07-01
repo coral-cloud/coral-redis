@@ -5,6 +5,7 @@ import io.netty.handler.codec.redis.FullBulkStringRedisMessage;
 import io.netty.handler.codec.redis.RedisMessage;
 import org.coral.redis.server.CommandSign;
 import org.coral.redis.server.RedisMessageFactory;
+import org.coral.redis.server.StoragePorxy;
 import org.coral.redis.uils.RedisMsgUtils;
 import org.coral.redis.perfmon.PerfmonCounters;
 import org.coral.redis.storage.impl.StorageDbFactory;
@@ -42,11 +43,7 @@ public class StringHandler {
 		if (message.children().size() > 4) {
 			expire = getExpire(message);
 		}
-
-		String keyStr = RedisMsgUtils.getString(key);
-		String valueStr = RedisMsgUtils.getString(value);
-		StorageDbFactory.getStorageDb().set(keyStr, valueStr);
-
+		StoragePorxy.set(key.content().array(), value.content().array(), expire);
 		stopwatch.end();
 		return RedisMessageFactory.buildOK();
 	}
@@ -93,8 +90,8 @@ public class StringHandler {
 		ArrayRedisMessage message = (ArrayRedisMessage) msgReq;
 		FullBulkStringRedisMessage cmd = (FullBulkStringRedisMessage) message.children().get(0);
 		FullBulkStringRedisMessage key = (FullBulkStringRedisMessage) message.children().get(1);
-		String keyStr = RedisMsgUtils.getString(key);
-		byte[] valueData = StorageDbFactory.getStorageDb().get(keyStr);
+//		String keyStr = RedisMsgUtils.getString(key);
+		byte[] valueData = StoragePorxy.get(key.content().array());
 		stopwatch.end();
 		//return RedisMessageFactory.buildOK();
 		return RedisMessageFactory.buildData(valueData);

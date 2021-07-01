@@ -11,15 +11,15 @@ import java.nio.charset.StandardCharsets;
  * @createTime 2021-06-24 18:27:00
  */
 public class StorageRocksDbImpl implements StorageDb {
-	private static final String DB_PATH = "./rocksdb-data/";
-	private static RocksDB rocksDB;
+
+	private RocksDB rocksDB;
 
 
-	public StorageRocksDbImpl() {
+	public StorageRocksDbImpl(String path) {
 		try {
 			Options options = new Options();
 			options.setCreateIfMissing(true);
-			rocksDB = RocksDB.open(options, DB_PATH);
+			rocksDB = RocksDB.open(options, path);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -56,12 +56,17 @@ public class StorageRocksDbImpl implements StorageDb {
 		return null;
 	}
 
+	@Override
+	public RocksDB getRocksDB() {
+		return rocksDB;
+	}
+
 	public static void main(String[] args) throws Exception {
 		testcache(10000, 16);
 	}
 
 	public static void testcache(int count, int dataSize) throws RocksDBException {
-		StorageRocksDbImpl storageRocksDb = new StorageRocksDbImpl();
+		StorageRocksDbImpl storageRocksDb = new StorageRocksDbImpl("./rocks_test/");
 		long cur = System.currentTimeMillis();
 		for (int i = 0; i < count; i++) {
 			storageRocksDb.set((i + "").getBytes(StandardCharsets.UTF_8), new byte[dataSize]);

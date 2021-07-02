@@ -33,12 +33,12 @@ public class GreapClientTest {
 	 */
 	public void setGetTest() throws InterruptedException {
 		String key = "111";
-		for (int i = 0 ; i < 10; i++){
-			Thread thread =  new Thread(new Runnable() {
+		for (int i = 0; i < 10; i++) {
+			Thread thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
 					GreapClient greapClient = new GreapClient(6399);
-					for (int i = 0; i < 100000000; i++){
+					for (int i = 0; i < 100000000; i++) {
 						greapClient.set(key, key, 100000);
 						greapClient.get(key);
 					}

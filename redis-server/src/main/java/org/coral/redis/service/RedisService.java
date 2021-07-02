@@ -1,25 +1,29 @@
 package org.coral.redis.service;
 
 import org.coral.redis.server.RedisServer;
-
-import javax.annotation.PostConstruct;
+import org.coral.redis.storage.expire.StorageExpireTask;
 
 /**
  * @author wuhao
  * @createTime 2021-06-25 17:24:00
  */
-//@Component
 public class RedisService {
 	private RedisServer redisServer = null;
 
-	@PostConstruct
-	public void start() {
+	public static void run(int port){
+		RedisService redisService = new RedisService();
+		redisService.startAll(port);
+	}
+	private void startAll(int port) {
+		startTcpServer(port);
+		StorageExpireTask.start();
+	}
+
+	private void startTcpServer(int port) {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					int port = 6399;
-					System.out.println("start RedisService: " + port);
 					redisServer = new RedisServer();
 					redisServer.bind(port);
 				} catch (Exception e) {
@@ -28,6 +32,10 @@ public class RedisService {
 			}
 		});
 		thread.start();
+	}
+
+	public static void main(String[] args) {
 
 	}
+
 }

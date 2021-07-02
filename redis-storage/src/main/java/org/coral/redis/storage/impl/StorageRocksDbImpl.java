@@ -1,8 +1,11 @@
 package org.coral.redis.storage.impl;
 
+import org.coral.redis.storage.FileUtils;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 
@@ -14,23 +17,21 @@ public class StorageRocksDbImpl implements StorageDb {
 
 	private RocksDB rocksDB;
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(StorageRocksDbImpl.class);
 
 	public StorageRocksDbImpl(String path) {
 		try {
+			FileUtils.checkAndCreateDir(path);
 			Options options = new Options();
 			options.setCreateIfMissing(true);
 			rocksDB = RocksDB.open(options, path);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("StorageRocksDb Create Exception:{}", path, e);
 		}
 
 	}
 
 
-	@Override
-	public void set(String key, String value) {
-		set(key.getBytes(StandardCharsets.UTF_8), value.getBytes(StandardCharsets.UTF_8));
-	}
 
 	@Override
 	public void set(byte[] key, byte[] value) {
@@ -41,10 +42,6 @@ public class StorageRocksDbImpl implements StorageDb {
 		}
 	}
 
-	@Override
-	public byte[] get(String key) {
-		return get(key.getBytes(StandardCharsets.UTF_8));
-	}
 
 	@Override
 	public byte[] get(byte[] key) {
@@ -61,21 +58,5 @@ public class StorageRocksDbImpl implements StorageDb {
 		return rocksDB;
 	}
 
-	public static void main(String[] args) throws Exception {
-		testcache(10000, 16);
-	}
 
-	public static void testcache(int count, int dataSize) throws RocksDBException {
-		StorageRocksDbImpl storageRocksDb = new StorageRocksDbImpl("./rocks_test/");
-		long cur = System.currentTimeMillis();
-		for (int i = 0; i < count; i++) {
-			storageRocksDb.set((i + "").getBytes(StandardCharsets.UTF_8), new byte[dataSize]);
-		}
-		System.out.println("set " + (System.currentTimeMillis() - cur));
-		cur = System.currentTimeMillis();
-		for (int i = 0; i < count; i++) {
-			storageRocksDb.get(i + "");
-		}
-		System.out.println("get " + (System.currentTimeMillis() - cur));
-	}
 }

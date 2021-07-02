@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2011 北京新媒传信科技有限公司
  */
-package org.coral.redis.perfmon;
+package org.coral.redis.client;
 
 import org.helium.perfmon.PerformanceCounterFactory;
 import org.helium.perfmon.PerformanceCounterType;
@@ -20,26 +20,14 @@ import org.helium.perfmon.annotation.PerformanceCounterCategory;
  * <p>
  * wuhao
  */
-@PerformanceCounterCategory(PerfmonCounters.INSTANCE)
-public class PerfmonCounters {
-	public static final String INSTANCE = "redis";
+@PerformanceCounterCategory("tendis")
+public class TendisPerfmonCounters {
 	@PerformanceCounter(name = "tx", type = PerformanceCounterType.TRANSACTION)
 	private SmartCounter tx;
 
-//	@PerformanceCounter(name = "qps", type = PerformanceCounterType.QPS)
-//	private SmartCounter qps;
-
-//	public SmartCounter getQps() {
-//		return qps;
-//	}
 
 	public SmartCounter getTx() {
 		return tx;
-	}
-
-	public static PerfmonCounters getInstance() {
-		PerfmonCounters perfmonCounters = PerformanceCounterFactory.getCounters(PerfmonCounters.class, INSTANCE);
-		return perfmonCounters;
 	}
 
 }

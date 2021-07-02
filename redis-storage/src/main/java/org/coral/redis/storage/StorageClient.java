@@ -9,7 +9,7 @@ import java.util.Map;
  * @author wuhao
  * @createTime 2021-06-24 14:41:00
  */
-public interface StorageClient{
+public interface StorageClient {
 
 	void copy(String srcKey, String dstKey, int db, boolean replace);
 
@@ -397,6 +397,7 @@ public interface StorageClient{
 
 	/**
 	 * Used for BITFIELD Redis command
+	 *
 	 * @param key
 	 * @param arguments
 	 */
@@ -406,6 +407,7 @@ public interface StorageClient{
 
 	/**
 	 * Used for HSTRLEN Redis command
+	 *
 	 * @param key
 	 * @param field
 	 */
@@ -495,9 +497,9 @@ public interface StorageClient{
 	void xautoclaimJustId(String key, String group, String consumerName,
 						  long minIdleTime, StreamEntryID start, XAutoClaimParams params);
 
-	void xinfoStream (String key);
+	void xinfoStream(String key);
 
-	void xinfoGroup (String key);
+	void xinfoGroup(String key);
 
-	void xinfoConsumers (String key, String group);
+	void xinfoConsumers(String key, String group);
 }

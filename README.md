@@ -14,18 +14,18 @@ pong | OK  |
 ## 2.模块
 
 * redis-client
-    
-    redis client    
+
+  redis client
 
 * redis-common
-    
-    common
+
+  common
 
 * redis-server
-    
-    netty redis encoder
-    
+
+  netty redis encoder
+
 * redis-storage
-    
-    rocksdb 
+
+  rocksdb 
 

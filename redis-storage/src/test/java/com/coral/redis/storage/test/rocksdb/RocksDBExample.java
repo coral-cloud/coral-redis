@@ -1,4 +1,4 @@
-package org.coral.redis.test;
+package com.coral.redis.storage.test.rocksdb;
 
 import org.rocksdb.*;
 

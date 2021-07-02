@@ -1,10 +1,11 @@
-package org.coral.redis.server;
+package org.coral.redis.storage;
 
 import org.coral.redis.storage.impl.StorageDbFactory;
 
 public class StoragePorxy {
 	/**
 	 * 设置过期处理
+	 *
 	 * @param key
 	 * @param content
 	 * @param expire
@@ -12,7 +13,7 @@ public class StoragePorxy {
 	 */
 	public static boolean set(byte[] key, byte content[], long expire) {
 		//设置过期
-		if (expire > 0){
+		if (expire > 0) {
 			StorageDbFactory.getExpireDb().set(key,
 					String.valueOf(expire * 1000 + System.currentTimeMillis()).getBytes());
 		}
@@ -22,11 +23,10 @@ public class StoragePorxy {
 	}
 
 	/**
-	 *
 	 * @param key
 	 * @return
 	 */
-	public static byte[] get(byte[] key){
+	public static byte[] get(byte[] key) {
 		return StorageDbFactory.getStorageDb().get(key);
 	}
 }

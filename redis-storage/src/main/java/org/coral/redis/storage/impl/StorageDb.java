@@ -8,11 +8,8 @@ import org.rocksdb.RocksDB;
  */
 public interface StorageDb {
 
-	void set(String key, String value);
 
 	void set(byte[] key, byte[] value);
-
-	byte[] get(String key);
 
 	byte[] get(byte[] key);
 

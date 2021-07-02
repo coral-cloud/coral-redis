@@ -8,7 +8,7 @@ import java.util.Map;
  * @author wuhao
  * @createTime 2021-06-24 18:25:00
  */
-public class StorageClientImpl implements StorageClient{
+public class StorageClientImpl implements StorageClient {
 	@Override
 	public void copy(String srcKey, String dstKey, int db, boolean replace) {
 

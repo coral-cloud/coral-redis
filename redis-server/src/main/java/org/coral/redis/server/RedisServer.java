@@ -57,7 +57,7 @@ public class RedisServer {
 			// 启动server，绑定端口，开始接收进来的连接，设置8088为启动的端口号，同时启动方式为同步
 			ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
 
-			System.out.println("server start " + port);
+			System.out.println("redis server started " + port);
 			// 监听关闭的channel，等待服务器 socket 关闭 。设置位同步方式
 			channelFuture.channel().closeFuture().sync();
 		} finally {
@@ -65,11 +65,6 @@ public class RedisServer {
 			bossGroup.shutdownGracefully();
 			workerGroup.shutdownGracefully();
 		}
-	}
-
-	public static void main(String[] args) throws Exception {
-		int port = 6399;
-		new RedisServer().bind(port);
 	}
 
 }

@@ -26,7 +26,11 @@ public class RedisMessageFactory {
 		return redisMessage;
 	}
 
+
 	public static RedisMessage buildData(byte[] data) {
+		if (data == null){
+			return FullBulkStringRedisMessage.NULL_INSTANCE;
+		}
 		ByteBuf byteBuf = Unpooled.buffer(data.length);
 		byteBuf.writeBytes(data);
 		RedisMessage redisMessage = new FullBulkStringRedisMessage(byteBuf);

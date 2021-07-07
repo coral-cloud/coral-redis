@@ -1,4 +1,4 @@
-package com.coral.redis.storage.test;
+package org.coral.redis.storage.test;
 
 import org.coral.redis.storage.FileUtils;
 import org.junit.jupiter.api.Test;

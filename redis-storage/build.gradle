@@ -2,4 +2,6 @@ dependencies {
   implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4j_version
   implementation group: 'org.rocksdb', name: 'rocksdbjni', version: '6.20.3'
   implementation group: 'io.netty', name: 'netty-all', version: '4.1.65.Final'
+  compile 'io.protostuff:protostuff-core:1.5.9'
+  compile 'io.protostuff:protostuff-runtime:1.5.9'
 }

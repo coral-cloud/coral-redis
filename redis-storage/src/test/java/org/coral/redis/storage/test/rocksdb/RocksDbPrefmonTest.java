@@ -1,4 +1,4 @@
-package com.coral.redis.storage.test.rocksdb;
+package org.coral.redis.storage.test.rocksdb;
 
 import org.coral.redis.storage.impl.StorageRocksDbImpl;
 import org.rocksdb.RocksDBException;

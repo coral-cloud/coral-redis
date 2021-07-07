@@ -1,4 +1,4 @@
-package com.coral.redis.storage.test;
+package org.coral.redis.storage.test;
 
 import org.coral.redis.storage.StoragePorxy;
 import org.coral.redis.storage.expire.StorageExpireTask;

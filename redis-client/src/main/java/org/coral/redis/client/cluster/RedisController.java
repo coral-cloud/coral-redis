@@ -1,5 +1,6 @@
-package org.coral.redis.client;
+package org.coral.redis.client.cluster;
 
+import org.coral.redis.client.TestRedisExec;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;

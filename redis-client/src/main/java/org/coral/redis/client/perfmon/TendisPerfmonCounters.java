@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2011 北京新媒传信科技有限公司
  */
-package org.coral.redis.client;
+package org.coral.redis.client.perfmon;
 
 import org.helium.perfmon.PerformanceCounterFactory;
 import org.helium.perfmon.PerformanceCounterType;
@@ -28,6 +28,11 @@ public class TendisPerfmonCounters {
 
 	public SmartCounter getTx() {
 		return tx;
+	}
+
+	public static TendisPerfmonCounters getInstance(String operator) {
+		TendisPerfmonCounters perfmonCounters = PerformanceCounterFactory.getCounters(TendisPerfmonCounters.class, operator);
+		return perfmonCounters;
 	}
 
 }

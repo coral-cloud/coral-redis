@@ -1,4 +1,4 @@
-rootProject.name = 'coral-redis'
+rootProject.name = 'cpredis'
 //helium-common
 include 'redis-common'
 include 'redis-storage'

@@ -1,5 +1,6 @@
-package org.coral.redis.client;
+package org.coral.redis.client.cluster;
 
+import org.coral.redis.client.perfmon.RedisPerfmonCounters;
 import org.helium.perfmon.PerformanceCounterFactory;
 import org.helium.perfmon.Stopwatch;
 import redis.clients.jedis.HostAndPort;

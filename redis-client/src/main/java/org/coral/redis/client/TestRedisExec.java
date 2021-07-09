@@ -1,5 +1,7 @@
 package org.coral.redis.client;
 
+import org.coral.redis.client.cluster.RedisClusterUtils;
+
 import java.nio.charset.StandardCharsets;
 
 /**

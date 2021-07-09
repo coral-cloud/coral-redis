@@ -6,7 +6,7 @@ package org.coral.redis.storage.entity;
  * @createTime 2021/07/07 23:27:00
  */
 
-public interface RData {
+public interface StorageData {
 	/**
 	 * 创建更新时间
 	 * @return
@@ -17,14 +17,24 @@ public interface RData {
 	 * 当前版本号
 	 * @return
 	 */
-	int getVersion();
+	default int getVersion() {
+		return 0;
+	};
 
 	/**
 	 * 是否过期
 	 *
 	 * @return
 	 */
-	boolean isExpire();
+	default boolean isExpire(){
+		if (getTime() == 0){
+			return false;
+		}
+		if (getTime() < System.currentTimeMillis()){
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * 返回数据实际内容
@@ -39,4 +49,7 @@ public interface RData {
 	 * @return
 	 */
 	byte[] getBytes();
+
+	StorageType getRType();
+
 }

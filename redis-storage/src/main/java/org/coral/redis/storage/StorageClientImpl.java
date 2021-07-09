@@ -3,12 +3,27 @@ package org.coral.redis.storage;
 import org.coral.redis.storage.params.*;
 
 import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author wuhao
  * @createTime 2021-06-24 18:25:00
  */
 public class StorageClientImpl implements StorageClient {
+	private static int LOCK_NUMBER = 128;
+	private static ReadWriteLock[] LOCKS = new ReadWriteLock[LOCK_NUMBER];
+
+	static {
+		for (int i = 0; i < LOCK_NUMBER; i++) {
+			LOCKS[i] = new ReentrantReadWriteLock();
+		}
+	}
+
+	public static ReadWriteLock getLock(String value) {
+		return LOCKS[Math.abs(value.hashCode() % LOCK_NUMBER)];
+	}
+
 	@Override
 	public void copy(String srcKey, String dstKey, int db, boolean replace) {
 
@@ -19,10 +34,6 @@ public class StorageClientImpl implements StorageClient {
 
 	}
 
-	@Override
-	public void ping(String message) {
-
-	}
 
 	@Override
 	public void set(String key, String value) {

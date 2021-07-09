@@ -11,21 +11,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TendisController {
 	boolean sign = false;
-
-	@GetMapping("/tendis/start")
-	public void sendTest(@RequestParam int count, @RequestParam int tcount) {
-		if (sign) {
-			return;
-		}
-		sign = true;
-		TestRedisExec redisExec = new TestRedisExec();
-		redisExec.testRedis(tcount, count, "tendis:", false);
-
-
-	}
-
-	@GetMapping("/tendis/stop")
-	public void stop() {
-		sign = false;
-	}
+//
+//	@GetMapping("/tendis/start")
+//	public void sendTest(@RequestParam int count, @RequestParam int tcount) {
+//		if (sign) {
+//			return;
+//		}
+//		sign = true;
+//		TestRedisExec redisExec = new TestRedisExec();
+//		redisExec.testRedis(tcount, count, "tendis:", false);
+//
+//
+//	}
+//
+//	@GetMapping("/tendis/stop")
+//	public void stop() {
+//		sign = false;
+//	}
 }

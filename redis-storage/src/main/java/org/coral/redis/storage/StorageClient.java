@@ -15,7 +15,6 @@ public interface StorageClient {
 
 	void copy(String srcKey, String dstKey, boolean replace);
 
-	void ping(String message);
 
 	void set(String key, String value);
 

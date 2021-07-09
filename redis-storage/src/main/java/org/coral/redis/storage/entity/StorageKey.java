@@ -6,7 +6,7 @@ package org.coral.redis.storage.entity;
  * @createTime 2021/07/07 23:26:00
  */
 
-public interface RKey {
+public interface StorageKey {
 	/**
 	 * 返回key值
 	 *

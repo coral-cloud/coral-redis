@@ -1,6 +1,6 @@
 package org.coral.redis.storage.test;
 
-import org.coral.redis.storage.StoragePorxy;
+import org.coral.redis.storage.StorageProxyString;
 import org.coral.redis.storage.expire.RcpStorageExpireTask;
 import org.junit.jupiter.api.Test;
 
@@ -15,17 +15,34 @@ public class StorageProxyTest {
 		storageProxyTest.testExpire();
 	}
 	@Test
+	public void testSetGet() throws InterruptedException {
+		Thread thread = new Thread(new RcpStorageExpireTask());
+		thread.start();
+		byte[] key = "testKey".getBytes(StandardCharsets.UTF_8);
+		byte[] value = "testValue".getBytes(StandardCharsets.UTF_8);
+		byte[] valueNull = null;
+		StorageProxyString.set(key, value, 2);
+		byte[] valueRet = StorageProxyString.get(key);
+		if (valueRet != null){
+			System.out.println(new String(valueRet));
+		}
+		assertArrayEquals(value, valueRet);
+	}
+	@Test
 	public void testExpire() throws InterruptedException {
 		Thread thread = new Thread(new RcpStorageExpireTask());
 		thread.start();
 		byte[] key = "testKey".getBytes(StandardCharsets.UTF_8);
 		byte[] value = "testValue".getBytes(StandardCharsets.UTF_8);
 		byte[] valueNull = null;
-		StoragePorxy.set(key, value, 3);
-		byte[] valueRet = StoragePorxy.get(key);
+		StorageProxyString.set(key, value, 2);
+		byte[] valueRet = StorageProxyString.get(key);
+		if (valueRet != null){
+			System.out.println(new String(valueRet));
+		}
 		assertArrayEquals(value, valueRet);
-		Thread.sleep(6000);
-		valueRet = StoragePorxy.get(key);
+		Thread.sleep(3000);
+		valueRet = StorageProxyString.get(key);
 		assertArrayEquals(valueNull, valueRet);
 	}
 }

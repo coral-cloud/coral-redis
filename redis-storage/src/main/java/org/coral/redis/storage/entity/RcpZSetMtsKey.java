@@ -16,18 +16,32 @@ public class RcpZSetMtsKey implements RcpKey {
 		this.version = version;
 		this.member = member;
 	}
+
 	@Override
 	public byte[] getKey() {
 		return key;
+	}
+
+	public void setKey(byte[] key) {
+		this.key = key;
 	}
 
 	public long getVersion() {
 		return version;
 	}
 
+	public void setVersion(long version) {
+		this.version = version;
+	}
+
 	public byte[] getMember() {
 		return member;
 	}
+
+	public void setMember(byte[] member) {
+		this.member = member;
+	}
+
 
 	public static RcpZSetMtsKey build(byte[] key, long version, byte[] member) {
 		return new RcpZSetMtsKey(key, version, member);

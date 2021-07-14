@@ -6,9 +6,8 @@ import io.netty.handler.codec.redis.RedisMessage;
 import org.coral.redis.perfmon.PerfmonCounters;
 import org.coral.redis.server.CommandSign;
 import org.coral.redis.server.RedisMessageFactory;
-import org.coral.redis.storage.StoragePorxy;
+import org.coral.redis.storage.StorageProxyString;
 import org.coral.redis.uils.RedisMsgUtils;
-import org.helium.perfmon.PerformanceCounterFactory;
 import org.helium.perfmon.Stopwatch;
 
 import java.nio.charset.StandardCharsets;
@@ -46,7 +45,7 @@ public class StringHandler {
 		}
 		String keyStr = RedisMsgUtils.getString(key);
 		String valueStr = RedisMsgUtils.getString(value);
-		StoragePorxy.set(keyStr.getBytes(StandardCharsets.UTF_8),
+		StorageProxyString.set(keyStr.getBytes(StandardCharsets.UTF_8),
 				valueStr.getBytes(StandardCharsets.UTF_8), expire);
 		stopwatch.end();
 		return RedisMessageFactory.buildOK();
@@ -95,7 +94,7 @@ public class StringHandler {
 		FullBulkStringRedisMessage cmd = (FullBulkStringRedisMessage) message.children().get(0);
 		FullBulkStringRedisMessage key = (FullBulkStringRedisMessage) message.children().get(1);
 		String keyStr = RedisMsgUtils.getString(key);
-		byte[] valueData = StoragePorxy.get(keyStr.getBytes(StandardCharsets.UTF_8));
+		byte[] valueData = StorageProxyString.get(keyStr.getBytes(StandardCharsets.UTF_8));
 		stopwatch.end();
 		return RedisMessageFactory.buildData(valueData);
 	}

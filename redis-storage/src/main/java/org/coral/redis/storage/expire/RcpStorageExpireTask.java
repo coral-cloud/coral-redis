@@ -65,7 +65,7 @@ public class RcpStorageExpireTask implements Runnable {
 			case STRING:
 				RcpStringKey rcpStringKey = RcpStringKey.build(rcpKey.getKey());
 				if (StorageClientString.getInstance().get(rcpStringKey) != null) {
-					StorageClientExpire.getInstance().delete(rcpStringKey);
+					StorageClientString.getInstance().delete(rcpStringKey);
 				}
 				break;
 			case ZSET:

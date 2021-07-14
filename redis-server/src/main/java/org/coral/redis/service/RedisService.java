@@ -34,8 +34,5 @@ public class RedisService {
 		thread.start();
 	}
 
-	public static void main(String[] args) {
-
-	}
 
 }

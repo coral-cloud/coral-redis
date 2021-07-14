@@ -37,7 +37,7 @@ public class StorageClientString extends StorageClient {
 		Stopwatch stopwatch = StorageCounters.getInstance("set-string").getTx().begin();
 		try {
 			RocksDB rocksDB = StorageDbFactory.getExpireDb().getRocksDB();
-			rocksDB.put(rcpStringRow.getRcpStringKey().getBytes(), rcpStringRow.getRcpStringData().getBytes());
+			rocksDB.put(rcpStringRow.getRcpStringKey().getKey(), rcpStringRow.getRcpStringData().getBytes());
 			stopwatch.end();
 		} catch (Exception e) {
 			LOGGER.error("set exception:{}", rcpStringRow.getRcpStringKey().getKeyString());

@@ -85,18 +85,18 @@ public class RcpZSetRow implements RcpRow{
 	 * @param version
 	 * @return
 	 */
-	public static List<RcpZSetRow> build(byte[] key, Map<Long, byte[]> zMap, long time, long version){
+	public static List<RcpZSetRow> build(byte[] key, Map<byte[], Double> zMap, long time, long version){
 		List<RcpZSetRow> rcpZSetRows = new ArrayList<>(zMap.size());
 		RcpZSetRow zSetRow = null;
 		RcpMetaKey rcpMetaKey = RcpMetaKey.build(key);
 		RcpMetaData rcpMetaData = RcpMetaData.build(time, version);
-		for (Map.Entry<Long, byte[]> mapEntry: zMap.entrySet()){
+		for (Map.Entry<byte[], Double> mapEntry: zMap.entrySet()){
 			zSetRow = new RcpZSetRow();
 			zSetRow.setRcpMetaData(rcpMetaData);
 			zSetRow.setRcpMetaKey(rcpMetaKey);
-			zSetRow.setRcpZSetMtsKey(RcpZSetMtsKey.build(key, version, mapEntry.getValue()));
-			zSetRow.setRcpZSetMtsData(RcpZSetMtsData.build(mapEntry.getKey()));
-			zSetRow.setRcpZSetStmKey(RcpZSetStmKey.build(key, version, mapEntry.getKey(), mapEntry.getValue()));
+			zSetRow.setRcpZSetMtsKey(RcpZSetMtsKey.build(key, version, mapEntry.getKey()));
+			zSetRow.setRcpZSetMtsData(RcpZSetMtsData.build(mapEntry.getValue()));
+			zSetRow.setRcpZSetStmKey(RcpZSetStmKey.build(key, version, mapEntry.getValue(), mapEntry.getKey()));
 			zSetRow.setRcpZSetStmData(RcpZSetStmData.build());
 		}
 		return rcpZSetRows;

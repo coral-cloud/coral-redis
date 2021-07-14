@@ -1,5 +1,7 @@
 package org.coral.redis.storage.entity;
 
+import org.coral.redis.storage.entity.type.RcpType;
+
 /**
  * RcpStringRow
  * 包含 rcpKey rcpData
@@ -32,9 +34,9 @@ public class RcpExpireRow implements RcpRow{
 		this.rcpExpireData = rcpExpireData;
 	}
 
-	public static RcpExpireRow build(byte[] keys, byte[] content, long time){
+	public static RcpExpireRow build(byte[] keys, long time, RcpType rcpType){
 		RcpExpireKey rcpKey = RcpExpireKey.build(keys);
-		RcpExpireData rcpData = RcpExpireData.build(time, content);
+		RcpExpireData rcpData = RcpExpireData.build(time, rcpType);
 		return new RcpExpireRow(rcpKey, rcpData);
 	}
 }

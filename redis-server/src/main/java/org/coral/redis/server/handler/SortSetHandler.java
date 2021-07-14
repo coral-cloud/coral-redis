@@ -6,16 +6,12 @@ import io.netty.handler.codec.redis.RedisMessage;
 import org.coral.redis.perfmon.PerfmonCounters;
 import org.coral.redis.server.CommandSign;
 import org.coral.redis.server.RedisMessageFactory;
-import org.coral.redis.storage.StoragePorxy;
-import org.coral.redis.storage.impl.StorageDbFactory;
+import org.coral.redis.storage.StorageProxyString;
 import org.coral.redis.uils.RedisMsgUtils;
-import org.helium.perfmon.PerformanceCounterFactory;
 import org.helium.perfmon.Stopwatch;
-import org.rocksdb.RocksDB;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.TreeMap;
 
 /**
  * @author wuhao
@@ -44,7 +40,7 @@ public class SortSetHandler {
 		FullBulkStringRedisMessage cmd = (FullBulkStringRedisMessage) message.children().get(0);
 		FullBulkStringRedisMessage keyMsg = (FullBulkStringRedisMessage) message.children().get(1);
 		String keyStr = RedisMsgUtils.getString(keyMsg);
-		RocksDB rocksDB = StorageDbFactory.getStorageDb().getRocksDB();
+		//RocksDB rocksDB = StorageDbFactory.getStorageDb().getRocksDB();
 		HashMap<Long, String> hashMap = new HashMap<>(48);
 		for (int i = 2; i < message.children().size(); i = i + 2){
 			FullBulkStringRedisMessage scoreMsg = (FullBulkStringRedisMessage) message.children().get(i);
@@ -59,7 +55,7 @@ public class SortSetHandler {
 		if (message.children().size() > 4) {
 			expire = getExpire(message);
 		}
-//		StoragePorxy.set(keyStr.getBytes(StandardCharsets.UTF_8),
+//		StorageProxyString.set(keyStr.getBytes(StandardCharsets.UTF_8),
 //				valueStr.getBytes(StandardCharsets.UTF_8), expire);
 		stopwatch.end();
 		return RedisMessageFactory.buildOK();
@@ -108,7 +104,7 @@ public class SortSetHandler {
 		FullBulkStringRedisMessage cmd = (FullBulkStringRedisMessage) message.children().get(0);
 		FullBulkStringRedisMessage key = (FullBulkStringRedisMessage) message.children().get(1);
 		String keyStr = RedisMsgUtils.getString(key);
-		byte[] valueData = StoragePorxy.get(keyStr.getBytes(StandardCharsets.UTF_8));
+		byte[] valueData = StorageProxyString.get(keyStr.getBytes(StandardCharsets.UTF_8));
 		stopwatch.end();
 		return RedisMessageFactory.buildData(valueData);
 	}

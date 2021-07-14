@@ -1,6 +1,6 @@
 package org.coral.redis.storage.test.rocksdb;
 
-import org.coral.redis.storage.impl.StorageRocksDbImpl;
+import org.coral.redis.storage.StorageProxyString;
 import org.rocksdb.RocksDBException;
 
 import java.nio.charset.StandardCharsets;
@@ -11,20 +11,20 @@ import java.nio.charset.StandardCharsets;
  */
 public class RocksDbPrefmonTest {
 	public static void main(String[] args) throws Exception {
-		//testcache(10000, 16);
+		testcache(1000000, 16);
 	}
 
-//	public static void testcache(int count, int dataSize) throws RocksDBException {
-//		StorageRocksDbImpl storageRocksDb = new StorageRocksDbImpl("./rocks_test/");
-//		long cur = System.currentTimeMillis();
-//		for (int i = 0; i < count; i++) {
-//			storageRocksDb.set((i + "").getBytes(StandardCharsets.UTF_8), new byte[dataSize]);
-//		}
-//		System.out.println("set " + (System.currentTimeMillis() - cur));
-//		cur = System.currentTimeMillis();
-//		for (int i = 0; i < count; i++) {
-//			storageRocksDb.get((i + "").getBytes(StandardCharsets.UTF_8));
-//		}
-//		System.out.println("get " + (System.currentTimeMillis() - cur));
-//	}
+	public static void testcache(int count, int dataSize) throws RocksDBException {
+
+		long cur = System.currentTimeMillis();
+		for (int i = 0; i < count; i++) {
+			StorageProxyString.set((i + "").getBytes(StandardCharsets.UTF_8), new byte[dataSize], 0);
+		}
+		System.out.println("set " + (System.currentTimeMillis() - cur));
+		cur = System.currentTimeMillis();
+		for (int i = 0; i < count; i++) {
+			StorageProxyString.get((i + "").getBytes(StandardCharsets.UTF_8));
+		}
+		System.out.println("get " + (System.currentTimeMillis() - cur));
+	}
 }

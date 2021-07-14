@@ -8,9 +8,9 @@ package org.coral.redis.storage.entity;
  */
 public class RcpZSetMtsData implements RcpData {
 	private long time;
-	private long score;
+	private double score;
 
-	public RcpZSetMtsData(long score) {
+	public RcpZSetMtsData(double score) {
 		this.score = score;
 	}
 
@@ -29,15 +29,15 @@ public class RcpZSetMtsData implements RcpData {
 		return 0;
 	}
 
-	public long getScore() {
+	public double getScore() {
 		return score;
 	}
 
-	public void setScore(long score) {
+	public void setScore(double score) {
 		this.score = score;
 	}
 
-	public static RcpZSetMtsData build(long score) {
+	public static RcpZSetMtsData build(double score) {
 		RcpZSetMtsData rcpZSetMtsData = new RcpZSetMtsData(score);
 		return rcpZSetMtsData;
 	}

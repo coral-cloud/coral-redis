@@ -9,10 +9,10 @@ package org.coral.redis.storage.entity;
 public class RcpZSetStmKey implements RcpKey {
 	private byte[] key;
 	private long version;
-	private long score;
+	private double score;
 	private byte[] member;
 
-	public RcpZSetStmKey(byte[] key, long version, long score, byte[] member) {
+	public RcpZSetStmKey(byte[] key, long version, double score, byte[] member) {
 		this.key = key;
 		this.version = version;
 		this.score = score;
@@ -24,19 +24,35 @@ public class RcpZSetStmKey implements RcpKey {
 		return key;
 	}
 
+	public void setKey(byte[] key) {
+		this.key = key;
+	}
+
 	public long getVersion() {
 		return version;
 	}
 
-	public long getScore() {
+	public void setVersion(long version) {
+		this.version = version;
+	}
+
+	public double getScore() {
 		return score;
+	}
+
+	public void setScore(double score) {
+		this.score = score;
 	}
 
 	public byte[] getMember() {
 		return member;
 	}
 
-	public static RcpZSetStmKey build(byte[] key, long version, long score, byte[] member) {
+	public void setMember(byte[] member) {
+		this.member = member;
+	}
+
+	public static RcpZSetStmKey build(byte[] key, long version, double score, byte[] member) {
 		return new RcpZSetStmKey(key, version, score, member);
 	}
 }

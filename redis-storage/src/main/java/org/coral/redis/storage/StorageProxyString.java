@@ -4,8 +4,9 @@ import org.coral.redis.storage.entity.RcpExpireRow;
 import org.coral.redis.storage.entity.RcpStringData;
 import org.coral.redis.storage.entity.RcpStringKey;
 import org.coral.redis.storage.entity.RcpStringRow;
+import org.coral.redis.storage.entity.type.RcpType;
 
-public class StoragePorxy {
+public class StorageProxyString {
 	/**
 	 * 设置过期处理
 	 *
@@ -17,7 +18,7 @@ public class StoragePorxy {
 	public static boolean set(byte[] key, byte content[], long expire) {
 		//设置过期
 		if (expire > 0) {
-			RcpExpireRow expireRow = RcpExpireRow.build(key, content, expire);
+			RcpExpireRow expireRow = RcpExpireRow.build(key, expire, RcpType.STRING);
 			StorageClientExpire.getInstance().set(expireRow);
 		}
 		//设置存储

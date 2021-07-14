@@ -17,6 +17,7 @@ import java.util.List;
  */
 public class StorageClientZSet extends StorageClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StorageClientZSet.class);
+
 	private static class StorageClientStringInit {
 		private static StorageClientZSet DB = new StorageClientZSet();
 	}
@@ -24,29 +25,35 @@ public class StorageClientZSet extends StorageClient {
 	public static StorageClientZSet getInstance() {
 		return StorageClientZSet.StorageClientStringInit.DB;
 	}
+
 	/**
 	 * set
 	 *
 	 * @param rcpZSetRow
 	 * @return
 	 */
-	public boolean zadd(RcpZSetRow rcpZSetRow){
+	public boolean zadd(RcpZSetRow rcpZSetRow) {
 		Stopwatch stopwatch = StorageCounters.getInstance("zset-zadd").getTx().begin();
 		try {
 			RocksDB rocksDB = StorageDbFactory.getZSetDb().getRocksDB();
 			RcpMetaKey rcpMetaKey = rcpZSetRow.getRcpMetaKey();
 			RcpMetaData rcpMetaData = rcpZSetRow.getRcpMetaData();
-			if (rocksDB.get(rcpZSetRow.getRcpMetaKey().getKey()) != null){
-
+			byte[] contentMeta = rocksDB.get(rcpMetaKey.getKey());
+			if (contentMeta != null) {
+				rcpMetaData = (RcpMetaData) ObjectUtils.toObject(contentMeta, RcpMetaData.class);
 			}
-			if (rocksDB.get(rcpZSetRow.getRcpZSetMtsKey().getKey()) != null){
-
+			byte[] contentScore = rocksDB.get(rcpZSetRow.getRcpZSetMtsKey().getKey());
+			if (contentScore == null) {
+				rcpMetaData.setSize(rcpMetaData.getSize() + 1);
 			}
-			//rocksDB.put(rcpZSetRow.getRcpMetaKey().getBytes(), rcpStringRow.getRcpStringData().getBytes());
+			//meta
+			rocksDB.put(rcpMetaKey.getKey(), rcpMetaData.getBytes());
+			rocksDB.put(rcpZSetRow.getRcpZSetMtsKey().getKey(), rcpZSetRow.getRcpZSetMtsData().getBytes());
+			rocksDB.put(rcpZSetRow.getRcpZSetStmKey().getKey(), rcpZSetRow.getRcpZSetStmData().getBytes());
 			stopwatch.end();
 		} catch (Exception e) {
-			//LOGGER.error("set exception:{}", rcpStringRow.getRcpStringKey().getKeyString());
-			//stopwatch.fail(e.getMessage());
+			LOGGER.error("set exception:{}", rcpZSetRow.getRcpMetaKey().getKeyString());
+			stopwatch.fail(e.getMessage());
 			return false;
 		}
 
@@ -56,31 +63,27 @@ public class StorageClientZSet extends StorageClient {
 	/**
 	 * get
 	 *
-	 * @param rcpStringKey
+	 * @param rcpMetaKey
 	 * @return
 	 */
-	public RcpStringData zrange(RcpStringKey rcpStringKey){
+	public RcpZSetRow zrange(RcpMetaKey rcpMetaKey, long start, long stop) {
 		Stopwatch stopwatch = StorageCounters.getInstance("get-string").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getExpireDb().getRocksDB();
-			byte[] content = rocksDB.get(rcpStringKey.getKey());
+			RocksDB rocksDB = StorageDbFactory.getZSetDb().getRocksDB();
+			byte[] content = rocksDB.get(rcpMetaKey.getKey());
 			if (content == null) {
 				stopwatch.end();
 				return null;
 			}
-			RcpStringData rcpStringData = (RcpStringData) ObjectUtils.toObject(content, RcpStringData.class);
-			stopwatch.end();
-			//快速过期
-			if (rcpStringData.isExpire()){
-				return null;
-			}
-			return rcpStringData;
+			//rocksDB.
+			return null;
 		} catch (Exception e) {
-			LOGGER.error("set exception:{}", rcpStringKey.getKeyString());
+			LOGGER.error("set exception:{}", rcpMetaKey.getKeyString());
 			stopwatch.fail(e.getMessage());
 		}
 		return null;
 	}
+
 	/**
 	 * get
 	 *

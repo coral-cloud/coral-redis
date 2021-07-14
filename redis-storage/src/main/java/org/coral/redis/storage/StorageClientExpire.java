@@ -37,7 +37,7 @@ public class StorageClientExpire extends StorageClient {
 		Stopwatch stopwatch = StorageCounters.getInstance("set-expire").getTx().begin();
 		try {
 			RocksDB rocksDB = StorageDbFactory.getExpireDb().getRocksDB();
-			rocksDB.put(rcpRow.getRcpExpireKey().getBytes(), rcpRow.getRcpExpireData().getBytes());
+			rocksDB.put(rcpRow.getRcpExpireKey().getKey(), rcpRow.getRcpExpireData().getBytes());
 			stopwatch.end();
 		} catch (Exception e) {
 			LOGGER.error("set exception:{}", rcpRow.getRcpExpireKey().getKeyString());
@@ -78,7 +78,7 @@ public class StorageClientExpire extends StorageClient {
 	 * @param rcpKey
 	 * @return
 	 */
-	public void delete(RcpStringKey rcpKey) {
+	public void delete(RcpExpireKey rcpKey) {
 		Stopwatch stopwatch = StorageCounters.getInstance("delete-expire").getTx().begin();
 		try {
 			RocksDB rocksDB = StorageDbFactory.getExpireDb().getRocksDB();

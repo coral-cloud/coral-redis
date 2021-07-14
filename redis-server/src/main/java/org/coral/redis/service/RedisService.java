@@ -1,7 +1,7 @@
 package org.coral.redis.service;
 
 import org.coral.redis.server.RedisServer;
-import org.coral.redis.storage.expire.StorageExpireTask;
+import org.coral.redis.storage.expire.RcpStorageExpireTask;
 
 /**
  * @author wuhao
@@ -16,7 +16,7 @@ public class RedisService {
 	}
 	private void startAll(int port) {
 		startTcpServer(port);
-		StorageExpireTask.start();
+		RcpStorageExpireTask.start();
 	}
 
 	private void startTcpServer(int port) {

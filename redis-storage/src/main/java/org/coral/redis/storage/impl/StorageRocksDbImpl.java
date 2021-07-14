@@ -31,28 +31,6 @@ public class StorageRocksDbImpl implements StorageDb {
 
 	}
 
-
-
-	@Override
-	public void set(byte[] key, byte[] value) {
-		try {
-			rocksDB.put(key, value);
-		} catch (RocksDBException e) {
-			e.printStackTrace();
-		}
-	}
-
-
-	@Override
-	public byte[] get(byte[] key) {
-		try {
-			return rocksDB.get(key);
-		} catch (RocksDBException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	@Override
 	public RocksDB getRocksDB() {
 		return rocksDB;

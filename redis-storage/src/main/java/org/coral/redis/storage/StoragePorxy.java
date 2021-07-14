@@ -1,6 +1,9 @@
 package org.coral.redis.storage;
 
-import org.coral.redis.storage.impl.StorageDbFactory;
+import org.coral.redis.storage.entity.RcpExpireRow;
+import org.coral.redis.storage.entity.RcpStringData;
+import org.coral.redis.storage.entity.RcpStringKey;
+import org.coral.redis.storage.entity.RcpStringRow;
 
 public class StoragePorxy {
 	/**
@@ -14,19 +17,26 @@ public class StoragePorxy {
 	public static boolean set(byte[] key, byte content[], long expire) {
 		//设置过期
 		if (expire > 0) {
-			StorageDbFactory.getExpireDb().set(key,
-					String.valueOf(expire * 1000 + System.currentTimeMillis()).getBytes());
+			RcpExpireRow expireRow = RcpExpireRow.build(key, content, expire);
+			StorageClientExpire.getInstance().set(expireRow);
 		}
 		//设置存储
-		StorageDbFactory.getStorageDb().set(key, content);
+		RcpStringRow rcpStringRow = RcpStringRow.build(key, content, expire);
+		StorageClientString.getInstance().set(rcpStringRow);
 		return true;
 	}
 
 	/**
+	 * 获取key
+	 *
 	 * @param key
 	 * @return
 	 */
 	public static byte[] get(byte[] key) {
-		return StorageDbFactory.getStorageDb().get(key);
+		RcpStringData rcpStringData = StorageClientString.getInstance().get(RcpStringKey.build(key));
+		if (rcpStringData == null) {
+			return null;
+		}
+		return rcpStringData.getContent();
 	}
 }

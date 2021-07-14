@@ -5,22 +5,43 @@ package org.coral.redis.storage.impl;
  * @createTime 2021-06-25 16:35:00
  */
 public class StorageDbFactory {
-	private static final String DB_PATH = "./rocksdb/data/";
+	private static final String DB_STRING_PATH = "./rocksdb/dbstring/";
+	private static final String DB_ZSET_PATH = "./rocksdb/dbzset/";
+	private static final String DB_SET_PATH = "./rocksdb/dbset/";
 	private static final String EXPIRE_PATH = "./rocksdb/expire/";
 
-	private static class StorageDbInit {
-		private static StorageDb STORAGEDB = new StorageRocksDbImpl(DB_PATH);
+	private static class DbStringInit {
+		private static StorageDb DB = new StorageRocksDbImpl(DB_STRING_PATH);
 	}
 
-	private static class StorageExpireDbInit {
-		private static StorageDb STORAGEDB = new StorageRocksDbImpl(EXPIRE_PATH);
+
+	private static class DbZSetInit {
+		private static StorageDb DB = new StorageRocksDbImpl(DB_ZSET_PATH);
 	}
 
-	public static StorageDb getStorageDb() {
-		return StorageDbInit.STORAGEDB;
+	private static class DbSetInit {
+		private static StorageDb DB = new StorageRocksDbImpl(DB_SET_PATH);
+	}
+
+
+	private static class ExpireDbInit {
+		private static StorageDb DB = new StorageRocksDbImpl(EXPIRE_PATH);
+	}
+
+	public static StorageDb getStringDb() {
+		return DbStringInit.DB;
+	}
+
+	public static StorageDb getZSetDb() {
+		return DbZSetInit.DB;
+	}
+
+	public static StorageDb getSetDb() {
+		return DbSetInit.DB;
 	}
 
 	public static StorageDb getExpireDb() {
-		return StorageExpireDbInit.STORAGEDB;
+
+		return ExpireDbInit.DB;
 	}
 }

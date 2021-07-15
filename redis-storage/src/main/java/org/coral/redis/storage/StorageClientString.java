@@ -36,7 +36,7 @@ public class StorageClientString extends StorageClient {
 	public boolean set(RcpStringRow rcpStringRow){
 		Stopwatch stopwatch = StorageCounters.getInstance("set-string").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getExpireDb().getRocksDB();
+			RocksDB rocksDB = StorageDbFactory.getStringDb().getRocksDB();
 			rocksDB.put(rcpStringRow.getRcpStringKey().getKey(), rcpStringRow.getRcpStringData().getBytes());
 			stopwatch.end();
 		} catch (Exception e) {
@@ -57,7 +57,7 @@ public class StorageClientString extends StorageClient {
 	public RcpStringData get(RcpStringKey rcpStringKey){
 		Stopwatch stopwatch = StorageCounters.getInstance("get-string").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getExpireDb().getRocksDB();
+			RocksDB rocksDB = StorageDbFactory.getStringDb().getRocksDB();
 			byte[] content = rocksDB.get(rcpStringKey.getKey());
 			if (content == null) {
 				stopwatch.end();

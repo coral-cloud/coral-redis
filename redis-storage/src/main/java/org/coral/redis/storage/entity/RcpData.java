@@ -64,7 +64,7 @@ public interface RcpData {
 	 * @return
 	 */
 	default boolean isExpire() {
-		if (getTime() == 0) {
+		if (getTime() <= 0) {
 			return false;
 		}
 		if (getTime() < System.currentTimeMillis()) {

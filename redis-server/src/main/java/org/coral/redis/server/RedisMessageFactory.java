@@ -2,9 +2,11 @@ package org.coral.redis.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.redis.FullBulkStringRedisMessage;
-import io.netty.handler.codec.redis.RedisMessage;
-import io.netty.handler.codec.redis.SimpleStringRedisMessage;
+import io.netty.handler.codec.redis.*;
+import org.coral.redis.storage.entity.RcpZSetRow;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author wuhao
@@ -26,15 +28,38 @@ public class RedisMessageFactory {
 		return redisMessage;
 	}
 
+	public static RedisMessage buildNum(int num) {
+		RedisMessage redisMessage = new IntegerRedisMessage(num);
+		return redisMessage;
+	}
+
 
 	public static RedisMessage buildData(byte[] data) {
-		if (data == null){
+		if (data == null) {
 			return FullBulkStringRedisMessage.NULL_INSTANCE;
 		}
 		ByteBuf byteBuf = Unpooled.buffer(data.length);
 		byteBuf.writeBytes(data);
 		RedisMessage redisMessage = new FullBulkStringRedisMessage(byteBuf);
 		return redisMessage;
+	}
+
+	public static ArrayRedisMessage buildArrayData(List<RcpZSetRow> rcpZSetRows) {
+		if (rcpZSetRows == null) {
+			return ArrayRedisMessage.EMPTY_INSTANCE;
+		}
+		List<RedisMessage> redisMessageList = new ArrayList<>();
+		for (RcpZSetRow rcpZSetRow : rcpZSetRows) {
+			if (rcpZSetRow.getRcpZSetStmKey() != null){
+				ByteBuf byteBuf = Unpooled.buffer(rcpZSetRow.getRcpZSetStmKey().getMember().length);
+				byteBuf.writeBytes(rcpZSetRow.getRcpZSetStmKey().getMember());
+				RedisMessage redisMessage = new FullBulkStringRedisMessage(byteBuf);
+				redisMessageList.add(redisMessage);
+			}
+
+		}
+		ArrayRedisMessage arrayRedisMessage = new ArrayRedisMessage(redisMessageList);
+		return arrayRedisMessage;
 	}
 
 	public static RedisMessage buildError() {

@@ -3,6 +3,7 @@ package org.coral.redis.server;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.redis.*;
 import org.coral.redis.server.handler.StringHandler;
+import org.coral.redis.server.handler.ZSetHandler;
 import org.coral.redis.uils.RedisMsgUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +27,13 @@ public class RedisCommandDispatcher {
 		}
 		switch (command) {
 			case CommandSign.GET:
-				return processGet(msg);
+				return StringHandler.processGet(msg);
 			case CommandSign.SET:
-				return processSet(msg);
+				return StringHandler.processSet(msg);
+			case CommandSign.ZADD:
+				return ZSetHandler.processZAdd(msg);
+			case CommandSign.ZRANGE:
+				return ZSetHandler.processZRange(msg);
 			case CommandSign.PING:
 				return RedisMessageFactory.buildPONG();
 			case CommandSign.PONG:
@@ -38,14 +43,6 @@ public class RedisCommandDispatcher {
 
 		}
 
-	}
-
-	public RedisMessage processSet(RedisMessage msg) {
-		return StringHandler.processSet(msg);
-	}
-
-	public RedisMessage processGet(RedisMessage msg) {
-		return StringHandler.processGet(msg);
 	}
 
 	/**

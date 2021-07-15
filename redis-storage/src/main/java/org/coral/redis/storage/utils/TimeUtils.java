@@ -16,9 +16,15 @@ public class TimeUtils {
 //	}
 
 	public static long getExpire(long expire) {
+		if (expire <= 0){
+			return expire;
+		}
 		return expire * SEC + System.currentTimeMillis();
 	}
 	public static long getExpireMs(long expire) {
+		if (expire <= 0){
+			return expire;
+		}
 		return expire  + System.currentTimeMillis();
 	}
 }

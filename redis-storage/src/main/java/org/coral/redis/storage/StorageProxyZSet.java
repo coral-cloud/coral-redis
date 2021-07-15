@@ -31,7 +31,7 @@ public class StorageProxyZSet {
 	 */
 	public static List<RcpZSetRow> zrange(byte[] key, int start, int stop) {
 		RcpMetaKey rcpMetaKey = RcpMetaKey.build(key);
-		StorageClientZSet.getInstance().zrange(rcpMetaKey, start, stop);
-		return null;
+		List<RcpZSetRow> rcpZSetRows = StorageClientZSet.getInstance().zrange(rcpMetaKey, start, stop);
+		return rcpZSetRows;
 	}
 }

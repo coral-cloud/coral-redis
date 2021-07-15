@@ -7,58 +7,45 @@ import org.coral.redis.perfmon.PerfmonCounters;
 import org.coral.redis.server.CommandSign;
 import org.coral.redis.server.RedisMessageFactory;
 import org.coral.redis.storage.StorageProxyString;
+import org.coral.redis.storage.StorageProxyZSet;
+import org.coral.redis.storage.entity.RcpZSetRow;
 import org.coral.redis.uils.RedisMsgUtils;
 import org.helium.perfmon.Stopwatch;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author wuhao
  * @createTime 2021-06-25 16:29:00
  */
-public class SortSetHandler {
+public class ZSetHandler {
 	public static PerfmonCounters perfmonCounters = PerfmonCounters.getInstance();
 
 	/**
-	 * *3
-	 * $3
-	 * set
-	 * $1
-	 * 1
-	 * $1
-	 * 1
-	 * +OK
+	 * processZAdd
 	 *
 	 * @param msgReq
 	 * @return
 	 */
-	public static RedisMessage processZSet(RedisMessage msgReq) {
-		Stopwatch stopwatch = perfmonCounters.getTx().begin();
+	public static RedisMessage processZAdd(RedisMessage msgReq) {
 
 		ArrayRedisMessage message = (ArrayRedisMessage) msgReq;
 		FullBulkStringRedisMessage cmd = (FullBulkStringRedisMessage) message.children().get(0);
 		FullBulkStringRedisMessage keyMsg = (FullBulkStringRedisMessage) message.children().get(1);
 		String keyStr = RedisMsgUtils.getString(keyMsg);
-		//RocksDB rocksDB = StorageDbFactory.getStorageDb().getRocksDB();
-		HashMap<Long, String> hashMap = new HashMap<>(48);
-		for (int i = 2; i < message.children().size(); i = i + 2){
+		HashMap<byte[], Double> hashMap = new HashMap<>(48);
+		for (int i = 2; i < message.children().size(); i = i + 2) {
 			FullBulkStringRedisMessage scoreMsg = (FullBulkStringRedisMessage) message.children().get(i);
-			long score = Long.parseLong(RedisMsgUtils.getString(scoreMsg));
-			FullBulkStringRedisMessage valueMsg = (FullBulkStringRedisMessage) message.children().get(i);
-			String value = RedisMsgUtils.getString(scoreMsg);
-			hashMap.put(score, value);
+			Double score = Double.parseDouble(RedisMsgUtils.getString(scoreMsg));
+			FullBulkStringRedisMessage valueMsg = (FullBulkStringRedisMessage) message.children().get(i + 1);
+			String value = RedisMsgUtils.getString(valueMsg);
+			hashMap.put(value.getBytes(), score);
 		}
+		StorageProxyZSet.zadd(keyStr.getBytes(), hashMap);
 
-		FullBulkStringRedisMessage value = (FullBulkStringRedisMessage) message.children().get(2);
-		int expire = -1;
-		if (message.children().size() > 4) {
-			expire = getExpire(message);
-		}
-//		StorageProxyString.set(keyStr.getBytes(StandardCharsets.UTF_8),
-//				valueStr.getBytes(StandardCharsets.UTF_8), expire);
-		stopwatch.end();
-		return RedisMessageFactory.buildOK();
+		return RedisMessageFactory.buildNum(hashMap.size());
 	}
 
 	public static int getExpire(ArrayRedisMessage redisMessage) {
@@ -98,14 +85,20 @@ public class SortSetHandler {
 		return false;
 	}
 
-	public static RedisMessage processGet(RedisMessage msgReq) {
+	public static RedisMessage processZRange(RedisMessage msgReq) {
 		Stopwatch stopwatch = perfmonCounters.getTx().begin();
 		ArrayRedisMessage message = (ArrayRedisMessage) msgReq;
-		FullBulkStringRedisMessage cmd = (FullBulkStringRedisMessage) message.children().get(0);
-		FullBulkStringRedisMessage key = (FullBulkStringRedisMessage) message.children().get(1);
-		String keyStr = RedisMsgUtils.getString(key);
-		byte[] valueData = StorageProxyString.get(keyStr.getBytes(StandardCharsets.UTF_8));
+		FullBulkStringRedisMessage cmdMsg = (FullBulkStringRedisMessage) message.children().get(0);
+		FullBulkStringRedisMessage keyMsg = (FullBulkStringRedisMessage) message.children().get(1);
+		FullBulkStringRedisMessage startMsg = (FullBulkStringRedisMessage) message.children().get(2);
+		FullBulkStringRedisMessage stopMsg = (FullBulkStringRedisMessage) message.children().get(3);
+		String keyStr = RedisMsgUtils.getString(keyMsg);
+		String startStr = RedisMsgUtils.getString(startMsg);
+		String stopStr = RedisMsgUtils.getString(stopMsg);
+		int start = Integer.parseInt(startStr);
+		int stop = Integer.parseInt(stopStr);
+		List<RcpZSetRow> rcpZSetRows = StorageProxyZSet.zrange(keyStr.getBytes(), start, stop);
 		stopwatch.end();
-		return RedisMessageFactory.buildData(valueData);
+		return RedisMessageFactory.buildArrayData(rcpZSetRows);
 	}
 }

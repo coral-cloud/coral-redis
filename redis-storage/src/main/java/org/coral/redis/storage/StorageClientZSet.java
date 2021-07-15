@@ -81,7 +81,7 @@ public class StorageClientZSet extends StorageClient {
 			}
 			RcpMetaData rcpMetaData = (RcpMetaData) ObjectUtils.toObject(contentMeta, RcpMetaData.class);
 			RocksIterator rocksIterator = rocksDB.newIterator();
-			RcpZSetStmKey mtsKey = RcpZSetStmKey.build(rcpMetaKey.getKey(), 0, 0, null);
+			RcpZSetStmKey stmKey = RcpZSetStmKey.build(rcpMetaKey.getKey(), 0, 0, null);
 			long stopIndex = stop;
 			int count = rcpMetaData.getSize();
 			int start_index = start >= 0 ? start : count + start;
@@ -92,10 +92,10 @@ public class StorageClientZSet extends StorageClient {
 				return list;
 			}
 			long curIndex = 0;
-			for (rocksIterator.seek(mtsKey.getKey()); rocksIterator.isValid() && curIndex <= stopIndex; ++curIndex) {
-				if (curIndex >= stopIndex) {
-					byte[] stmKey = rocksIterator.key();
-					RcpZSetStmKey rcpZSetStmKey = RcpZSetStmKey.parse(stmKey);
+			for (rocksIterator.seek(stmKey.getKey()); rocksIterator.isValid() && curIndex <= stopIndex; ++curIndex) {
+				if (curIndex >= start_index) {
+					byte[] stmKeyBytes = rocksIterator.key();
+					RcpZSetStmKey rcpZSetStmKey = RcpZSetStmKey.parse(stmKeyBytes);
 					RcpZSetStmData rcpZSetStmData = RcpZSetStmData.build();
 					RcpZSetRow rcpZSetRow = new RcpZSetRow();
 					rcpZSetRow.setRcpZSetStmKey(rcpZSetStmKey);

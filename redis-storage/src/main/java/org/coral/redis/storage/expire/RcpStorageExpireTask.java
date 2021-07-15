@@ -20,21 +20,25 @@ public class RcpStorageExpireTask implements Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
-			expireKeys();
-		}
+//		while (true) {
+//			try {
+//				expireKeys();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
 	}
 
 	/**
 	 * 定期删除过期keys
 	 */
-	public void expireKeys() {
+	public void expireKeys() throws InterruptedException {
 		try {
 			RocksIterator rocksIterator = StorageDbFactory.getExpireDb().getRocksDB().newIterator();
 			rocksIterator.seekToFirst();
 			while (rocksIterator.isValid()) {
 				byte[] expireKey = rocksIterator.key();
-				byte[] expireValue = rocksIterator.key();
+				byte[] expireValue = rocksIterator.value();
 				RcpExpireKey rcpKey = (RcpExpireKey) ObjectUtils.toObject(expireKey, RcpExpireKey.class);
 				RcpExpireData rcpData = (RcpExpireData) ObjectUtils.toObject(expireValue, RcpExpireData.class);
 				if (rcpData.isExpire()) {
@@ -50,7 +54,9 @@ public class RcpStorageExpireTask implements Runnable {
 			Thread.sleep(100);
 		} catch (Exception e) {
 			LOGGER.error("StorageExpireTask Expire Exception:{}", e.getMessage());
+
 		}
+		Thread.sleep(100);
 
 	}
 

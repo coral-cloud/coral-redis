@@ -25,7 +25,7 @@ public class RcpZSetMtsData implements RcpData {
 	}
 
 	@Override
-	public long getSize() {
+	public int getSize() {
 		return 0;
 	}
 

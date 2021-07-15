@@ -29,7 +29,7 @@ public class StorageProxyZSet {
 	 * @param start
 	 * @param stop
 	 */
-	public static List<RcpZSetRow> zrange(byte[] key, long start, long stop) {
+	public static List<RcpZSetRow> zrange(byte[] key, int start, int stop) {
 		RcpMetaKey rcpMetaKey = RcpMetaKey.build(key);
 		StorageClientZSet.getInstance().zrange(rcpMetaKey, start, stop);
 		return null;

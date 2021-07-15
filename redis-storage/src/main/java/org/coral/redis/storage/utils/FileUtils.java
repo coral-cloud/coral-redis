@@ -1,4 +1,4 @@
-package org.coral.redis.storage;
+package org.coral.redis.storage.utils;
 
 import java.io.File;
 import java.io.IOException;

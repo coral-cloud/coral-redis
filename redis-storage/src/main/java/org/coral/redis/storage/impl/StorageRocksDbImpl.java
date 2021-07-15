@@ -1,6 +1,6 @@
 package org.coral.redis.storage.impl;
 
-import org.coral.redis.storage.FileUtils;
+import org.coral.redis.storage.utils.FileUtils;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;

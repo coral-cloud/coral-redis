@@ -20,7 +20,7 @@ public class RcpZSetStmData implements RcpData {
 	}
 
 	@Override
-	public long getSize() {
+	public int getSize() {
 		return 0;
 	}
 
@@ -31,4 +31,5 @@ public class RcpZSetStmData implements RcpData {
 	public static RcpZSetStmData build(){
 		return new RcpZSetStmData();
 	}
+
 }

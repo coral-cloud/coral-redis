@@ -1,5 +1,7 @@
 package org.coral.redis.storage.entity;
 
+import org.coral.redis.storage.protostuff.ObjectUtils;
+
 /**
  * RcpZSetStmKey
  *
@@ -21,7 +23,7 @@ public class RcpZSetStmKey implements RcpKey {
 
 	@Override
 	public byte[] getKey() {
-		return key;
+		return ObjectUtils.toBytes(this);
 	}
 
 	public void setKey(byte[] key) {
@@ -54,5 +56,11 @@ public class RcpZSetStmKey implements RcpKey {
 
 	public static RcpZSetStmKey build(byte[] key, long version, double score, byte[] member) {
 		return new RcpZSetStmKey(key, version, score, member);
+	}
+	public static RcpZSetStmKey parse(byte[] content) {
+		if (content == null){
+			return null;
+		}
+		return (RcpZSetStmKey) ObjectUtils.toObject(content, RcpZSetStmKey.class);
 	}
 }

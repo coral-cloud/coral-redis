@@ -54,6 +54,10 @@ dependencies {
   compile group: 'io.github.helium-cloud', name: 'helium-logging', version: helium_version
   compile group: 'redis.clients', name: 'jedis', version: jredis_version
 
+  // https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch
+  compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.12.0'
+
+
   compile files("${System.properties['java.home']}/../lib/tools.jar")
 
 }

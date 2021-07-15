@@ -10,7 +10,7 @@ import org.coral.redis.storage.utils.TimeUtils;
  */
 public class RcpMetaData implements RcpData {
 	private long time;
-	private long size;
+	private int size;
 	private long version;
 
 	public RcpMetaData(long time, long version) {
@@ -29,12 +29,12 @@ public class RcpMetaData implements RcpData {
 	}
 
 	@Override
-	public long getSize() {
+	public int getSize() {
 		return size;
 	}
 
 	@Override
-	public void setSize(long size) {
+	public void setSize(int size) {
 		this.size = size;
 	}
 

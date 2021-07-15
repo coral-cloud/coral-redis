@@ -9,9 +9,9 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class StorageProxyTest {
+public class StorageProxyStringTest {
 	public static void main(String[] args) throws InterruptedException {
-		StorageProxyTest storageProxyTest = new StorageProxyTest();
+		StorageProxyStringTest storageProxyTest = new StorageProxyStringTest();
 		storageProxyTest.testExpire();
 	}
 	@Test
@@ -21,7 +21,7 @@ public class StorageProxyTest {
 		byte[] key = "testKey".getBytes(StandardCharsets.UTF_8);
 		byte[] value = "testValue".getBytes(StandardCharsets.UTF_8);
 		byte[] valueNull = null;
-		StorageProxyString.set(key, value, 2);
+		StorageProxyString.set(key, value, 0);
 		byte[] valueRet = StorageProxyString.get(key);
 		if (valueRet != null){
 			System.out.println(new String(valueRet));

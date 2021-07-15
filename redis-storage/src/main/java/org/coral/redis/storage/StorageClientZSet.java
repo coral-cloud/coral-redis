@@ -6,9 +6,11 @@ import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;
 import org.helium.perfmon.Stopwatch;
 import org.rocksdb.RocksDB;
+import org.rocksdb.RocksIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,27 +63,54 @@ public class StorageClientZSet extends StorageClient {
 	}
 
 	/**
-	 * get
+	 * zrange
 	 *
 	 * @param rcpMetaKey
+	 * @param start
+	 * @param stop
 	 * @return
 	 */
-	public RcpZSetRow zrange(RcpMetaKey rcpMetaKey, long start, long stop) {
+	public List<RcpZSetRow> zrange(RcpMetaKey rcpMetaKey, int start, int stop) {
 		Stopwatch stopwatch = StorageCounters.getInstance("get-string").getTx().begin();
+		List<RcpZSetRow> list = new ArrayList<>();
 		try {
 			RocksDB rocksDB = StorageDbFactory.getZSetDb().getRocksDB();
-			byte[] content = rocksDB.get(rcpMetaKey.getKey());
-			if (content == null) {
-				stopwatch.end();
-				return null;
+			byte[] contentMeta = rocksDB.get(rcpMetaKey.getKey());
+			if (contentMeta == null) {
+				return list;
 			}
-			//rocksDB.
-			return null;
+			RcpMetaData rcpMetaData = (RcpMetaData) ObjectUtils.toObject(contentMeta, RcpMetaData.class);
+			RocksIterator rocksIterator = rocksDB.newIterator();
+			RcpZSetStmKey mtsKey = RcpZSetStmKey.build(rcpMetaKey.getKey(), 0, 0, null);
+			long stopIndex = stop;
+			int count = rcpMetaData.getSize();
+			int start_index = start >= 0 ? start : count + start;
+			int stop_index = stop >= 0 ? stop : count + stop;
+			start_index = start_index <= 0 ? 0 : start_index;
+			stop_index = stop_index >= count ? count - 1 : stop_index;
+			if (start_index > stop_index || start_index >= count || stop_index < 0) {
+				return list;
+			}
+			long curIndex = 0;
+			for (rocksIterator.seek(mtsKey.getKey()); rocksIterator.isValid() && curIndex <= stopIndex; ++curIndex) {
+				if (curIndex >= stopIndex) {
+					byte[] stmKey = rocksIterator.key();
+					RcpZSetStmKey rcpZSetStmKey = RcpZSetStmKey.parse(stmKey);
+					RcpZSetStmData rcpZSetStmData = RcpZSetStmData.build();
+					RcpZSetRow rcpZSetRow = new RcpZSetRow();
+					rcpZSetRow.setRcpZSetStmKey(rcpZSetStmKey);
+					rcpZSetRow.setRcpZSetStmData(rcpZSetStmData);
+					rcpZSetRow.setRcpMetaKey(rcpMetaKey);
+					rcpZSetRow.setRcpMetaData(rcpMetaData);
+					list.add(rcpZSetRow);
+				}
+				rocksIterator.next();
+			}
 		} catch (Exception e) {
 			LOGGER.error("set exception:{}", rcpMetaKey.getKeyString());
 			stopwatch.fail(e.getMessage());
 		}
-		return null;
+		return list;
 	}
 
 	/**

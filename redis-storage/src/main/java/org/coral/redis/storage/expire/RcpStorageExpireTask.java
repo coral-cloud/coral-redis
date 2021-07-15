@@ -4,7 +4,6 @@ import org.coral.redis.storage.StorageClientExpire;
 import org.coral.redis.storage.StorageClientString;
 import org.coral.redis.storage.entity.RcpExpireData;
 import org.coral.redis.storage.entity.RcpExpireKey;
-import org.coral.redis.storage.entity.RcpStringData;
 import org.coral.redis.storage.entity.RcpStringKey;
 import org.coral.redis.storage.impl.StorageDbFactory;
 import org.coral.redis.storage.protostuff.ObjectUtils;
@@ -42,7 +41,7 @@ public class RcpStorageExpireTask implements Runnable {
 					rocksIterator.next();
 
 					LOGGER.debug("delete expire key:{} time stamp:{}", rcpKey.getKeyString(), rcpData.getTime());
-
+					deleteData(rcpKey, rcpData);
 					if (StorageClientExpire.getInstance().get(rcpKey) != null) {
 						StorageClientExpire.getInstance().delete(rcpKey);
 					}
@@ -56,12 +55,11 @@ public class RcpStorageExpireTask implements Runnable {
 	}
 
 	/**
-	 *
 	 * @param rcpKey
 	 * @param rcpExpireData
 	 */
-	public void deleteData(RcpExpireKey rcpKey, RcpExpireData rcpExpireData){
-		switch (rcpExpireData.getRcpType()){
+	public void deleteData(RcpExpireKey rcpKey, RcpExpireData rcpExpireData) {
+		switch (rcpExpireData.getRcpType()) {
 			case STRING:
 				RcpStringKey rcpStringKey = RcpStringKey.build(rcpKey.getKey());
 				if (StorageClientString.getInstance().get(rcpStringKey) != null) {
@@ -77,7 +75,6 @@ public class RcpStorageExpireTask implements Runnable {
 
 	/**
 	 * 启动清理线程
-	 *
 	 */
 	public static void start() {
 		if (runExpire.compareAndSet(true, false)) {

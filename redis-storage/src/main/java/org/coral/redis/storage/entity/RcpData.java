@@ -30,13 +30,13 @@ public interface RcpData {
 	 *
 	 * @return
 	 */
-	long getSize();
+	int getSize();
 
 	/**
 	 * setSize
 	 * @param size
 	 */
-	default void setSize(long size){
+	default void setSize(int size){
 
 	}
 

@@ -85,7 +85,7 @@ public class RcpZSetRow implements RcpRow{
 	 * @param version
 	 * @return
 	 */
-	public static List<RcpZSetRow> build(byte[] key, Map<byte[], Double> zMap, long time, long version){
+	public static List<RcpZSetRow> build(byte[] key, Map<byte[], Double> zMap, long time, int version){
 		List<RcpZSetRow> rcpZSetRows = new ArrayList<>(zMap.size());
 		RcpZSetRow zSetRow = null;
 		RcpMetaKey rcpMetaKey = RcpMetaKey.build(key);
@@ -98,6 +98,7 @@ public class RcpZSetRow implements RcpRow{
 			zSetRow.setRcpZSetMtsData(RcpZSetMtsData.build(mapEntry.getValue()));
 			zSetRow.setRcpZSetStmKey(RcpZSetStmKey.build(key, version, mapEntry.getValue(), mapEntry.getKey()));
 			zSetRow.setRcpZSetStmData(RcpZSetStmData.build());
+			rcpZSetRows.add(zSetRow);
 		}
 		return rcpZSetRows;
 	}

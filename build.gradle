@@ -57,9 +57,9 @@ subprojects { project ->
     from sourceSets.main.allJava
     classifier = 'sources'
   }
-//  test {
-//    useJUnitPlatform()
-//  }
+  test {
+    useJUnitPlatform()
+  }
   if (!(project.name in mavenPublishIgnoreList)) {
     publishing {
       repositories {

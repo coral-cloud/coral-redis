@@ -1,5 +1,14 @@
 package org.coral.redis.storage.entity;
 
+import org.coral.redis.storage.protostuff.ObjectUtils;
+import org.coral.redis.storage.utils.ByteUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 /**
  * 简单字符串
  *
@@ -7,30 +16,42 @@ package org.coral.redis.storage.entity;
  * @createTime 2021-07-09 16:09:00
  */
 public class RcpZSetMtsKey implements RcpKey {
+	private static final Logger LOGGER = LoggerFactory.getLogger(RcpZSetMtsKey.class);
 	private byte[] key;
-	private long version;
+	private int version;
 	private byte[] member;
 
-	public RcpZSetMtsKey(byte[] key, long version, byte[] member) {
+	public RcpZSetMtsKey(byte[] key, int version, byte[] member) {
 		this.key = key;
 		this.version = version;
 		this.member = member;
 	}
 
+	public static RcpZSetMtsKey build(byte[] key, int version, byte[] member) {
+		return new RcpZSetMtsKey(key, version, member);
+	}
+
+	public static RcpZSetMtsKey parse(byte[] content) {
+		if (content == null){
+			return null;
+		}
+		return (RcpZSetMtsKey) ObjectUtils.toObject(content, RcpZSetMtsKey.class);
+	}
+
 	@Override
 	public byte[] getKey() {
-		return key;
+		return ObjectUtils.toBytes(this);
 	}
 
 	public void setKey(byte[] key) {
 		this.key = key;
 	}
 
-	public long getVersion() {
+	public int getVersion() {
 		return version;
 	}
 
-	public void setVersion(long version) {
+	public void setVersion(int version) {
 		this.version = version;
 	}
 
@@ -43,9 +64,6 @@ public class RcpZSetMtsKey implements RcpKey {
 	}
 
 
-	public static RcpZSetMtsKey build(byte[] key, long version, byte[] member) {
-		return new RcpZSetMtsKey(key, version, member);
-	}
 
 
 }

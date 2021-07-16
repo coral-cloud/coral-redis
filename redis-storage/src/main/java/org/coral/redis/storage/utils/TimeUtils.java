@@ -1,7 +1,6 @@
 package org.coral.redis.storage.utils;
 
 /**
- *
  * @author wuhao
  * @createTime 2021-07-14 17:07:00
  */
@@ -16,15 +15,16 @@ public class TimeUtils {
 //	}
 
 	public static long getExpire(long expire) {
-		if (expire <= 0){
+		if (expire <= 0) {
 			return expire;
 		}
 		return expire * SEC + System.currentTimeMillis();
 	}
+
 	public static long getExpireMs(long expire) {
-		if (expire <= 0){
+		if (expire <= 0) {
 			return expire;
 		}
-		return expire  + System.currentTimeMillis();
+		return expire + System.currentTimeMillis();
 	}
 }

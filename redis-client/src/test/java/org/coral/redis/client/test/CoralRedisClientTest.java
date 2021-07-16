@@ -12,8 +12,8 @@ public class CoralRedisClientTest {
 
 	public static void main(String[] args) throws InterruptedException {
 		CoralRedisExec greapClientTest = new CoralRedisExec();
-		MonitorServer.run(8081);
-		greapClientTest.setGetTest(10, 30000000, 512);
+		//MonitorServer.run(8081);
+		greapClientTest.setGetTest(8, 10000000, 64);
 	}
 
 }

@@ -3,8 +3,6 @@ package org.coral.redis.storage.entity;
 import org.coral.redis.storage.utils.TimeUtils;
 
 /**
- *
- *
  * @author wuhao
  * @createTime 2021-07-09 16:09:00
  */
@@ -48,6 +46,7 @@ public class RcpMetaData implements RcpData {
 
 	/**
 	 * build
+	 *
 	 * @param time
 	 * @param version
 	 * @return

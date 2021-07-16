@@ -25,11 +25,11 @@ public class ObjectUtils {
 		return bytes;
 	}
 
-	public static Object toObject(byte[] bytes, Class tClass) {
+	public static <T> T toObject(byte[] bytes, Class<T> tClass) {
 		LinkedBuffer buffer = LinkedBuffer.allocate();
 		Schema schema = RuntimeSchema.getSchema(tClass);
 		Object object = schema.newMessage();
 		ProtobufIOUtil.mergeFrom(bytes, object, schema);
-		return object;
+		return (T) object;
 	}
 }

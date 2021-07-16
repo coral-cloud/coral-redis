@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.redis.*;
 import org.coral.redis.storage.entity.RcpZSetRow;
+import org.coral.redis.storage.utils.ByteUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class RedisMessageFactory {
 		return redisMessage;
 	}
 
-	public static ArrayRedisMessage buildArrayData(List<RcpZSetRow> rcpZSetRows) {
+	public static ArrayRedisMessage buildZSetArrayData(List<RcpZSetRow> rcpZSetRows, boolean withScores) {
 		if (rcpZSetRows == null) {
 			return ArrayRedisMessage.EMPTY_INSTANCE;
 		}
@@ -55,6 +56,16 @@ public class RedisMessageFactory {
 				byteBuf.writeBytes(rcpZSetRow.getRcpZSetStmKey().getMember());
 				RedisMessage redisMessage = new FullBulkStringRedisMessage(byteBuf);
 				redisMessageList.add(redisMessage);
+				if (withScores){
+					//TODO 这里好像有点问题，按理说应该是返回double，但是看抓包为整形，先强转一下吧
+					int scores = (int) rcpZSetRow.getRcpZSetStmKey().getScore();
+					byte[] scoresBytes = ByteUtils.stringToBytes(String.valueOf(scores));
+					ByteBuf byteBufScores = Unpooled.buffer(scoresBytes.length);
+					byteBufScores.writeBytes(scoresBytes);
+					RedisMessage redisMessageScores = new FullBulkStringRedisMessage(byteBufScores);
+					redisMessageList.add(redisMessageScores);
+				}
+
 			}
 
 		}

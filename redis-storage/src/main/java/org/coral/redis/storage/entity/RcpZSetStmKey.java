@@ -57,8 +57,9 @@ public class RcpZSetStmKey implements RcpKey {
 	public static RcpZSetStmKey build(byte[] key, long version, double score, byte[] member) {
 		return new RcpZSetStmKey(key, version, score, member);
 	}
+
 	public static RcpZSetStmKey parse(byte[] content) {
-		if (content == null){
+		if (content == null) {
 			return null;
 		}
 		return (RcpZSetStmKey) ObjectUtils.toObject(content, RcpZSetStmKey.class);

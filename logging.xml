@@ -1,4 +1,4 @@
-<logging level="INFO">
+<logging level="DEBUG">
   <subLevels>
     <subLevel name="com.feinno.superpojo" level="ERROR"/>
   </subLevels>

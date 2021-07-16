@@ -3,7 +3,6 @@ package org.coral.redis.storage;
 import org.coral.redis.storage.entity.RcpExpireData;
 import org.coral.redis.storage.entity.RcpExpireKey;
 import org.coral.redis.storage.entity.RcpExpireRow;
-import org.coral.redis.storage.entity.RcpStringKey;
 import org.coral.redis.storage.impl.StorageDbFactory;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;
@@ -63,7 +62,7 @@ public class StorageClientExpire extends StorageClient {
 				stopwatch.end();
 				return null;
 			}
-			RcpExpireData rcpExpireRow = (RcpExpireData) ObjectUtils.toObject(content, RcpExpireData.class);
+			RcpExpireData rcpExpireRow = ObjectUtils.toObject(content, RcpExpireData.class);
 			stopwatch.end();
 			return rcpExpireRow;
 		} catch (Exception e) {
@@ -72,6 +71,7 @@ public class StorageClientExpire extends StorageClient {
 		}
 		return null;
 	}
+
 	/**
 	 * get
 	 *

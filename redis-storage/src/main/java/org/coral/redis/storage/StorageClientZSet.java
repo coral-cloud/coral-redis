@@ -107,7 +107,7 @@ public class StorageClientZSet extends StorageClient {
 				rocksIterator.next();
 			}
 		} catch (Exception e) {
-			LOGGER.error("set exception:{}", rcpMetaKey.getKeyString());
+			LOGGER.error("zrange exception:{}", rcpMetaKey.getKeyString(), e);
 			stopwatch.fail(e.getMessage());
 		}
 		return list;

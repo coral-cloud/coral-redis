@@ -1,7 +1,5 @@
 package org.coral.redis.storage.entity;
 
-import org.coral.redis.storage.protostuff.ObjectUtils;
-
 /**
  * @author wuhao
  * @description: RKey
@@ -17,11 +15,10 @@ public interface RcpKey {
 	byte[] getKey();
 
 	/**
-	 *
 	 * @return
 	 */
-	default String getKeyString(){
-		if (getKey() == null){
+	default String getKeyString() {
+		if (getKey() == null) {
 			return "";
 		}
 		return new String(getKey());

@@ -1,13 +1,8 @@
 package org.coral.redis.storage.entity;
 
 import org.coral.redis.storage.protostuff.ObjectUtils;
-import org.coral.redis.storage.utils.ByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /**
  * 简单字符串
@@ -32,7 +27,7 @@ public class RcpZSetMtsKey implements RcpKey {
 	}
 
 	public static RcpZSetMtsKey parse(byte[] content) {
-		if (content == null){
+		if (content == null) {
 			return null;
 		}
 		return (RcpZSetMtsKey) ObjectUtils.toObject(content, RcpZSetMtsKey.class);
@@ -62,8 +57,6 @@ public class RcpZSetMtsKey implements RcpKey {
 	public void setMember(byte[] member) {
 		this.member = member;
 	}
-
-
 
 
 }

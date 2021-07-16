@@ -13,8 +13,10 @@ public class CommandSign {
 	public static final String ZRANGE = "ZRANGE";
 	public static final String LPUSH = "LPUSH";
 	public static final String LPOP = "LPOP";
-	public static final String EX = "EX";
-	public static final String PX = "PX";
-	public static final String NX = "NX";
-	public static final String XX = "XX";
+
+	public static final String P_EX = "EX";
+	public static final String P_PX = "PX";
+	public static final String P_NX = "NX";
+	public static final String P_XX = "XX";
+	public static final String P_WITHSCORES = "WITHSCORES";
 }

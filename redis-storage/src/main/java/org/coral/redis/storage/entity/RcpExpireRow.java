@@ -5,10 +5,11 @@ import org.coral.redis.storage.entity.type.RcpType;
 /**
  * RcpStringRow
  * 包含 rcpKey rcpData
+ *
  * @author wuhao
  * @createTime 2021-07-13 20:35:00
  */
-public class RcpExpireRow implements RcpRow{
+public class RcpExpireRow implements RcpRow {
 	private RcpExpireKey rcpExpireKey;
 
 	private RcpExpireData rcpExpireData;
@@ -34,7 +35,7 @@ public class RcpExpireRow implements RcpRow{
 		this.rcpExpireData = rcpExpireData;
 	}
 
-	public static RcpExpireRow build(byte[] keys, long time, RcpType rcpType){
+	public static RcpExpireRow build(byte[] keys, long time, RcpType rcpType) {
 		RcpExpireKey rcpKey = RcpExpireKey.build(keys);
 		RcpExpireData rcpData = RcpExpireData.build(time, rcpType);
 		return new RcpExpireRow(rcpKey, rcpData);

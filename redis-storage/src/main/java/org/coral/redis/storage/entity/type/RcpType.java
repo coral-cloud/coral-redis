@@ -2,7 +2,6 @@ package org.coral.redis.storage.entity.type;
 
 /**
  * @author wuhao
- *
  * @description: RcpType
  * @createTime 2021/07/07 23:27:00
  */

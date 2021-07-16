@@ -20,13 +20,13 @@ public class RcpStorageExpireTask implements Runnable {
 
 	@Override
 	public void run() {
-//		while (true) {
-//			try {
-//				expireKeys();
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
+		while (true) {
+			try {
+				expireKeys();
+			} catch (InterruptedException e) {
+				LOGGER.error("expireKeys Exception", e);
+			}
+		}
 	}
 
 	/**
@@ -39,25 +39,24 @@ public class RcpStorageExpireTask implements Runnable {
 			while (rocksIterator.isValid()) {
 				byte[] expireKey = rocksIterator.key();
 				byte[] expireValue = rocksIterator.value();
-				RcpExpireKey rcpKey = (RcpExpireKey) ObjectUtils.toObject(expireKey, RcpExpireKey.class);
-				RcpExpireData rcpData = (RcpExpireData) ObjectUtils.toObject(expireValue, RcpExpireData.class);
+				RcpExpireKey rcpKey = RcpExpireKey.build(expireKey);
+				RcpExpireData rcpData = ObjectUtils.toObject(expireValue, RcpExpireData.class);
 				if (rcpData.isExpire()) {
 					rocksIterator.next();
 
-					LOGGER.debug("delete expire key:{} time stamp:{}", rcpKey.getKeyString(), rcpData.getTime());
+					LOGGER.info("delete expire key:{} time stamp:{}", rcpKey.getKeyString(), rcpData.getTime());
 					deleteData(rcpKey, rcpData);
 					if (StorageClientExpire.getInstance().get(rcpKey) != null) {
 						StorageClientExpire.getInstance().delete(rcpKey);
 					}
 				}
 			}
-			Thread.sleep(100);
+
 		} catch (Exception e) {
 			LOGGER.error("StorageExpireTask Expire Exception:{}", e.getMessage());
-
+		} finally {
+			Thread.sleep(30000);
 		}
-		Thread.sleep(100);
-
 	}
 
 	/**
@@ -65,6 +64,9 @@ public class RcpStorageExpireTask implements Runnable {
 	 * @param rcpExpireData
 	 */
 	public void deleteData(RcpExpireKey rcpKey, RcpExpireData rcpExpireData) {
+		if (rcpExpireData.getRcpType() == null) {
+			LOGGER.warn("rcpKey expire Type not Set:{}", rcpKey);
+		}
 		switch (rcpExpireData.getRcpType()) {
 			case STRING:
 				RcpStringKey rcpStringKey = RcpStringKey.build(rcpKey.getKey());

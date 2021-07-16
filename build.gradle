@@ -9,9 +9,10 @@ buildscript {
       }
     }
     repoClosure = {
+      mavenLocal()
       mavenCentral()
       maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-      mavenLocal()
+
 
 
     }
@@ -26,7 +27,7 @@ allprojects { project ->
   project.repositories rootProject.repoClosure
 
   group = 'io.github.helium-cloud'
-  version = "1.0.0-release"
+  version = "5.0.0-$versionTail"
 }
 
 def mavenPublishIgnoreList = ['helium-sample']

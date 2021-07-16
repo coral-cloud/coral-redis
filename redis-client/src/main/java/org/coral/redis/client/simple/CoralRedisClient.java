@@ -3,6 +3,7 @@ package org.coral.redis.client.simple;
 import org.coral.redis.client.perfmon.RedisPerfmonCounters;
 import org.helium.perfmon.Stopwatch;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.params.SetParams;
 
 /**
  * @author wuhao
@@ -12,13 +13,19 @@ public class CoralRedisClient {
 	private Jedis jedis = null;
 
 	public CoralRedisClient(String ip, int port) {
-		jedis = new Jedis(ip, 9221);
+		jedis = new Jedis(ip, port);
 	}
 
 	public void set(byte[] key, byte[] value, long ttl) {
 		Stopwatch stopwatch = RedisPerfmonCounters.getInstance("set").getTx().begin();
 		try {
-			jedis.setex(key, ttl, value);
+			if (ttl > 0){
+				SetParams setParams = new SetParams();
+				setParams.ex(ttl);
+				jedis.set(key, value, setParams);
+			} else {
+				jedis.set(key, value);
+			}
 			stopwatch.end();
 		} catch (Exception e) {
 			e.printStackTrace();

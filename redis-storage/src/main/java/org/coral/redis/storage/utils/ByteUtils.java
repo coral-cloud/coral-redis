@@ -1,10 +1,6 @@
 package org.coral.redis.storage.utils;
 
-import org.coral.redis.storage.entity.RcpZSetMtsKey;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author wuhao
@@ -45,34 +41,59 @@ public class ByteUtils {
 
 	}
 
-	public static RcpZSetMtsKey parseBytes(byte[] content) {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
-		inputStream.read();
-		byte[] keyLengthBytes = new byte[4];
-		System.arraycopy(content, 0, keyLengthBytes, 0, 4);
-		int keyLength = ByteUtils.byteArrayToInt(keyLengthBytes);
-		byte[] keyBytes = new byte[keyLength];
-		System.arraycopy(content, 4, keyBytes, 0, keyLength);
-		byte[] versionBytes = new byte[4];
-		System.arraycopy(content, 4 + keyLength, versionBytes, 0, 4);
-		int version = ByteUtils.byteArrayToInt(versionBytes);
-		int memberLength = content.length - 8 - keyLength;
-		byte[] memberBytes = new byte[memberLength];
-		System.arraycopy(content, content.length - memberLength, memberBytes, 0, memberLength);
-		return RcpZSetMtsKey.build(keyBytes, version, memberBytes);
-	}
-	public byte[] getBytes(){
-//		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//		try {
-//			outputStream.write(ByteUtils.intToByteArray(key.length));
-//			outputStream.write(key);
-//			outputStream.write(ByteUtils.intToByteArray(version));
-//			outputStream.write(member);
-//		} catch (IOException e) {
-//			LOGGER.error("getKey error:{} ", new String(key), e);
-//		}
-//		return outputStream.toByteArray();
-		return null;
+
+	/**
+	 * double转byte[]
+	 *
+	 * @param value
+	 * @return byte[]
+	 */
+
+	public static byte[] doubleToByteArray(double value) {
+		long bitLayoutLongValue = Double.doubleToLongBits(value);
+		byte[] bytes = new byte[8];
+		for (int i = 0; i < bytes.length; i++) {
+			bytes[i] = (byte) (bitLayoutLongValue >> (bytes.length - i - 1) * 8);
+		}
+		return bytes;
 
 	}
+
+	/**
+	 * byte[]转double
+	 *
+	 * @param bytes
+	 * @return double
+	 */
+
+	public static double byteArrayToDouble(byte[] bytes) {
+		long ff = 0xFF;
+		long bitLayoutLongValue = 0;
+		for (int i = 0; i < bytes.length; i++) {
+			bitLayoutLongValue |= (bytes[i] & ff) << (bytes.length - i - 1) * 8;
+		}
+		return Double.longBitsToDouble(bitLayoutLongValue);
+
+	}
+
+	/**
+	 * stringToBytes
+	 *
+	 * @param str
+	 * @return
+	 */
+	public static byte[] stringToBytes(String str) {
+		return str.getBytes(StandardCharsets.UTF_8);
+	}
+
+	/**
+	 * byteToString
+	 *
+	 * @param bytes
+	 * @return
+	 */
+	public static String byteToString(byte[] bytes) {
+		return new String(bytes);
+	}
+
 }

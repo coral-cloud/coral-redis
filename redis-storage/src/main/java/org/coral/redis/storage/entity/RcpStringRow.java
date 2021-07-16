@@ -3,10 +3,11 @@ package org.coral.redis.storage.entity;
 /**
  * RcpStringRow
  * 包含 rcpKey rcpData
+ *
  * @author wuhao
  * @createTime 2021-07-13 20:35:00
  */
-public class RcpStringRow implements RcpRow{
+public class RcpStringRow implements RcpRow {
 	private RcpStringKey rcpStringKey;
 
 	private RcpStringData rcpStringData;
@@ -24,7 +25,7 @@ public class RcpStringRow implements RcpRow{
 		this.rcpStringData = rcpStringData;
 	}
 
-	public static RcpStringRow build(byte[] keys, byte[] content, long time){
+	public static RcpStringRow build(byte[] keys, byte[] content, long time) {
 		RcpStringKey rcpKey = RcpStringKey.build(keys);
 		RcpStringData rcpData = RcpStringData.build(time, content);
 		return new RcpStringRow(rcpKey, rcpData);

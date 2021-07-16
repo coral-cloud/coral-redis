@@ -10,9 +10,10 @@ import java.util.UUID;
  * @createTime 2021-07-05 14:43:00
  */
 public class CoralRedisExec {
-	private String ip = "10.3.4.111";
-	private int port = 9221;
+	private String ip = "127.0.0.1";
+	private int port = 6399;
 	private int ttl = 7 * 24 * 60 * 60;
+	private boolean sign = true;
 
 	/**
 	 * @param threadNum
@@ -31,12 +32,8 @@ public class CoralRedisExec {
 					CoralRedisClient greapClient = new CoralRedisClient(getIp(), getPort());
 					for (long j = 0; j < simpleThreadCount; j++) {
 						byte[] setKey = (key + j).getBytes(StandardCharsets.UTF_8);
-						byte[] content = new byte[size];
-						for (int ss = 0; ss < setKey.length; ss++) {
-							content[ss] = setKey[ss];
-						}
-						greapClient.set(setKey, content, getTtl());
-						greapClient.get(setKey);
+						greapClient.set(setKey, setKey, getTtl());
+						//greapClient.get(setKey);
 					}
 				}
 			});
@@ -47,14 +44,19 @@ public class CoralRedisExec {
 	}
 
 	public String getIp() {
-		return getSetting("CR_RDIP", "10.3.4.111");
+		return getSetting("CR_RDIP", "127.0.0.1");
 	}
 
 	public int getPort() {
-		return Integer.parseInt(getSetting("CR_RDPORT", "9221"));
+		return Integer.parseInt(getSetting("CR_RDPORT", "6399"));
 	}
 
 	public int getTtl() {
+		if (sign){
+			ttl = Integer.parseInt(getSetting("CR_TTL", "0"));
+			sign = false;
+		}
+
 		return ttl;
 	}
 

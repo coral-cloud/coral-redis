@@ -3,11 +3,8 @@ package org.coral.redis.storage.impl;
 import org.coral.redis.storage.utils.FileUtils;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
-import org.rocksdb.RocksDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author wuhao

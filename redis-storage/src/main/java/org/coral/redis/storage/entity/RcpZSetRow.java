@@ -6,10 +6,11 @@ import java.util.Map;
 
 /**
  * 包含  RcpMeta  RcpZSetMts RcpZSetStm
+ *
  * @author wuhao
  * @createTime 2021-07-13 20:45:00
  */
-public class RcpZSetRow implements RcpRow{
+public class RcpZSetRow implements RcpRow {
 	/**
 	 * meta 信息
 	 */
@@ -85,12 +86,12 @@ public class RcpZSetRow implements RcpRow{
 	 * @param version
 	 * @return
 	 */
-	public static List<RcpZSetRow> build(byte[] key, Map<byte[], Double> zMap, long time, int version){
+	public static List<RcpZSetRow> build(byte[] key, Map<byte[], Double> zMap, long time, int version) {
 		List<RcpZSetRow> rcpZSetRows = new ArrayList<>(zMap.size());
 		RcpZSetRow zSetRow = null;
 		RcpMetaKey rcpMetaKey = RcpMetaKey.build(key);
 		RcpMetaData rcpMetaData = RcpMetaData.build(time, version);
-		for (Map.Entry<byte[], Double> mapEntry: zMap.entrySet()){
+		for (Map.Entry<byte[], Double> mapEntry : zMap.entrySet()) {
 			zSetRow = new RcpZSetRow();
 			zSetRow.setRcpMetaData(rcpMetaData);
 			zSetRow.setRcpMetaKey(rcpMetaKey);

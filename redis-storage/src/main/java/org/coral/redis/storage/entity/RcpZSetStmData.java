@@ -28,7 +28,8 @@ public class RcpZSetStmData implements RcpData {
 	public byte[] getBytes() {
 		return new byte[]{};
 	}
-	public static RcpZSetStmData build(){
+
+	public static RcpZSetStmData build() {
 		return new RcpZSetStmData();
 	}
 

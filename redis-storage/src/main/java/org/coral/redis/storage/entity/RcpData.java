@@ -34,9 +34,10 @@ public interface RcpData {
 
 	/**
 	 * setSize
+	 *
 	 * @param size
 	 */
-	default void setSize(int size){
+	default void setSize(int size) {
 
 	}
 
@@ -79,7 +80,7 @@ public interface RcpData {
 	 *
 	 * @return
 	 */
-	default byte[] getBytes(){
+	default byte[] getBytes() {
 		return ObjectUtils.toBytes(this);
 	}
 
@@ -88,7 +89,7 @@ public interface RcpData {
 	 *
 	 * @return
 	 */
-	default RcpType getRcpType(){
+	default RcpType getRcpType() {
 		return RcpType.STRING;
 	}
 

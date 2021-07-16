@@ -17,8 +17,8 @@ public class ProtostuffTest {
 		testLong();
 	}
 
-	public static void testPro(){
-		Person p = new Person("mushan",20);
+	public static void testPro() {
+		Person p = new Person("mushan", 20);
 		System.out.println("create: " + p);
 		LinkedBuffer buffer = LinkedBuffer.allocate();
 		Schema<Person> schema = RuntimeSchema.getSchema(Person.class);
@@ -26,18 +26,20 @@ public class ProtostuffTest {
 		byte[] protobuf = ProtobufIOUtil.toByteArray(p, schema, buffer);
 
 		Person person = schema.newMessage();
-		ProtobufIOUtil.mergeFrom(protobuf,person,schema);
+		ProtobufIOUtil.mergeFrom(protobuf, person, schema);
 		System.out.println("parse: " + person);
 	}
-	public static void testNew(){
-		Person p = new Person("mushan",20);
+
+	public static void testNew() {
+		Person p = new Person("mushan", 20);
 		System.out.println("create: " + p);
 
 		byte[] protobuf = ObjectUtils.toBytes(p);
 		Person person = (Person) ObjectUtils.toObject(protobuf, Person.class);
 		System.out.println("parse: " + person);
 	}
-	public static void testLong(){
+
+	public static void testLong() {
 		Long test1 = 3l;
 		System.out.println("create: " + test1);
 

@@ -1,7 +1,5 @@
 package org.coral.redis.storage.entity;
 
-import java.nio.charset.StandardCharsets;
-
 /**
  * 简单字符串
  *

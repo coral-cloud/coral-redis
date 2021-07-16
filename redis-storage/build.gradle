@@ -1,8 +1,9 @@
+
 dependencies {
-  implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4j_version
-  implementation group: 'org.rocksdb', name: 'rocksdbjni', version: '6.20.3'
-  implementation group: 'io.netty', name: 'netty-all', version: '4.1.65.Final'
+
+  implementation group: 'org.rocksdb', name: 'rocksdbjni', version: rocksdb_version
+  implementation group: 'io.netty', name: 'netty-all', version: netty_version
   implementation group: 'io.github.helium-cloud', name: 'helium-monitor', version: helium_version
-  compile 'io.protostuff:protostuff-core:1.5.9'
-  compile 'io.protostuff:protostuff-runtime:1.5.9'
+  implementation "io.protostuff:protostuff-core:${protostuff_version}"
+  implementation "io.protostuff:protostuff-runtime:${protostuff_version}"
 }

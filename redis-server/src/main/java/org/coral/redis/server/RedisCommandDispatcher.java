@@ -58,10 +58,10 @@ public class RedisCommandDispatcher {
 		} else if (msg instanceof IntegerRedisMessage) {
 			throw new CodecException("unknown message type: " + msg);
 		} else if (msg instanceof FullBulkStringRedisMessage) {
-			command = RedisMsgUtils.getString((FullBulkStringRedisMessage) msg);
+			command = RedisMsgUtils.getString(msg);
 		} else if (msg instanceof ArrayRedisMessage) {
 			ArrayRedisMessage message = (ArrayRedisMessage) msg;
-			command = RedisMsgUtils.getString((FullBulkStringRedisMessage) message.children().get(0));
+			command = RedisMsgUtils.getString(message.children().get(0));
 		} else {
 			LOGGER.warn("unknown message type:{}", msg);
 			throw new CodecException("unknown message type: " + msg);

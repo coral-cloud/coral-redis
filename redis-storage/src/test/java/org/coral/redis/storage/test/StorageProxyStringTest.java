@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StorageProxyStringTest {
 	public static void main(String[] args) throws InterruptedException {
 		StorageProxyStringTest storageProxyTest = new StorageProxyStringTest();
 		storageProxyTest.testExpire();
 	}
+
 	@Test
 	public void testSetGet() throws InterruptedException {
 		Thread thread = new Thread(new RcpStorageExpireTask());
@@ -23,11 +23,12 @@ public class StorageProxyStringTest {
 		byte[] valueNull = null;
 		StorageProxyString.set(key, value, 0);
 		byte[] valueRet = StorageProxyString.get(key);
-		if (valueRet != null){
+		if (valueRet != null) {
 			System.out.println(new String(valueRet));
 		}
 		assertArrayEquals(value, valueRet);
 	}
+
 	@Test
 	public void testExpire() throws InterruptedException {
 		Thread thread = new Thread(new RcpStorageExpireTask());
@@ -37,7 +38,7 @@ public class StorageProxyStringTest {
 		byte[] valueNull = null;
 		StorageProxyString.set(key, value, 2);
 		byte[] valueRet = StorageProxyString.get(key);
-		if (valueRet != null){
+		if (valueRet != null) {
 			System.out.println(new String(valueRet));
 		}
 		assertArrayEquals(value, valueRet);

@@ -28,7 +28,7 @@ public class RcpExpireData implements RcpData {
 
 	@Override
 	public int getSize() {
-		if (getContent() == null){
+		if (getContent() == null) {
 			return 0;
 		}
 		return getContent().length;

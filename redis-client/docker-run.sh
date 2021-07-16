@@ -29,8 +29,8 @@ docker run \
     --env CR_RDPORT="16399" \
     --env CR_THREAD="15" \
     --env CR_TESTNUM="1000000000" \
-    --env CR_TESTSIZE="45" \
+    --env CR_TESTSIZE="1024" \
     --env CR_TTL="0" \
-    10.3.4.111:5000/redis-test:5.0.0-2107161608
+    10.3.4.111:5000/redis-test:5.0.0-2107161726
 
 docker logs -f  redis-test

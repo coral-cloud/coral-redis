@@ -32,7 +32,11 @@ public class CoralRedisExec {
 					CoralRedisClient greapClient = new CoralRedisClient(getIp(), getPort());
 					for (long j = 0; j < simpleThreadCount; j++) {
 						byte[] setKey = (key + j).getBytes(StandardCharsets.UTF_8);
-						greapClient.set(setKey, setKey, getTtl());
+						byte[] content = new byte[size];
+						for (int ss = 0; ss < setKey.length; ss++) {
+							content[ss] = setKey[ss];
+						}
+						greapClient.set(setKey, content, getTtl());
 						//greapClient.get(setKey);
 					}
 				}

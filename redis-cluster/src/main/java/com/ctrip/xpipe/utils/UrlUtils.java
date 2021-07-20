@@ -2,8 +2,8 @@ package com.ctrip.xpipe.utils;
 
 /**
  * @author wenchao.meng
- *
- *         Mar 21, 2017
+ * <p>
+ * Mar 21, 2017
  */
 public class UrlUtils {
 

@@ -6,30 +6,30 @@ import com.ctrip.xpipe.redis.meta.server.crdt.master.MasterChooseCommand;
 
 public abstract class AbstractMasterChooseCommand extends AbstractCommand<RedisMeta> implements MasterChooseCommand {
 
-    protected String clusterId;
+	protected String clusterId;
 
-    protected String shardId;
+	protected String shardId;
 
-    public AbstractMasterChooseCommand(String clusterId, String shardId) {
-        this.clusterId = clusterId;
-        this.shardId = shardId;
-    }
+	public AbstractMasterChooseCommand(String clusterId, String shardId) {
+		this.clusterId = clusterId;
+		this.shardId = shardId;
+	}
 
-    @Override
-    protected void doExecute() throws Exception {
-        future().setSuccess(choose());
-    }
+	@Override
+	protected void doExecute() throws Exception {
+		future().setSuccess(choose());
+	}
 
-    protected abstract RedisMeta choose() throws Exception;
+	protected abstract RedisMeta choose() throws Exception;
 
-    @Override
-    public String getName() {
-        return getClass().getSimpleName();
-    }
+	@Override
+	public String getName() {
+		return getClass().getSimpleName();
+	}
 
-    @Override
-    protected void doReset() {
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	protected void doReset() {
+		throw new UnsupportedOperationException();
+	}
 
 }

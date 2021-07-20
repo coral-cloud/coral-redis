@@ -7,11 +7,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
-public class FixedObjectPool<T> implements SimpleObjectPool<T>{
-	
+public class FixedObjectPool<T> implements SimpleObjectPool<T> {
+
 	private AtomicReference<T> objRef = new AtomicReference<T>();
 	private Semaphore semaphore;
 	private int permits;
@@ -24,15 +24,15 @@ public class FixedObjectPool<T> implements SimpleObjectPool<T>{
 		objRef.set(obj);
 		semaphore = new Semaphore(permits);
 	}
-	
+
 
 	@Override
 	public T borrowObject() throws BorrowObjectException {
 
-		if(semaphore.tryAcquire()){
+		if (semaphore.tryAcquire()) {
 			T obj = objRef.get();
 			return obj;
-		}else{
+		} else {
 			throw new BorrowObjectException("no object left:" + permits);
 		}
 	}
@@ -41,14 +41,14 @@ public class FixedObjectPool<T> implements SimpleObjectPool<T>{
 	public void returnObject(T obj) throws ReturnObjectException {
 		semaphore.release();
 	}
-	
-	public T getObject(){
+
+	public T getObject() {
 		return objRef.get();
 	}
 
 	@Override
 	public void clear() {
-		semaphore = new Semaphore(permits);		
+		semaphore = new Semaphore(permits);
 	}
 
 	@Override

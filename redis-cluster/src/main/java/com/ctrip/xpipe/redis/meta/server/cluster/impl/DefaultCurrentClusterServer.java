@@ -22,34 +22,34 @@ import java.util.concurrent.Executor;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 25, 2016
  */
-public class DefaultCurrentClusterServer extends AbstractClusterServer implements CurrentClusterServer, TopElement{
+public class DefaultCurrentClusterServer extends AbstractClusterServer implements CurrentClusterServer, TopElement {
 
 	@Autowired
 	private ZkClient zkClient;
-	
+
 	@Autowired
 	private MetaServerConfig config;
-	
+
 	@Autowired
 	private SlotManager slotManager;
-	
+
 	@Autowired
 	private MetaserverLeaderElector metaserverLeaderElector;
-	
+
 	private int currentServerId;
-	
+
 	private String serverPath;
 
 	@Resource(name = AbstractSpringConfigContext.GLOBAL_EXECUTOR)
 	private Executor executors;
-	
+
 	private PersistentNode persistentNode;
-	
+
 	public DefaultCurrentClusterServer() {
-		
+
 	}
 
 	@Override
@@ -57,19 +57,19 @@ public class DefaultCurrentClusterServer extends AbstractClusterServer implement
 
 		this.currentServerId = config.getMetaServerId();
 		serverPath = MetaZkConfig.getMetaServerRegisterPath() + "/" + currentServerId;
-		
+
 		setServerId(currentServerId);
 		setClusterServerInfo(new ClusterServerInfo(config.getMetaServerIp(), config.getMetaServerPort()));
 	}
-	
+
 	@Override
 	protected void doStart() throws Exception {
-		
+
 		CuratorFramework client = zkClient.get();
-		
-		if(client.checkExists().forPath(serverPath) != null){ 
-			
-			byte []data = client.getData().forPath(serverPath);
+
+		if (client.checkExists().forPath(serverPath) != null) {
+
+			byte[] data = client.getData().forPath(serverPath);
 			throw new IllegalStateException("server already exist:" + new String(data));
 		}
 
@@ -105,8 +105,8 @@ public class DefaultCurrentClusterServer extends AbstractClusterServer implement
 	public void notifySlotChange(int slotId) {
 		new SlotRefreshCommand(slotId).execute(executors);
 	}
-	
-	
+
+
 	@Override
 	public CommandFuture<Void> addSlot(int slotId) {
 		return new SlotAddCommand(slotId).execute(executors);
@@ -131,46 +131,44 @@ public class DefaultCurrentClusterServer extends AbstractClusterServer implement
 	@Override
 	public Set<Integer> slots() {
 		Set<Integer> slots = slotManager.getSlotsByServerId(currentServerId);
-		if(slots == null){
+		if (slots == null) {
 			return new HashSet<>();
 		}
-		return slots; 
+		return slots;
 	}
-	
+
 	@Override
 	public boolean isLeader() {
 		return metaserverLeaderElector.amILeader();
 	}
-	
-	
-	protected boolean isExporting(Object key){
-		
+
+
+	protected boolean isExporting(Object key) {
+
 		SlotInfo slotInfo = slotManager.getSlotInfoByKey(key);
-		if(slotInfo.getSlotState() == SLOT_STATE.MOVING){
-			return true;
-		}
-		return false;
+		return slotInfo.getSlotState() == SLOT_STATE.MOVING;
 	}
-	
+
 	public void doWaitForSlotCommandsFinish() {
 		//TODO wait for slot to clean export info
 	}
 
 	@Override
 	public boolean hasKey(Object key) {
-		
+
 		Integer serverId = slotManager.getServerIdByKey(key);
-		if(serverId == null){
+		if (serverId == null) {
 			return false;
 		}
 		return serverId == this.getServerId();
 	}
 
 
-	class SlotImportCommand extends AbstractCommand<Void>{
-		
+	class SlotImportCommand extends AbstractCommand<Void> {
+
 		private int slotId;
-		public SlotImportCommand(int slotId){
+
+		public SlotImportCommand(int slotId) {
 			this.slotId = slotId;
 		}
 
@@ -181,27 +179,29 @@ public class DefaultCurrentClusterServer extends AbstractClusterServer implement
 
 		@Override
 		protected void doExecute() throws Exception {
-			
+
 			slotManager.refresh(slotId);
 			SlotInfo slotInfo = slotManager.getSlotInfo(slotId);
-			if(slotInfo.getSlotState() == SLOT_STATE.MOVING && slotInfo.getToServerId() == getServerId()){
+			if (slotInfo.getSlotState() == SLOT_STATE.MOVING && slotInfo.getToServerId() == getServerId()) {
 				logger.info("[doExecute][import({})]{}, {}", currentServerId, slotId, slotInfo);
-			}else{
+			} else {
 				throw new IllegalStateException("error import " + slotId + "," + slotInfo);
 			}
 			doSlotImport(slotId);
 			future().setSuccess();
 		}
+
 		@Override
 		protected void doReset() {
-			
+
 		}
 	}
-	
-	class SlotExportCommand extends AbstractCommand<Void>{
-		
+
+	class SlotExportCommand extends AbstractCommand<Void> {
+
 		private int slotId;
-		public SlotExportCommand(int slotId){
+
+		public SlotExportCommand(int slotId) {
 			this.slotId = slotId;
 		}
 
@@ -212,26 +212,28 @@ public class DefaultCurrentClusterServer extends AbstractClusterServer implement
 
 		@Override
 		protected void doExecute() throws Exception {
-			
+
 			slotManager.refresh(slotId);
 			SlotInfo slotInfo = slotManager.getSlotInfo(slotId);
-			if(slotInfo.getSlotState() == SLOT_STATE.MOVING && slotInfo.getServerId() == getServerId()){
+			if (slotInfo.getSlotState() == SLOT_STATE.MOVING && slotInfo.getServerId() == getServerId()) {
 				logger.info("[doExecute][export({}){}, {},{}", currentServerId, slotId, slotInfo, getServerId());
-			}else{
+			} else {
 				throw new IllegalStateException("error export " + slotId + "," + slotInfo);
 			}
 			doSlotExport(slotId);
 			future().setSuccess();
 		}
+
 		@Override
 		protected void doReset() {
-			
+
 		}
 	}
 
-	class SlotAddCommand extends AbstractCommand<Void>{
-		
+	class SlotAddCommand extends AbstractCommand<Void> {
+
 		private int slotId;
+
 		public SlotAddCommand(int slotId) {
 			this.slotId = slotId;
 		}
@@ -243,12 +245,12 @@ public class DefaultCurrentClusterServer extends AbstractClusterServer implement
 
 		@Override
 		protected void doExecute() throws Exception {
-			
+
 			slotManager.refresh(slotId);
 			SlotInfo slotInfo = slotManager.getSlotInfo(slotId);
-			if(slotInfo.getSlotState() == SLOT_STATE.NORMAL && slotInfo.getServerId() == getServerId()){
+			if (slotInfo.getSlotState() == SLOT_STATE.NORMAL && slotInfo.getServerId() == getServerId()) {
 				logger.info("[doExecute][slot add]{}, {}", slotId, slotInfo);
-			}else{
+			} else {
 				throw new IllegalStateException("error add " + slotId + "," + slotInfo);
 			}
 			doSlotAdd(slotId);
@@ -256,13 +258,14 @@ public class DefaultCurrentClusterServer extends AbstractClusterServer implement
 		}
 
 		@Override
-		protected void doReset(){
+		protected void doReset() {
 		}
-	} 
+	}
 
-	class SlotDeleteCommand extends AbstractCommand<Void>{
-		
+	class SlotDeleteCommand extends AbstractCommand<Void> {
+
 		private int slotId;
+
 		public SlotDeleteCommand(int slotId) {
 			this.slotId = slotId;
 		}
@@ -274,25 +277,27 @@ public class DefaultCurrentClusterServer extends AbstractClusterServer implement
 
 		@Override
 		protected void doExecute() throws Exception {
-			
+
 			slotManager.refresh(slotId);
 			SlotInfo slotInfo = slotManager.getSlotInfo(slotId);
-			if(slotInfo.getSlotState() == SLOT_STATE.NORMAL && slotInfo.getServerId() != getServerId()){
+			if (slotInfo.getSlotState() == SLOT_STATE.NORMAL && slotInfo.getServerId() != getServerId()) {
 				logger.info("[doExecute][slot delete]{}, {}", slotId, slotInfo);
-			}else{
+			} else {
 				throw new IllegalStateException("error delete " + slotId + "," + slotInfo);
 			}
 			doSlotDelete(slotId);
 			future().setSuccess();
 		}
-		@Override
-		protected void doReset(){
-		}
-	} 
 
-	class SlotRefreshCommand extends AbstractCommand<Void>{
-		
+		@Override
+		protected void doReset() {
+		}
+	}
+
+	class SlotRefreshCommand extends AbstractCommand<Void> {
+
 		private int slotId;
+
 		public SlotRefreshCommand(int slotId) {
 			this.slotId = slotId;
 		}
@@ -304,12 +309,13 @@ public class DefaultCurrentClusterServer extends AbstractClusterServer implement
 
 		@Override
 		protected void doExecute() throws Exception {
-			
+
 			slotManager.refresh(slotId);
 			future().setSuccess();
 		}
+
 		@Override
-		protected void doReset(){
+		protected void doReset() {
 		}
 	}
 
@@ -319,8 +325,8 @@ public class DefaultCurrentClusterServer extends AbstractClusterServer implement
 	protected void doSlotAdd(int slotId) {
 	}
 
-	protected  void doSlotExport(int slotId) {
-	} 
+	protected void doSlotExport(int slotId) {
+	}
 
 	protected void doSlotDelete(int slotId) {
 	}

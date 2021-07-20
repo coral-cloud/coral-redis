@@ -4,17 +4,16 @@ import com.ctrip.xpipe.redis.core.exception.RedisRuntimeException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 27, 2016
  */
-public class MetaException extends RedisRuntimeException{
+public class MetaException extends RedisRuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
 	public MetaException(String message) {
 		super(message);
 	}
-	
-	
+
 
 }

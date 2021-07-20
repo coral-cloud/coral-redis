@@ -14,31 +14,31 @@ import io.netty.handler.codec.MessageToByteEncoder;
  */
 public interface ProxyConfig extends TLSConfig {
 
-    int frontendTcpPort();
+	int frontendTcpPort();
 
-    int frontendTlsPort();
+	int frontendTlsPort();
 
-    long getTrafficReportIntervalMillis();
+	long getTrafficReportIntervalMillis();
 
-    int endpointHealthCheckIntervalSec();
+	int endpointHealthCheckIntervalSec();
 
-    boolean noTlsNettyHandler();
+	boolean noTlsNettyHandler();
 
-    int getFixedRecvBufferSize();
+	int getFixedRecvBufferSize();
 
-    // to avoid any connect outside internal network
-    String[] getInternalNetworkPrefix();
+	// to avoid any connect outside internal network
+	String[] getInternalNetworkPrefix();
 
-    boolean startMonitor();
+	boolean startMonitor();
 
-    int getResponseTimeout();
+	int getResponseTimeout();
 
-    boolean isCompressEnabled();
+	boolean isCompressEnabled();
 
-    CompressAlgorithm getCompressAlgorithm();
+	CompressAlgorithm getCompressAlgorithm();
 
-    ByteToMessageDecoder getCompressDecoder();
+	ByteToMessageDecoder getCompressDecoder();
 
-    MessageToByteEncoder<ByteBuf> getCompressEncoder();
+	MessageToByteEncoder<ByteBuf> getCompressEncoder();
 
 }

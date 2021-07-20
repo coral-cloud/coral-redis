@@ -9,17 +9,17 @@ import com.ctrip.xpipe.api.endpoint.Endpoint;
  */
 public interface ProxyEndpoint extends Endpoint {
 
-    boolean isSslEnabled();
+	boolean isSslEnabled();
 
-    boolean isProxyProtocolSupported();
+	boolean isProxyProtocolSupported();
 
-    String getUri();
+	String getUri();
 
-    enum PROXY_SCHEME {
-        TCP, TLS, PROXYTCP, PROXYTLS;
+	enum PROXY_SCHEME {
+		TCP, TLS, PROXYTCP, PROXYTLS;
 
-        public boolean matches(String scheme) {
-            return name().equalsIgnoreCase(scheme);
-        }
-    }
+		public boolean matches(String scheme) {
+			return name().equalsIgnoreCase(scheme);
+		}
+	}
 }

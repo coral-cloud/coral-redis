@@ -11,18 +11,18 @@ import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 17, 2016
  */
-public class SpringComponentLifecycleManager implements ApplicationContextAware, ApplicationListener<ApplicationEvent>{
+public class SpringComponentLifecycleManager implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
 
 	private Logger logger = LoggerFactory.getLogger(SpringComponentLifecycleManager.class);
 
 	private ComponentRegistry componentRegistry;
 	private static ConfigurableApplicationContext applicationContext;
-	
-	
-	public void startAll() throws Exception{
+
+
+	public void startAll() throws Exception {
 
 		componentRegistry.initialize();
 		componentRegistry.start();
@@ -30,25 +30,25 @@ public class SpringComponentLifecycleManager implements ApplicationContextAware,
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		
-		SpringComponentLifecycleManager.applicationContext = (ConfigurableApplicationContext)applicationContext;
-		componentRegistry = new SpringComponentRegistry((ConfigurableApplicationContext)applicationContext);
+
+		SpringComponentLifecycleManager.applicationContext = (ConfigurableApplicationContext) applicationContext;
+		componentRegistry = new SpringComponentRegistry((ConfigurableApplicationContext) applicationContext);
 	}
-	
-	public void stopAll() throws Exception{
+
+	public void stopAll() throws Exception {
 
 		componentRegistry.stop();
 		componentRegistry.dispose();
 	}
-	
+
 	public static ApplicationContext getApplicationContext() {
 		return applicationContext;
 	}
 
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
-		
-		if(event instanceof ContextRefreshedEvent){
+
+		if (event instanceof ContextRefreshedEvent) {
 			try {
 				logger.info("[onApplicationEvent][ContextRefreshedEvent, startAll]");
 				startAll();
@@ -56,8 +56,8 @@ public class SpringComponentLifecycleManager implements ApplicationContextAware,
 				throw new XpipeRuntimeException("[startAll][fail]", e);
 			}
 		}
-		
-		if(event instanceof ContextClosedEvent){
+
+		if (event instanceof ContextClosedEvent) {
 			try {
 				logger.info("[onApplicationEvent][ContextClosedEvent, stopAll]");
 				stopAll();

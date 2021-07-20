@@ -10,11 +10,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 13, 2016
  */
-public class DefaultKeepersMonitorManager extends AbstractKeepersMonitorManager implements KeepersMonitorManager{
-	
+public class DefaultKeepersMonitorManager extends AbstractKeepersMonitorManager implements KeepersMonitorManager {
+
 	@Autowired
 	public KeeperConfig keeperConfig;
 
@@ -22,5 +22,5 @@ public class DefaultKeepersMonitorManager extends AbstractKeepersMonitorManager 
 	protected KeeperMonitor createKeeperMonitor(RedisKeeperServer redisKeeperServer, ScheduledExecutorService scheduled) {
 		return new DefaultKeeperMonitor(redisKeeperServer, scheduled);
 	}
-	
+
 }

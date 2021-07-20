@@ -5,16 +5,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Nov 22, 2016
  */
 public class KeeperLogger {
-	
+
 	public static final String delayTraceLog = "DelayTraceLog";
-	
-	
-	public static Logger getDelayTraceLog(){
-		
+
+
+	public static Logger getDelayTraceLog() {
+
 		return LoggerFactory.getLogger(delayTraceLog);
 	}
 

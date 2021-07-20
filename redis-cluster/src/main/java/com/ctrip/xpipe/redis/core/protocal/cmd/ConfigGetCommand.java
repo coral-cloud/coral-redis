@@ -9,11 +9,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 2, 2016
  */
-public abstract class ConfigGetCommand<T> extends AbstractConfigCommand<T>{
-	
+public abstract class ConfigGetCommand<T> extends AbstractConfigCommand<T> {
+
 	public ConfigGetCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 		super(clientPool, scheduled);
 	}
@@ -26,11 +26,11 @@ public abstract class ConfigGetCommand<T> extends AbstractConfigCommand<T>{
 	public String getName() {
 		return getClass().getSimpleName();
 	}
-	
+
 	@Override
 	protected T format(Object payload) {
-		
-		return doFormat((Object[])payload);
+
+		return doFormat((Object[]) payload);
 	}
 
 	protected abstract T doFormat(Object[] payload);
@@ -39,11 +39,11 @@ public abstract class ConfigGetCommand<T> extends AbstractConfigCommand<T>{
 	public ByteBuf getRequest() {
 		return new RequestStringParser(CONFIG, " get " + getConfigName()).format();
 	}
-	
+
 	protected abstract String getConfigName();
 
 
-	public static class ConfigGetMinSlavesToWrite extends ConfigGetCommand<Integer>{
+	public static class ConfigGetMinSlavesToWrite extends ConfigGetCommand<Integer> {
 
 		public ConfigGetMinSlavesToWrite(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 			super(clientPool, scheduled);
@@ -51,11 +51,11 @@ public abstract class ConfigGetCommand<T> extends AbstractConfigCommand<T>{
 
 		@Override
 		protected Integer doFormat(Object[] payload) {
-			
-			if(payload.length < 2){
+
+			if (payload.length < 2) {
 				throw new IllegalStateException(getName() + " result length not right:" + payload.length);
 			}
-			return (Integer) payloadToInteger(payload[1]);
+			return payloadToInteger(payload[1]);
 		}
 
 
@@ -65,7 +65,7 @@ public abstract class ConfigGetCommand<T> extends AbstractConfigCommand<T>{
 		}
 	}
 
-	public static class ConfigGetDisklessSync extends ConfigGetCommand<Boolean>{
+	public static class ConfigGetDisklessSync extends ConfigGetCommand<Boolean> {
 
 		public ConfigGetDisklessSync(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 			super(clientPool, scheduled);
@@ -78,15 +78,15 @@ public abstract class ConfigGetCommand<T> extends AbstractConfigCommand<T>{
 
 		@Override
 		protected Boolean doFormat(Object[] payload) {
-			
-			if(payload.length < 2){
+
+			if (payload.length < 2) {
 				throw new IllegalStateException(getName() + " result length not right:" + payload.length);
 			}
 			String result = payloadToString(payload[1]);
-			if(result.equalsIgnoreCase("yes")){
+			if (result.equalsIgnoreCase("yes")) {
 				return true;
 			}
-			if(result.equalsIgnoreCase("no")){
+			if (result.equalsIgnoreCase("no")) {
 				return false;
 			}
 			throw new IllegalStateException("expected yes or no, but:" + result);
@@ -99,7 +99,7 @@ public abstract class ConfigGetCommand<T> extends AbstractConfigCommand<T>{
 		}
 	}
 
-	public static class ConfigGetDisklessSyncDelay extends ConfigGetCommand<Integer>{
+	public static class ConfigGetDisklessSyncDelay extends ConfigGetCommand<Integer> {
 
 		public ConfigGetDisklessSyncDelay(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 			super(clientPool, scheduled);
@@ -107,8 +107,8 @@ public abstract class ConfigGetCommand<T> extends AbstractConfigCommand<T>{
 
 		@Override
 		protected Integer doFormat(Object[] payload) {
-			
-			if(payload.length < 2){
+
+			if (payload.length < 2) {
 				throw new IllegalStateException(getName() + " result length not right:" + payload.length);
 			}
 			return payloadToInteger(payload[1]);

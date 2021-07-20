@@ -11,14 +11,15 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * just move slots to the dest
- * @author wenchao.meng
  *
+ * @author wenchao.meng
+ * <p>
  * Jul 27, 2016
  */
-public abstract class AbstractDirectMoveSharding extends AbstractResharding{
+public abstract class AbstractDirectMoveSharding extends AbstractResharding {
 
 	public AbstractDirectMoveSharding(ExecutorService executors, SlotManager slotManager, ClusterServers<?> servers,
-			ZkClient zkClient) {
+									  ZkClient zkClient) {
 		super(executors, slotManager, servers, zkClient);
 	}
 
@@ -26,43 +27,43 @@ public abstract class AbstractDirectMoveSharding extends AbstractResharding{
 		super(slotManager, servers, zkClient);
 	}
 
-	
+
 	@Override
 	protected void doShardingTask() throws ShardingException {
-		
+
 		List<Integer> slots = getSlotsToArrange();
-		
+
 		List<ClusterServer> aliveServers = allAliveServers();
 		logger.info("[doExecute][aliveServers]{}", aliveServers);
-		if(aliveServers.size() == 0){
+		if (aliveServers.size() == 0) {
 			logger.info("[doExecute][no aliveServers]{}");
 			future().setSuccess(null);
 			return;
 		}
 
 		int aliveTotal = getAliveTotal(aliveServers);
-		
-		int average = (aliveTotal + slots.size())/aliveServers.size();
-		
+
+		int average = (aliveTotal + slots.size()) / aliveServers.size();
+
 		int slotIndex = 0;
-		
-		for(ClusterServer alive : aliveServers){
-			
+
+		for (ClusterServer alive : aliveServers) {
+
 			int currentServerSlotsSize = slotManager.getSlotsSizeByServerId(alive.getServerId());
-			for(int i=0 ; i<average - currentServerSlotsSize ; i++){
+			for (int i = 0; i < average - currentServerSlotsSize; i++) {
 				executeTask(new MoveSlotFromDeadOrEmpty(slots.get(slotIndex), getDeadServer(), alive, zkClient));
 				slotIndex++;
 			}
 		}
-		
+
 		int aliveServerIndex = 0;
-		for(;slotIndex < slots.size(); slotIndex++){
+		for (; slotIndex < slots.size(); slotIndex++) {
 			executeTask(
-					new MoveSlotFromDeadOrEmpty(slots.get(slotIndex), 
-							getDeadServer(), 
-							aliveServers.get(aliveServerIndex++%aliveServers.size()), 
+					new MoveSlotFromDeadOrEmpty(slots.get(slotIndex),
+							getDeadServer(),
+							aliveServers.get(aliveServerIndex++ % aliveServers.size()),
 							zkClient)
-				);
+			);
 		}
 	}
 

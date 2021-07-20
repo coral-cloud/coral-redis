@@ -9,11 +9,11 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 26, 2016
  */
-public class DefaultDumpedRdbStore extends DefaultRdbStore implements DumpedRdbStore{
-	
+public class DefaultDumpedRdbStore extends DefaultRdbStore implements DumpedRdbStore {
+
 	public DefaultDumpedRdbStore(File file) throws IOException {
 		super(file, -1, null);
 	}
@@ -23,7 +23,7 @@ public class DefaultDumpedRdbStore extends DefaultRdbStore implements DumpedRdbS
 		return this.eofType;
 	}
 
-	
+
 	@Override
 	public void setEofType(EofType eofType) {
 		this.eofType = eofType;
@@ -35,7 +35,7 @@ public class DefaultDumpedRdbStore extends DefaultRdbStore implements DumpedRdbS
 	}
 
 	@Override
-	public void setRdbOffset(long rdbOffset){
+	public void setRdbOffset(long rdbOffset) {
 		this.rdbOffset = rdbOffset;
 	}
 }

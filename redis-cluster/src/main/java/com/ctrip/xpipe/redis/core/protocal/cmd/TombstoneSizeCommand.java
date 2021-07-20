@@ -9,23 +9,23 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class TombstoneSizeCommand extends AbstractRedisCommand<Long> {
 
-    public TombstoneSizeCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
-        super(clientPool, scheduled, commandTimeoutMilli);
-    }
+	public TombstoneSizeCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
+		super(clientPool, scheduled, commandTimeoutMilli);
+	}
 
-    protected Long format(Object payload) {
-        return payloadToLong(payload);
-    }
+	protected Long format(Object payload) {
+		return payloadToLong(payload);
+	}
 
-    @Override
-    public String getName() {
-        return "TOMBSTONESIZE";
-    }
+	@Override
+	public String getName() {
+		return "TOMBSTONESIZE";
+	}
 
-    @Override
-    public ByteBuf getRequest() {
-        RequestStringParser requestString = new RequestStringParser(getName());
-        return requestString.format();
-    }
+	@Override
+	public ByteBuf getRequest() {
+		RequestStringParser requestString = new RequestStringParser(getName());
+		return requestString.format();
+	}
 
 }

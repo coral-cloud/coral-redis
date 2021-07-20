@@ -9,23 +9,23 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 7, 2016
  */
 public interface MetaUpdateOperation {
 
 	boolean updateKeeperActive(String dc, String clusterId, String shardId, KeeperMeta activeKeeper);
-	
+
 	boolean noneKeeperActive(String currentDc, String clusterId, String shardId);
-	
+
 	boolean updateRedisMaster(String dc, String clusterId, String shardId, RedisMeta redisMaster);
-	
+
 	void update(DcMeta dcMeta);
 
 	void update(String dcId, ClusterMeta clusterMeta);
-	
+
 	ClusterMeta removeCluster(String currentDc, String clusterId);
-	
+
 	void setSurviveKeepers(String dcId, String clusterId, String shardId, List<KeeperMeta> surviceKeepers);
 
 }

@@ -13,9 +13,9 @@ import com.ctrip.xpipe.redis.proxy.monitor.stats.SocketStats;
  */
 public interface SessionMonitor extends Startable, Stoppable {
 
-    SessionStats getSessionStats();
+	SessionStats getSessionStats();
 
-    OutboundBufferMonitor getOutboundBufferMonitor();
+	OutboundBufferMonitor getOutboundBufferMonitor();
 
-    SocketStats getSocketStats();
+	SocketStats getSocketStats();
 }

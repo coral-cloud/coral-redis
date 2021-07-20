@@ -7,38 +7,36 @@ import org.springframework.web.client.ResourceAccessException;
 
 /**
  * @author shyin
- *         <p>
- *         Sep 20, 2016
+ * <p>
+ * Sep 20, 2016
  */
 public class RestOperationsRetryPolicy extends AbstractRetryPolicy implements RetryPolicy {
 
-    private int retryInterval;
+	private int retryInterval;
 
-    public RestOperationsRetryPolicy() {
-        this(5);
-    }
+	public RestOperationsRetryPolicy() {
+		this(5);
+	}
 
-    public RestOperationsRetryPolicy(int retryInterval) {
-        this.retryInterval = retryInterval;
-    }
+	public RestOperationsRetryPolicy(int retryInterval) {
+		this.retryInterval = retryInterval;
+	}
 
-    @Override
-    public boolean retry(Throwable e) {
-        if (e instanceof ResourceAccessException) {
-            return true;
-        }
-        if (e instanceof HttpServerErrorException) {
-            HttpStatus statusCode = ((HttpServerErrorException) e).getStatusCode();
-            if (statusCode == HttpStatus.BAD_GATEWAY) {
-                return true;
-            }
-        }
-        return false;
-    }
+	@Override
+	public boolean retry(Throwable e) {
+		if (e instanceof ResourceAccessException) {
+			return true;
+		}
+		if (e instanceof HttpServerErrorException) {
+			HttpStatus statusCode = ((HttpServerErrorException) e).getStatusCode();
+			return statusCode == HttpStatus.BAD_GATEWAY;
+		}
+		return false;
+	}
 
-    @Override
-    protected int getSleepTime(int currentRetryTime) {
-        return (retryInterval <= 0) ? 0 : retryInterval;
-    }
+	@Override
+	protected int getSleepTime(int currentRetryTime) {
+		return (retryInterval <= 0) ? 0 : retryInterval;
+	}
 
 }

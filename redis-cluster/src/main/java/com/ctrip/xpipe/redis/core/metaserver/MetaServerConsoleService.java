@@ -9,32 +9,33 @@ import com.ctrip.xpipe.redis.core.protocal.pojo.MasterInfo;
 
 /**
  * used for console
- * @author wenchao.meng
  *
+ * @author wenchao.meng
+ * <p>
  * Aug 2, 2016
  */
-public interface MetaServerConsoleService extends MetaServerService{
-	
-	
+public interface MetaServerConsoleService extends MetaServerService {
+
+
 	void clusterAdded(String clusterId, ClusterMeta clusterMeta);
 
 	void clusterModified(String clusterId, ClusterMeta clusterMeta);
 
 	void clusterDeleted(String clusterId);
-	
+
 	/**
 	 * @param clusterId
 	 * @param shardId
 	 * @param primaryDc
-	 * @return 
-	 * 0 : success
-	 * 1 : already 
+	 * @return 0 : success
+	 * 1 : already
 	 * other : fail
 	 */
 	PrimaryDcCheckMessage changePrimaryDcCheck(String clusterId, String shardId, String newPrimaryDc);
-	
+
 	/**
 	 * just try
+	 *
 	 * @param clusterId
 	 * @param shardId
 	 * @param readOnly  true mark as read only, false writable
@@ -44,6 +45,7 @@ public interface MetaServerConsoleService extends MetaServerService{
 	/**
 	 * for new primary: promote redis, sync to redis<br/>
 	 * for others: sync to new primary dc's active keeper
+	 *
 	 * @param clusterId
 	 * @param shardId
 	 * @param newPrimaryDc
@@ -54,15 +56,15 @@ public interface MetaServerConsoleService extends MetaServerService{
 	RedisMeta getCurrentMaster(String clusterId, String shardId);
 
 	DcMeta getDynamicInfo();
-	
-	public static enum PRIMARY_DC_CHECK_RESULT{
-		
+
+	enum PRIMARY_DC_CHECK_RESULT {
+
 		SUCCESS,
 		PRIMARY_DC_ALREADY_IS_NEW,
 		FAIL
 	}
 
-	public static class PreviousPrimaryDcMessage{
+	class PreviousPrimaryDcMessage {
 
 		private HostPort masterAddr;
 
@@ -70,10 +72,10 @@ public interface MetaServerConsoleService extends MetaServerService{
 
 		private String message;
 
-		public PreviousPrimaryDcMessage(){
+		public PreviousPrimaryDcMessage() {
 		}
 
-		public PreviousPrimaryDcMessage(HostPort masterAddr, MasterInfo masterInfo, String message){
+		public PreviousPrimaryDcMessage(HostPort masterAddr, MasterInfo masterInfo, String message) {
 			this.masterAddr = masterAddr;
 			this.masterInfo = masterInfo;
 			this.message = message;
@@ -109,10 +111,11 @@ public interface MetaServerConsoleService extends MetaServerService{
 		}
 	}
 
-	
-	public static class PrimaryDcCheckMessage extends ErrorMessage<PRIMARY_DC_CHECK_RESULT>{
-		
-		public PrimaryDcCheckMessage(){}
+
+	class PrimaryDcCheckMessage extends ErrorMessage<PRIMARY_DC_CHECK_RESULT> {
+
+		public PrimaryDcCheckMessage() {
+		}
 
 		public PrimaryDcCheckMessage(PRIMARY_DC_CHECK_RESULT errorType, String errorMessage) {
 			super(errorType, errorMessage);
@@ -122,27 +125,27 @@ public interface MetaServerConsoleService extends MetaServerService{
 			super(errorType, null);
 		}
 	}
-	
-	public static enum PRIMARY_DC_CHANGE_RESULT{
-		
+
+	enum PRIMARY_DC_CHANGE_RESULT {
+
 		SUCCESS,
 		FAIL
 	}
 
-	public static class PrimaryDcChangeRequest {
+	class PrimaryDcChangeRequest {
 
 		private MasterInfo masterInfo;
 
-		public PrimaryDcChangeRequest(){
+		public PrimaryDcChangeRequest() {
 		}
 
-		public PrimaryDcChangeRequest(PreviousPrimaryDcMessage previousPrimaryDcMessage){
-			if(previousPrimaryDcMessage != null){
+		public PrimaryDcChangeRequest(PreviousPrimaryDcMessage previousPrimaryDcMessage) {
+			if (previousPrimaryDcMessage != null) {
 				this.masterInfo = previousPrimaryDcMessage.getMasterInfo();
 			}
 		}
 
-		public PrimaryDcChangeRequest(MasterInfo masterInfo){
+		public PrimaryDcChangeRequest(MasterInfo masterInfo) {
 			this.masterInfo = masterInfo;
 		}
 
@@ -160,40 +163,41 @@ public interface MetaServerConsoleService extends MetaServerService{
 		}
 	}
 
-	public static class PrimaryDcChangeMessage extends ErrorMessage<PRIMARY_DC_CHANGE_RESULT>{
-		
+	class PrimaryDcChangeMessage extends ErrorMessage<PRIMARY_DC_CHANGE_RESULT> {
+
 		private String newMasterIp;
-		
+
 		private int newMasterPort;
-		
-		public PrimaryDcChangeMessage(){}
+
+		public PrimaryDcChangeMessage() {
+		}
 
 		public PrimaryDcChangeMessage(PRIMARY_DC_CHANGE_RESULT errorType, String errorMessage) {
 			super(errorType, errorMessage);
 		}
-		
-		public PrimaryDcChangeMessage(String message, String newMasterIp, int newMasterPort){
+
+		public PrimaryDcChangeMessage(String message, String newMasterIp, int newMasterPort) {
 			super(PRIMARY_DC_CHANGE_RESULT.SUCCESS, message);
 			this.newMasterIp = newMasterIp;
 			this.newMasterPort = newMasterPort;
 		}
-		
+
 		public PrimaryDcChangeMessage(PRIMARY_DC_CHANGE_RESULT errorType) {
 			super(errorType, null);
 		}
-		
+
 		public String getNewMasterIp() {
 			return newMasterIp;
 		}
-		
+
 		public int getNewMasterPort() {
 			return newMasterPort;
 		}
-		
+
 		@Override
 		public String toString() {
-			
-			if(getErrorType() == PRIMARY_DC_CHANGE_RESULT.SUCCESS){
+
+			if (getErrorType() == PRIMARY_DC_CHANGE_RESULT.SUCCESS) {
 				return String.format("code:%s, newmaster:%s:%d, message:%s", getErrorType(), newMasterIp, newMasterPort, getErrorMessage());
 			}
 			return super.toString();

@@ -11,42 +11,42 @@ import io.netty.buffer.ByteBuf;
  */
 public class SessionClosing extends AbstractSessionState {
 
-    public SessionClosing(Session session) {
-        super(session);
-    }
+	public SessionClosing(Session session) {
+		super(session);
+	}
 
-    @Override
-    protected SessionState doNextAfterSuccess() {
-        return new SessionClosed(session);
-    }
+	@Override
+	protected SessionState doNextAfterSuccess() {
+		return new SessionClosed(session);
+	}
 
-    @Override
-    protected SessionState doNextAfterFail() {
-        return this;
-    }
+	@Override
+	protected SessionState doNextAfterFail() {
+		return this;
+	}
 
-    @Override
-    public void tryWrite(ByteBuf byteBuf) {
-        throw new UnsupportedOperationException("No write, Session closing");
-    }
+	@Override
+	public void tryWrite(ByteBuf byteBuf) {
+		throw new UnsupportedOperationException("No write, Session closing");
+	}
 
-    @Override
-    public String name() {
-        return "Session-Closing";
-    }
+	@Override
+	public String name() {
+		return "Session-Closing";
+	}
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 }

@@ -11,12 +11,12 @@ import io.netty.buffer.ByteBuf;
  */
 public interface ProxyProtocolParser {
 
-    ByteBuf format();
+	ByteBuf format();
 
-    <T extends ProxyProtocol> T read(String protocol);
+	<T extends ProxyProtocol> T read(String protocol);
 
-    <T extends ProxyProtocol> T read(ByteBuf byteBuf);
+	<T extends ProxyProtocol> T read(ByteBuf byteBuf);
 
-    ProxyOptionParser getProxyOptionParser(PROXY_OPTION option);
+	ProxyOptionParser getProxyOptionParser(PROXY_OPTION option);
 
 }

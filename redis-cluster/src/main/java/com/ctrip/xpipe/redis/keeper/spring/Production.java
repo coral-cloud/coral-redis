@@ -21,49 +21,49 @@ import org.springframework.context.annotation.Profile;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 22, 2016
  */
 @Configuration
 @Profile(AbstractProfile.PROFILE_NAME_PRODUCTION)
-public class Production extends AbstractProfile{
+public class Production extends AbstractProfile {
 
 	@Bean
 	public ZkClient getZkClient(KeeperConfig keeperConfig) {
 		return getZkClient(keeperConfig.getZkNameSpace(), keeperConfig.getZkConnectionString());
 	}
-	
+
 	@Bean
-	public KeeperContainerConfig getKeeperContainerConfig(){
+	public KeeperContainerConfig getKeeperContainerConfig() {
 		return new DefaultKeeperContainerConfig();
 	}
 
 	@Bean
-	public KeeperConfig getKeeperConfig(){
+	public KeeperConfig getKeeperConfig() {
 		return new DefaultKeeperConfig();
 	}
-	
+
 	@Bean
-	public KeepersMonitorManager getKeeperMonitorManager(){
+	public KeepersMonitorManager getKeeperMonitorManager() {
 		return new DefaultKeepersMonitorManager();
 	}
 
 	@Bean
 	public MetaServerKeeperService getMetaServerKeeperService(KeeperConfig keeperConfig) {
-		return new DefaultMetaServerKeeperService(()->keeperConfig.getMetaServerAddress());
+		return new DefaultMetaServerKeeperService(() -> keeperConfig.getMetaServerAddress());
 	}
 
 	@Bean
 	public KeeperResourceManager getKeeperResourceManager(LeakyBucket leakyBucket) {
-		ProxyEndpointManager endpointManager = new DefaultProxyEndpointManager(()->2);
+		ProxyEndpointManager endpointManager = new DefaultProxyEndpointManager(() -> 2);
 		NextHopAlgorithm algorithm = new NaiveNextHopAlgorithm();
 		return new DefaultKeeperResourceManager(endpointManager, algorithm, leakyBucket);
 	}
 
 	@Bean(initMethod = "start", destroyMethod = "stop")
 	public CompositeLeakyBucket getLeakyBucket(KeeperConfig keeperConfig,
-                                               MetaServerKeeperService metaServerKeeperService,
-                                               KeeperContainerService keeperContainerService) {
+											   MetaServerKeeperService metaServerKeeperService,
+											   KeeperContainerService keeperContainerService) {
 		return new CompositeLeakyBucket(keeperConfig, metaServerKeeperService, keeperContainerService);
 	}
 }

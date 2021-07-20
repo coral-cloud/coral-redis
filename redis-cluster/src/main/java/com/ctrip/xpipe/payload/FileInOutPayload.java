@@ -13,16 +13,16 @@ import java.nio.channels.WritableByteChannel;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月29日 下午4:33:20
  */
-public class FileInOutPayload extends AbstractInOutPayload{
+public class FileInOutPayload extends AbstractInOutPayload {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileInOutPayload.class);
 	public String fileName;
-	private FileChannel inFileChannel; 
-	private FileChannel outFileChannel; 
-	
+	private FileChannel inFileChannel;
+	private FileChannel outFileChannel;
+
 	public FileInOutPayload(String fileName) {
 		this.fileName = fileName;
 	}
@@ -30,7 +30,7 @@ public class FileInOutPayload extends AbstractInOutPayload{
 	@SuppressWarnings("resource")
 	@Override
 	public void doStartInput() {
-		
+
 		try {
 			inFileChannel = new RandomAccessFile(fileName, "rw").getChannel();
 		} catch (FileNotFoundException e) {
@@ -40,15 +40,15 @@ public class FileInOutPayload extends AbstractInOutPayload{
 
 	@Override
 	public int doIn(ByteBuf byteBuf) throws IOException {
-		
-		
+
+
 		int readerIndex = byteBuf.readerIndex();
 		int n = inFileChannel.write(byteBuf.nioBuffer());
 		byteBuf.readerIndex(readerIndex + n);
 		return n;
 	}
 
-	
+
 	@Override
 	public void doEndInput() {
 		try {
@@ -61,17 +61,17 @@ public class FileInOutPayload extends AbstractInOutPayload{
 	@SuppressWarnings("resource")
 	@Override
 	public void doStartOutput() {
-		
+
 		try {
 			outFileChannel = new RandomAccessFile(fileName, "rw").getChannel();
 		} catch (FileNotFoundException e) {
 			throw new IllegalStateException("file not found:" + fileName, e);
 		}
 	}
-	
+
 	@Override
 	public long doOut(WritableByteChannel writableByteChannel) throws IOException {
-		
+
 		return outFileChannel.transferTo(0, outFileChannel.size(), writableByteChannel);
 	}
 
@@ -79,7 +79,7 @@ public class FileInOutPayload extends AbstractInOutPayload{
 	protected void doTruncate(int reduceLen) throws IOException {
 		outFileChannel.truncate(outFileChannel.size() - reduceLen);
 	}
-	
+
 	@Override
 	public void doEndOutput() {
 		try {

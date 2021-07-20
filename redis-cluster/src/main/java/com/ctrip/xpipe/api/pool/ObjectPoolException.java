@@ -4,16 +4,16 @@ import com.ctrip.xpipe.exception.XpipeException;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Jul 27, 2017
+ * <p>
+ * Jul 27, 2017
  */
-public class ObjectPoolException extends XpipeException{
+public class ObjectPoolException extends XpipeException {
 
-    public ObjectPoolException(String message) {
-        super(message);
-    }
+	public ObjectPoolException(String message) {
+		super(message);
+	}
 
-    public ObjectPoolException(String message, Throwable th) {
-        super(message, th);
-    }
+	public ObjectPoolException(String message, Throwable th) {
+		super(message, th);
+	}
 }

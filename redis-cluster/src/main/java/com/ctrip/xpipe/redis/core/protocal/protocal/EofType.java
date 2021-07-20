@@ -8,21 +8,21 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 23, 2016
  */
 public interface EofType {
-	
+
 	boolean putOnLineOnAck();
-	
+
 	boolean fileOk(File file);
-	
+
 	String getTag();
 
 	ByteBuf getStart();
-	
+
 	ByteBuf getEnd();
 
 	boolean support(Set<CAPA> capas);
-	
+
 }

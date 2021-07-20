@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface NextHopAlgorithm {
 
-    ProxyEndpoint nextHop(List<ProxyEndpoint> endpoints);
+	ProxyEndpoint nextHop(List<ProxyEndpoint> endpoints);
 }

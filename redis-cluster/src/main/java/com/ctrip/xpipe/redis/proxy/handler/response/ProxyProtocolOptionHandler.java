@@ -5,8 +5,8 @@ import io.netty.channel.Channel;
 
 public interface ProxyProtocolOptionHandler {
 
-    PROXY_OPTION getOption();
+	PROXY_OPTION getOption();
 
-    void handle(Channel channel, String[] content);
+	void handle(Channel channel, String[] content);
 
 }

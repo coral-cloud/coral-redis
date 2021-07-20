@@ -9,36 +9,36 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月24日 下午6:31:56
  */
-public class LongParser extends AbstractRedisClientProtocol<Long>{
+public class LongParser extends AbstractRedisClientProtocol<Long> {
 
 	private static final Logger logger = LoggerFactory.getLogger(LongParser.class);
 
 	public LongParser() {
 	}
-	
+
 	public LongParser(Long payload) {
 		super(payload, true, true);
 	}
-	
+
 	public LongParser(Integer payload) {
 		super(payload.longValue(), true, true);
 	}
-	
+
 	public LongParser(Long payload, boolean logRead, boolean logWrite) {
 		super(payload, logRead, logWrite);
 	}
-	
+
 	@Override
-	public RedisClientProtocol<Long> read(ByteBuf byteBuf){
-		
+	public RedisClientProtocol<Long> read(ByteBuf byteBuf) {
+
 		String data = readTilCRLFAsString(byteBuf);
-		if(data == null){
+		if (data == null) {
 			return null;
 		}
-		if(data.charAt(0) != COLON_BYTE){
+		if (data.charAt(0) != COLON_BYTE) {
 			logger.debug("[read] first char expected is Colon (:)");
 			return new LongParser(Long.valueOf(data.trim()));
 		} else {
@@ -48,7 +48,7 @@ public class LongParser extends AbstractRedisClientProtocol<Long>{
 
 	@Override
 	protected ByteBuf getWriteByteBuf() {
-		
+
 		return Unpooled.wrappedBuffer(getRequestBytes(COLON_BYTE, payload));
 	}
 

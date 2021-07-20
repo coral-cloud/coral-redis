@@ -5,19 +5,19 @@ import io.netty.channel.Channel;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
 public interface NettyClient {
 
 	void sendRequest(ByteBuf byteBuf);
-	
+
 	/**
 	 * @param byteBuf
 	 * @return if true, means finish reading
 	 */
 	void handleResponse(Channel channel, ByteBuf byteBuf);
-	
+
 	Channel channel();
 
 	/**
@@ -27,5 +27,5 @@ public interface NettyClient {
 	void sendRequest(ByteBuf byteBuf, ByteBufReceiver byteBufReceiver);
 
 	void onTimeout(ByteBufReceiver byteBufReceiver, int timeoutMill);
-	
+
 }

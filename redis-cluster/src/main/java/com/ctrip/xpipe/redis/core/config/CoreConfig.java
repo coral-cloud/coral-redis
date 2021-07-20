@@ -4,10 +4,10 @@ import com.ctrip.xpipe.config.ZkConfig;
 
 /**
  * @author marsqing
- *
- *         Jun 16, 2016 12:07:43 PM
+ * <p>
+ * Jun 16, 2016 12:07:43 PM
  */
-public interface CoreConfig extends ZkConfig{
-	
+public interface CoreConfig extends ZkConfig {
+
 
 }

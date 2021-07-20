@@ -24,54 +24,54 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 5, 2016
  */
-public class DefaultKeeperStateController extends AbstractLifecycle implements KeeperStateController, TopElement{
-	
+public class DefaultKeeperStateController extends AbstractLifecycle implements KeeperStateController, TopElement {
+
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	
-	private int addKeeperSuccessTimeoutMilli =    180000;
+
+	private int addKeeperSuccessTimeoutMilli = 180000;
 	private int removeKeeperSuccessTimeoutMilli = 60000;
-		
+
 	@Autowired
 	private KeeperContainerServiceFactory keeperContainerServiceFactory;
-	
+
 	@Autowired
 	private DcMetaCache dcMetaCache;
 
 	private ExecutorService executors;
 
-	@Resource( name = AbstractSpringConfigContext.SCHEDULED_EXECUTOR)
+	@Resource(name = AbstractSpringConfigContext.SCHEDULED_EXECUTOR)
 	private ScheduledExecutorService scheduled;
-	
+
 	private KeyedOneThreadTaskExecutor<Pair<String, String>> shardExecutor;
-	
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		executors = DefaultExecutorFactory.createAllowCoreTimeout("keeperStateController", OsUtils.defaultMaxCoreThreadCount()).createExecutorService();
 		shardExecutor = new KeyedOneThreadTaskExecutor<>(executors);
 	}
-	
+
 	@Override
 	public void addKeeper(KeeperTransMeta keeperTransMeta) {
-		
+
 		logger.info("[addKeeper]{}", keeperTransMeta);
-		
+
 		KeeperContainerService keeperContainerService = getKeeperContainerService(keeperTransMeta);
-		shardExecutor.execute(new Pair<>(keeperTransMeta.getClusterId(), keeperTransMeta.getShardId()), 
+		shardExecutor.execute(new Pair<>(keeperTransMeta.getClusterId(), keeperTransMeta.getShardId()),
 				createAddKeeperCommand(keeperContainerService, keeperTransMeta, scheduled, addKeeperSuccessTimeoutMilli));
 	}
 
 	protected Command<?> createAddKeeperCommand(KeeperContainerService keeperContainerService,
-			KeeperTransMeta keeperTransMeta, ScheduledExecutorService scheduled, int addKeeperSuccessTimeoutMilli) {
+												KeeperTransMeta keeperTransMeta, ScheduledExecutorService scheduled, int addKeeperSuccessTimeoutMilli) {
 		return new AddKeeperCommand(keeperContainerService, keeperTransMeta, scheduled, addKeeperSuccessTimeoutMilli);
 	}
 
 	@Override
 	public void removeKeeper(KeeperTransMeta keeperTransMeta) {
-		
+
 		logger.info("[removeKeeper]{}", keeperTransMeta);
 		KeeperContainerService keeperContainerService = getKeeperContainerService(keeperTransMeta);
 		shardExecutor.execute(new Pair<>(keeperTransMeta.getClusterId(), keeperTransMeta.getShardId()),
@@ -79,14 +79,14 @@ public class DefaultKeeperStateController extends AbstractLifecycle implements K
 	}
 
 	protected Command<?> createDeleteKeeperCommand(KeeperContainerService keeperContainerService,
-			KeeperTransMeta keeperTransMeta, ScheduledExecutorService scheduled,
-			int removeKeeperSuccessTimeoutMilli) {
+												   KeeperTransMeta keeperTransMeta, ScheduledExecutorService scheduled,
+												   int removeKeeperSuccessTimeoutMilli) {
 		return null;
 		//return new DeleteKeeperCommand(keeperContainerService, keeperTransMeta, scheduled, removeKeeperSuccessTimeoutMilli);
 	}
 
 	protected KeeperContainerService getKeeperContainerService(KeeperTransMeta keeperTransMeta) {
-		
+
 		KeeperContainerMeta keeperContainerMeta = dcMetaCache.getKeeperContainer(keeperTransMeta.getKeeperMeta());
 		KeeperContainerService keeperContainerService = keeperContainerServiceFactory.getOrCreateKeeperContainerService(keeperContainerMeta);
 		return keeperContainerService;

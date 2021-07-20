@@ -6,11 +6,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 23, 2016
  */
-public abstract class AbstractCodec implements Codec{
-	
+public abstract class AbstractCodec implements Codec {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 

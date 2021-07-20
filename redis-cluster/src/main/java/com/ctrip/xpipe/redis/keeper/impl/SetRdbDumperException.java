@@ -7,10 +7,10 @@ import java.util.Date;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 25, 2016
  */
-public class SetRdbDumperException extends AbstractRdbDumperException{
+public class SetRdbDumperException extends AbstractRdbDumperException {
 
 	private static final long serialVersionUID = 1L;
 

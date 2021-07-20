@@ -14,32 +14,32 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author marsqing
- *
+ * <p>
  * 2016年3月24日 下午2:24:38
  */
 public abstract class AbstractReplicationStorePsync extends AbstractPsync {
-	
-	protected volatile ReplicationStore  	    currentReplicationStore;
+
+	protected volatile ReplicationStore currentReplicationStore;
 
 	private volatile RdbStore rdbStore;
-	
+
 	private volatile InOutPayloadReplicationStore inOutPayloadReplicationStore;
-	
+
 	public AbstractReplicationStorePsync(SimpleObjectPool<NettyClient> clientPool, boolean saveCommands, ScheduledExecutorService scheduled) {
 		super(clientPool, saveCommands, scheduled);
 	}
-	
+
 
 	@Override
 	protected Pair<String, Long> getRequestMasterInfo() {
-		
+
 		String replIdRequest = null;
 		long offset = -1;
-		
-		if(currentReplicationStore == null){
+
+		if (currentReplicationStore == null) {
 			replIdRequest = "?";
 			offset = -1;
-		}else{
+		} else {
 			replIdRequest = currentReplicationStore.getMetaStore().getReplId();
 			offset = currentReplicationStore.getEndOffset() + 1;
 		}
@@ -48,21 +48,21 @@ public abstract class AbstractReplicationStorePsync extends AbstractPsync {
 
 
 	protected abstract ReplicationStore getCurrentReplicationStore();
-	
+
 	@Override
 	protected void doOnFullSync() throws IOException {
-		
-		if(currentReplicationStore == null || !currentReplicationStore.isFresh()){
+
+		if (currentReplicationStore == null || !currentReplicationStore.isFresh()) {
 			doWhenFullSyncToNonFreshReplicationStore(replId);
 		}
 		super.doOnFullSync();
 	}
-	
-	
+
+
 	@Override
 	protected void doOnContinue(String newReplId) throws IOException {
-		
-		if(newReplId != null){
+
+		if (newReplId != null) {
 			currentReplicationStore.shiftReplicationId(newReplId);
 		}
 		super.doOnContinue(newReplId);
@@ -70,7 +70,7 @@ public abstract class AbstractReplicationStorePsync extends AbstractPsync {
 
 	@Override
 	protected BulkStringParser createRdbReader() {
-		
+
 		inOutPayloadReplicationStore = new InOutPayloadReplicationStore();
 		BulkStringParser rdbReader = new BulkStringParser(inOutPayloadReplicationStore);
 		return rdbReader;
@@ -86,14 +86,14 @@ public abstract class AbstractReplicationStorePsync extends AbstractPsync {
 			getLogger().error("[beginReadRdb]" + replId + "," + masterRdbOffset, e);
 		}
 	}
-	
+
 	@Override
 	protected void failReadRdb(Throwable throwable) {
 		rdbStore.failRdb(throwable);
 	}
 
 	protected void appendCommands(ByteBuf byteBuf) throws IOException {
-		
+
 		currentReplicationStore.appendCommands(byteBuf);
 	}
 

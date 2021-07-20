@@ -16,36 +16,36 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * May 18, 2016 4:14:57 PM
  */
-public abstract class AbstractLifecycleObservable extends AbstractLifecycle implements Observable, Lifecycle{
-	
+public abstract class AbstractLifecycleObservable extends AbstractLifecycle implements Observable, Lifecycle {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private ReadWriteLock observersLock = new ReentrantReadWriteLock();
 	private List<Observer> observers = new ArrayList<>();
-	
+
 	private Executor executors = MoreExecutors.directExecutor();
 
-	
+
 	public AbstractLifecycleObservable() {
 	}
 
 	public AbstractLifecycleObservable(Executor executors) {
 		this.executors = executors;
 	}
-	
+
 	@Override
 	public void addObserver(Observer observer) {
 
-		try{
+		try {
 			observersLock.writeLock().lock();
 			observers.add(observer);
-		}finally {
+		} finally {
 			observersLock.writeLock().unlock();
 		}
-		
+
 	}
 
 	public void removeObserver(Observer observer) {
@@ -53,7 +53,7 @@ public abstract class AbstractLifecycleObservable extends AbstractLifecycle impl
 		try {
 			observersLock.writeLock().lock();
 			observers.remove(observer);
-		}finally {
+		} finally {
 			observersLock.writeLock().unlock();
 		}
 	}
@@ -62,34 +62,34 @@ public abstract class AbstractLifecycleObservable extends AbstractLifecycle impl
 		this.executors = executors;
 	}
 
-	protected void notifyObservers(final Object arg){
-		
-		Object []tmpObservers;
+	protected void notifyObservers(final Object arg) {
+
+		Object[] tmpObservers;
 
 		try {
 			observersLock.readLock().lock();
 			tmpObservers = observers.toArray();
-		}finally {
+		} finally {
 			observersLock.readLock().unlock();
 		}
-		
-		for(final Object observer : tmpObservers){
 
-				beginNotifyObserver(observer);
+		for (final Object observer : tmpObservers) {
 
-				executors.execute(new Runnable() {
-					@Override
-					public void run() {
-						try{
-							((Observer)observer).update(arg, AbstractLifecycleObservable.this);
-						}catch(Exception e){
-							logger.error("[notifyObservers]" + observer, e);
-						}
+			beginNotifyObserver(observer);
+
+			executors.execute(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						((Observer) observer).update(arg, AbstractLifecycleObservable.this);
+					} catch (Exception e) {
+						logger.error("[notifyObservers]" + observer, e);
 					}
-				});
+				}
+			});
 		}
 	}
 
-	protected void beginNotifyObserver(Object observer){
+	protected void beginNotifyObserver(Object observer) {
 	}
 }

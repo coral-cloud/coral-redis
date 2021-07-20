@@ -4,8 +4,8 @@ import java.io.*;
 
 /**
  * @author marsqing
- *
- *         Dec 26, 2016 12:02:37 PM
+ * <p>
+ * Dec 26, 2016 12:02:37 PM
  */
 public class NonFinalizeFileInputStream extends FileInputStream {
 

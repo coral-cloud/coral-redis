@@ -28,79 +28,79 @@ import static com.ctrip.xpipe.redis.proxy.spring.Production.*;
 @Component
 public class ProxyRelatedResourceManager implements ResourceManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProxyRelatedResourceManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProxyRelatedResourceManager.class);
 
-    @Resource(name = CLIENT_SSL_HANDLER_FACTORY)
-    private NettySslHandlerFactory clientSslHandlerFactory;
+	@Resource(name = CLIENT_SSL_HANDLER_FACTORY)
+	private NettySslHandlerFactory clientSslHandlerFactory;
 
-    @Resource(name = SERVER_SSL_HANDLER_FACTORY)
-    private NettySslHandlerFactory serverSslHandlerFactory;
+	@Resource(name = SERVER_SSL_HANDLER_FACTORY)
+	private NettySslHandlerFactory serverSslHandlerFactory;
 
-    @Resource(name = GLOBAL_SCHEDULED)
-    private ScheduledExecutorService scheduled;
+	@Resource(name = GLOBAL_SCHEDULED)
+	private ScheduledExecutorService scheduled;
 
-    @Resource(name = GLOBAL_ENDPOINT_MANAGER)
-    private ProxyEndpointManager endpointManager;
+	@Resource(name = GLOBAL_ENDPOINT_MANAGER)
+	private ProxyEndpointManager endpointManager;
 
-    @Autowired
-    private ProxyConfig config;
+	@Autowired
+	private ProxyConfig config;
 
-    private NextHopAlgorithm algorithm = new NaiveNextHopAlgorithm();
+	private NextHopAlgorithm algorithm = new NaiveNextHopAlgorithm();
 
-    private volatile SimpleKeyedObjectPool<Endpoint, NettyClient> keyedObjectPool;
+	private volatile SimpleKeyedObjectPool<Endpoint, NettyClient> keyedObjectPool;
 
-    @Override
-    public NettySslHandlerFactory getClientSslHandlerFactory() {
-        return clientSslHandlerFactory;
-    }
+	@Override
+	public NettySslHandlerFactory getClientSslHandlerFactory() {
+		return clientSslHandlerFactory;
+	}
 
-    @Override
-    public NettySslHandlerFactory getServerSslHandlerFactory() {
-        return serverSslHandlerFactory;
-    }
+	@Override
+	public NettySslHandlerFactory getServerSslHandlerFactory() {
+		return serverSslHandlerFactory;
+	}
 
-    @Override
-    public ScheduledExecutorService getGlobalSharedScheduled() {
-        return scheduled;
-    }
+	@Override
+	public ScheduledExecutorService getGlobalSharedScheduled() {
+		return scheduled;
+	}
 
-    @Override
-    public ProxyConfig getProxyConfig() {
-        return config;
-    }
+	@Override
+	public ProxyConfig getProxyConfig() {
+		return config;
+	}
 
-    @Override
-    public SimpleKeyedObjectPool<Endpoint, NettyClient> getKeyedObjectPool() {
-        if(keyedObjectPool == null) {
-            synchronized (this) {
-                if(keyedObjectPool == null) {
-                    createKeyedObjectPool();
-                }
-            }
-        }
-        return keyedObjectPool;
-    }
+	@Override
+	public SimpleKeyedObjectPool<Endpoint, NettyClient> getKeyedObjectPool() {
+		if (keyedObjectPool == null) {
+			synchronized (this) {
+				if (keyedObjectPool == null) {
+					createKeyedObjectPool();
+				}
+			}
+		}
+		return keyedObjectPool;
+	}
 
-    @Override
-    public ProxyEndpointSelector createProxyEndpointSelector(ProxyConnectProtocol protocol) {
-        ProxyEndpointSelector selector = new DefaultProxyEndpointSelector(protocol.nextEndpoints(), endpointManager);
-        selector.setNextHopAlgorithm(algorithm);
-        selector.setSelectStrategy(new SelectOneCycle(selector));
-        return selector;
-    }
+	@Override
+	public ProxyEndpointSelector createProxyEndpointSelector(ProxyConnectProtocol protocol) {
+		ProxyEndpointSelector selector = new DefaultProxyEndpointSelector(protocol.nextEndpoints(), endpointManager);
+		selector.setNextHopAlgorithm(algorithm);
+		selector.setSelectStrategy(new SelectOneCycle(selector));
+		return selector;
+	}
 
-    private void createKeyedObjectPool() {
-        keyedObjectPool = new XpipeNettyClientKeyedObjectPool(getKeyedPoolClientFactory());
-        try {
-            LifecycleHelper.initializeIfPossible(keyedObjectPool);
-            LifecycleHelper.startIfPossible(keyedObjectPool);
-        } catch (Exception e) {
-            logger.error("[createKeyedObjectPool]", e);
-        }
-    }
+	private void createKeyedObjectPool() {
+		keyedObjectPool = new XpipeNettyClientKeyedObjectPool(getKeyedPoolClientFactory());
+		try {
+			LifecycleHelper.initializeIfPossible(keyedObjectPool);
+			LifecycleHelper.startIfPossible(keyedObjectPool);
+		} catch (Exception e) {
+			logger.error("[createKeyedObjectPool]", e);
+		}
+	}
 
-    private NettyKeyedPoolClientFactory getKeyedPoolClientFactory() {
-        return new SslEnabledNettyClientFactory(this);
-    }
+	private NettyKeyedPoolClientFactory getKeyedPoolClientFactory() {
+		return new SslEnabledNettyClientFactory(this);
+	}
 
 }

@@ -4,8 +4,8 @@ import com.ctrip.xpipe.api.retry.RetryPolicy;
 
 /**
  * @author shyin
- *
- *         Sep 20, 2016
+ * <p>
+ * Sep 20, 2016
  */
 public class RestOperationsRetryPolicyFactory implements RetryPolicyFactory {
 	private int retryInterval;

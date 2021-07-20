@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 /**
  * @author zhangle
- *
  */
 @Service
 public class ConsoleServiceImpl extends AbstractService implements ConsoleService {
@@ -28,7 +27,7 @@ public class ConsoleServiceImpl extends AbstractService implements ConsoleServic
 	private String host;
 
 	@PostConstruct
-	public void init(){
+	public void init() {
 		host = config.getConsoleAddress();
 		logger.debug("[init][console address]{}", host);
 	}
@@ -36,7 +35,7 @@ public class ConsoleServiceImpl extends AbstractService implements ConsoleServic
 	@Override
 	public Set<String> getAllDcIds() {
 		String[] dcIds = restTemplate.getForObject(host + "/api/dcids", String[].class);
-		if (dcIds == null || dcIds.length == 0){
+		if (dcIds == null || dcIds.length == 0) {
 			return Collections.emptySet();
 		}
 		return new HashSet<>(Arrays.asList(dcIds));
@@ -46,7 +45,7 @@ public class ConsoleServiceImpl extends AbstractService implements ConsoleServic
 	@Override
 	public Set<String> getAllClusterIds() {
 		String[] clustersIds = restTemplate.getForObject(host + "/api/clusterids", String[].class);
-		if (clustersIds == null || clustersIds.length == 0){
+		if (clustersIds == null || clustersIds.length == 0) {
 			return Collections.emptySet();
 		}
 		return new HashSet<>(Arrays.asList(clustersIds));
@@ -55,7 +54,7 @@ public class ConsoleServiceImpl extends AbstractService implements ConsoleServic
 	@Override
 	public Set<String> getClusterShardIds(String clusterId) {
 		String[] shardIds = restTemplate.getForObject(host + "/api/cluster/{clusterId}/shardids", String[].class, clusterId);
-		if (shardIds == null || shardIds.length == 0){
+		if (shardIds == null || shardIds.length == 0) {
 			return Collections.emptySet();
 		}
 		return new HashSet<>(Arrays.asList(shardIds));
@@ -82,7 +81,7 @@ public class ConsoleServiceImpl extends AbstractService implements ConsoleServic
 	@Override
 	public ShardMeta getShardMeta(String dcId, String clusterId, String shardId) {
 		return restTemplate
-			.getForObject(host + "/api/dc/{dcId}/cluster/{clusterId}/shard/{shardId}", ShardMeta.class, dcId, clusterId, shardId);
+				.getForObject(host + "/api/dc/{dcId}/cluster/{clusterId}/shard/{shardId}", ShardMeta.class, dcId, clusterId, shardId);
 	}
 
 	@Override

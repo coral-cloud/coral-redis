@@ -7,11 +7,11 @@ package com.ctrip.xpipe.api.proxy;
  */
 public interface CompressAlgorithm {
 
-    String version();
+	String version();
 
-    AlgorithmType getType();
+	AlgorithmType getType();
 
-    enum AlgorithmType {
-        ZSTD;
-    }
+	enum AlgorithmType {
+		ZSTD
+	}
 }

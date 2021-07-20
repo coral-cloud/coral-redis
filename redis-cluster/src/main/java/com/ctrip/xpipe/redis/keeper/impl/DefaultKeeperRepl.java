@@ -5,8 +5,8 @@ import com.ctrip.xpipe.redis.keeper.KeeperRepl;
 
 /**
  * @author wenchao.meng
- *
- *         May 23, 2016
+ * <p>
+ * May 23, 2016
  */
 public class DefaultKeeperRepl implements KeeperRepl {
 

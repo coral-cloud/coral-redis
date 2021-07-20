@@ -7,6 +7,6 @@ package com.ctrip.xpipe.api.email;
  */
 public enum EmailType {
 
-    CONSOLE_ALERT;
+	CONSOLE_ALERT
 
 }

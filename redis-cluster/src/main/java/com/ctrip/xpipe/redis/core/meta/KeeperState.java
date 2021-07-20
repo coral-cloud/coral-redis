@@ -2,11 +2,11 @@ package com.ctrip.xpipe.redis.core.meta;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 7, 2016
  */
 public enum KeeperState {
-	
+
 	UNKNOWN {
 		@Override
 		public boolean isActive() {
@@ -18,7 +18,7 @@ public enum KeeperState {
 			return false;
 		}
 	},
-	
+
 	BACKUP {
 		@Override
 		public boolean isActive() {
@@ -30,7 +30,7 @@ public enum KeeperState {
 			return true;
 		}
 	},
-	
+
 	ACTIVE {
 		@Override
 		public boolean isActive() {
@@ -43,8 +43,9 @@ public enum KeeperState {
 		}
 	},
 
-	
+
 	PRE_ACTIVE {//when restart, state load from local store
+
 		@Override
 		public boolean isActive() {
 			return false;
@@ -57,6 +58,7 @@ public enum KeeperState {
 	},
 
 	PRE_BACKUP {//when restart, state load from local store
+
 		@Override
 		public boolean isActive() {
 			return false;
@@ -70,5 +72,6 @@ public enum KeeperState {
 
 
 	public abstract boolean isActive();
+
 	public abstract boolean isBackup();
 }

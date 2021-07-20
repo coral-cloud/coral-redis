@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author wenchao.meng
- *
- *         Jul 1, 2016
+ * <p>
+ * Jul 1, 2016
  */
 public class NettyClientFactory extends AbstractStartStoppable implements PooledObjectFactory<NettyClient> {
 
@@ -37,7 +37,7 @@ public class NettyClientFactory extends AbstractStartStoppable implements Pooled
 
 	@Override
 	protected void doStart() throws Exception {
-		
+
 		eventLoopGroup = new NioEventLoopGroup(1);
 		b.group(eventLoopGroup).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true)
 				.handler(new ChannelInitializer<SocketChannel>() {
@@ -70,7 +70,7 @@ public class NettyClientFactory extends AbstractStartStoppable implements Pooled
 	}
 
 	private void sendProxyProtocolIfNeeded(Channel channel) {
-		if(endpoint instanceof ProxyEnabled) {
+		if (endpoint instanceof ProxyEnabled) {
 			channel.writeAndFlush(((ProxyEnabled) endpoint).getProxyProtocol());
 		}
 	}

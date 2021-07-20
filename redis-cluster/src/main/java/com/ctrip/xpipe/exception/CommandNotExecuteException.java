@@ -7,15 +7,15 @@ package com.ctrip.xpipe.exception;
  */
 public class CommandNotExecuteException extends XpipeRuntimeException {
 
-    public CommandNotExecuteException(String message) {
-        super(message);
-    }
+	public CommandNotExecuteException(String message) {
+		super(message);
+	}
 
-    public CommandNotExecuteException(String message, Throwable th) {
-        super(message, th);
-    }
+	public CommandNotExecuteException(String message, Throwable th) {
+		super(message, th);
+	}
 
-    public <T extends Enum<T>> CommandNotExecuteException(ErrorMessage<T> errorMessage, Throwable th) {
-        super(errorMessage, th);
-    }
+	public <T extends Enum<T>> CommandNotExecuteException(ErrorMessage<T> errorMessage, Throwable th) {
+		super(errorMessage, th);
+	}
 }

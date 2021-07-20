@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface LogoutHandler extends Ordered {
 
-    LogoutHandler DEFAULT = ServicesUtil.getLogoutHandler();
+	LogoutHandler DEFAULT = ServicesUtil.getLogoutHandler();
 
-    void logout(HttpServletRequest request, HttpServletResponse response);
+	void logout(HttpServletRequest request, HttpServletResponse response);
 
 }

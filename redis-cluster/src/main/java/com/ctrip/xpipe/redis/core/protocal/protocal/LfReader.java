@@ -9,8 +9,8 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * @author wenchao.meng
- *
- *         Dec 25, 2016
+ * <p>
+ * Dec 25, 2016
  */
 public class LfReader extends AbstractRedisClientProtocol<byte[]> {
 

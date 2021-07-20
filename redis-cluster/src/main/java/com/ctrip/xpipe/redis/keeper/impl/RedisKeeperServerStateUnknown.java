@@ -10,27 +10,26 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 8, 2016
  */
-public class RedisKeeperServerStateUnknown extends AbstractRedisKeeperServerState{
+public class RedisKeeperServerStateUnknown extends AbstractRedisKeeperServerState {
 
 	public RedisKeeperServerStateUnknown(RedisKeeperServer redisKeeperServer) {
 		super(redisKeeperServer);
 	}
 
 
-
 	@Override
 	public void becomeBackup(Endpoint masterAddress) {
 		logger.info("[becomeBackup][unknown->backup] {}", this);
-		
+
 		doBecomeBackup(masterAddress);
 	}
 
 	@Override
 	public void becomeActive(Endpoint masterAddress) {
-		
+
 		logger.info("[becomeActive][unknown->active] {}", this);
 		doBecomeActive(masterAddress);
 	}
@@ -48,14 +47,14 @@ public class RedisKeeperServerStateUnknown extends AbstractRedisKeeperServerStat
 
 	@Override
 	public boolean psync(RedisClient redisClient, String[] args) {
-		
+
 		logger.error("[psync][server state unknown, close connection.]" + redisClient + "," + this);
 		try {
 			redisClient.close();
 		} catch (IOException e) {
 			logger.error("[doHandle][close redisClient]" + redisClient, e);
 		}
-		
+
 		return false;
 	}
 

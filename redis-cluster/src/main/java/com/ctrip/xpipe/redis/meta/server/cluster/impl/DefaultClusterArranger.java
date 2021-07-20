@@ -29,21 +29,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 25, 2016
  */
 @Component
-public class DefaultClusterArranger extends AbstractLifecycle implements ClusterArranger, TopElement, LeaderAware, Observer{
-	
+public class DefaultClusterArranger extends AbstractLifecycle implements ClusterArranger, TopElement, LeaderAware, Observer {
+
 	@Autowired
 	private ClusterServers<?> clusterServers;
-	
+
 	@Autowired
 	private ZkClient zkClient;
-	
+
 	@Autowired
 	private ArrangeTaskTrigger arrangeTaskTrigger;
-	
+
 	@Autowired
 	private RemoteClusterServerFactory<?> remoteClusterServerFactory;
 
@@ -52,28 +52,28 @@ public class DefaultClusterArranger extends AbstractLifecycle implements Cluster
 
 	@Autowired
 	private SlotManager slotManager;
-	
+
 	@Autowired
 	private MetaServerConfig config;
-	
+
 	private AtomicBoolean leader = new AtomicBoolean(false);
 	private ScheduledFuture<?> future;
 
-	
+
 	@Override
 	public void isleader() {
-		
+
 		logger.info("[isLeader]");
 		leader.set(true);
-		
+
 		try {
 			initCheck();
 		} catch (Exception e) {
 			logger.error("[isLeader]", e);
 		}
-		
+
 		future = scheduled.scheduleWithFixedDelay(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				try {
@@ -83,32 +83,32 @@ public class DefaultClusterArranger extends AbstractLifecycle implements Cluster
 				}
 			}
 		}, 0, config.getLeaderCheckMilli(), TimeUnit.MILLISECONDS);
-		
+
 		clusterServers.addObserver(this);
 	}
 
-	
+
 	@Override
 	protected void doDispose() throws Exception {
-		
+
 		super.doDispose();
 	}
-	
+
 	private void refresh() throws ClusterException {
 		slotManager.refresh();
 		clusterServers.refresh();
-		
+
 	}
 
 	protected void periodCheck() {
-		
+
 		checkDeadServer();
 		arrangeTaskTrigger.rebalance();
 	}
 
 	private void initCheck() throws ClusterException {
 		refresh();
-		
+
 		checkNotExist();
 		checkMovingTasks();
 		checkDeadServer();
@@ -116,18 +116,18 @@ public class DefaultClusterArranger extends AbstractLifecycle implements Cluster
 
 	private void checkDeadServer() {
 		Set<Integer> deadServer = new HashSet<>();
-		
-		
+
+
 		Set<Integer> allSlotServers = slotManager.allServers();
-		for(int slotServer : allSlotServers){
-			if(!clusterServers.exist(slotServer)){
+		for (int slotServer : allSlotServers) {
+			if (!clusterServers.exist(slotServer)) {
 				deadServer.add(slotServer);
 			}
 		}
 
-		if(deadServer.size() > 0){
+		if (deadServer.size() > 0) {
 			logger.info("[checkAllSlots][dead servers]{}", deadServer);
-			for(Integer deadServerId : deadServer){
+			for (Integer deadServerId : deadServer) {
 				onServerRemoved(remoteClusterServerFactory.createClusterServer(deadServerId, null));
 			}
 		}
@@ -136,34 +136,34 @@ public class DefaultClusterArranger extends AbstractLifecycle implements Cluster
 	private void checkMovingTasks() {
 		//moving slots
 		Map<Integer, SlotInfo> movingSlots = slotManager.allMoveingSlots();
-		if(movingSlots.size() > 0){
+		if (movingSlots.size() > 0) {
 			arrangeTaskTrigger.initSharding(new ContinueResharding(slotManager, movingSlots, clusterServers, remoteClusterServerFactory, zkClient));
 		}
 	}
 
 	private void checkNotExist() {
-		
-		Set<Integer> notExist =  new HashSet<>();
-		Set<Integer> allSlots =  slotManager.allSlots();
-		for(int i=0;i<SlotManager.TOTAL_SLOTS;i++){
-			if(!allSlots.contains(i)){
+
+		Set<Integer> notExist = new HashSet<>();
+		Set<Integer> allSlots = slotManager.allSlots();
+		for (int i = 0; i < SlotManager.TOTAL_SLOTS; i++) {
+			if (!allSlots.contains(i)) {
 				notExist.add(i);
 			}
 		}
-		
-		if(notExist.size() > 0){
+
+		if (notExist.size() > 0) {
 			logger.info("[checkAllSlots][not exist]{}", notExist);
 			arrangeTaskTrigger.initSharding(new InitResharding(slotManager, notExist, clusterServers, zkClient));
 		}
-		
+
 	}
 
 	@Override
 	public void notLeader() {
 		logger.info("[notCrossDcLeader]");
-		if(leader.compareAndSet(true, false)){
+		if (leader.compareAndSet(true, false)) {
 			clusterServers.removeObserver(this);
-			if(future != null){
+			if (future != null) {
 				future.cancel(true);
 			}
 		}
@@ -176,17 +176,17 @@ public class DefaultClusterArranger extends AbstractLifecycle implements Cluster
 
 	@Override
 	public void onServerAdded(ClusterServer clusterServer) {
-		if(!leader.get()){
+		if (!leader.get()) {
 			return;
 		}
 		logger.info("[onServerAdded]{}", clusterServer);
 		arrangeTaskTrigger.serverAlive(clusterServer);
-		
+
 	}
 
 	@Override
 	public void onServerRemoved(ClusterServer clusterServer) {
-		if(!leader.get()){
+		if (!leader.get()) {
 			return;
 		}
 		logger.info("[onServerRemoved]{}", clusterServer);
@@ -195,7 +195,7 @@ public class DefaultClusterArranger extends AbstractLifecycle implements Cluster
 
 	@Override
 	public void onServerChanged(ClusterServer oldClusterServer, ClusterServer newClusterServer) {
-		if(!leader.get()){
+		if (!leader.get()) {
 			return;
 		}
 		logger.info("[onNodeChanged][nothing to do]{}->{}", oldClusterServer, newClusterServer);
@@ -205,25 +205,25 @@ public class DefaultClusterArranger extends AbstractLifecycle implements Cluster
 	@SuppressWarnings("unchecked")
 	@Override
 	public void update(Object args, Observable observable) {
-		
-		if(args instanceof NodeAdded<?>){
+
+		if (args instanceof NodeAdded<?>) {
 			NodeAdded<ClusterServer> added = (NodeAdded<ClusterServer>) args;
 			onServerAdded(added.getNode());
 			return;
 		}
 
-		if(args instanceof NodeDeleted<?>){
+		if (args instanceof NodeDeleted<?>) {
 			NodeDeleted<ClusterServer> deleted = (NodeDeleted<ClusterServer>) args;
 			onServerRemoved(deleted.getNode());
 			return;
 		}
 
-		if(args instanceof NodeModified<?>){
+		if (args instanceof NodeModified<?>) {
 			NodeModified<ClusterServer> modified = (NodeModified<ClusterServer>) args;
 			onServerChanged(modified.getOldNode(), modified.getNewNode());
 			return;
 		}
-		
+
 		throw new IllegalArgumentException("unknown:" + args + ", from:" + observable);
 	}
 

@@ -13,8 +13,8 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
- *         Aug 6, 2016
+ * <p>
+ * Aug 6, 2016
  */
 public interface CurrentMetaManager extends Observable {
 

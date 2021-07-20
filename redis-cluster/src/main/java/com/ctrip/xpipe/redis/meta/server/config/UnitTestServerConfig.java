@@ -15,30 +15,31 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 9, 2016
  */
-public class UnitTestServerConfig implements MetaServerConfig{
+public class UnitTestServerConfig implements MetaServerConfig {
 
 	private String zkAddress = "localhost:2181";
 
 	private String consoleAddress = "http://localhost:9000";
-	
+
 	private String zkNameSpace = ZkConfig.DEFAULT_ZK_NAMESPACE;
 
 	private int metaServerId = 1;
-	
+
 	private int metaServerPort = 9747;
 
 	private int waitforOffsetMilli = 1000;
 
 	private int waitForMetaSyncDelayMilli = 0;
-	
-	public UnitTestServerConfig(){
-		
+
+	public UnitTestServerConfig() {
+
 	}
+
 	public UnitTestServerConfig(int metaServerId, int metaServerPort) {
-		
+
 		this.metaServerId = metaServerId;
 		this.metaServerPort = metaServerPort;
 	}
@@ -92,15 +93,15 @@ public class UnitTestServerConfig implements MetaServerConfig{
 	public void setZkAddress(String zkAddress) {
 		this.zkAddress = zkAddress;
 	}
-	
+
 	public void setMetaServerId(int metaServerId) {
 		this.metaServerId = metaServerId;
 	}
-	
+
 	public void setMetaServerPort(int metaServerPort) {
 		this.metaServerPort = metaServerPort;
 	}
-	
+
 	@Override
 	public String toString() {
 		return Codec.DEFAULT.encode(this);
@@ -110,7 +111,7 @@ public class UnitTestServerConfig implements MetaServerConfig{
 	public String getZkNameSpace() {
 		return zkNameSpace;
 	}
-	
+
 	public void setZkNameSpace(String zkNameSpace) {
 		this.zkNameSpace = zkNameSpace;
 	}

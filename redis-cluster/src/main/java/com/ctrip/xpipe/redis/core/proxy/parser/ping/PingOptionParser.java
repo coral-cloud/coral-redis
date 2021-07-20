@@ -13,26 +13,26 @@ import com.ctrip.xpipe.redis.core.proxy.parser.ProxyReqResOptionParser;
  */
 public class PingOptionParser extends AbstractProxyOptionParser implements ProxyReqResOptionParser<String> {
 
-    private static final String PING = PROXY_OPTION.PING.name();
+	private static final String PING = PROXY_OPTION.PING.name();
 
-    @Override
-    public String getContent() {
-        return output;
-    }
+	@Override
+	public String getContent() {
+		return output;
+	}
 
-    @Override
-    public PROXY_OPTION option() {
-        return PROXY_OPTION.PING;
-    }
+	@Override
+	public PROXY_OPTION option() {
+		return PROXY_OPTION.PING;
+	}
 
-    @Override
-    public String output() {
-        return PING;
-    }
+	@Override
+	public String output() {
+		return PING;
+	}
 
-    @Override
-    public ProxyOptionParser read(String option) {
-        return super.read(option);
-    }
+	@Override
+	public ProxyOptionParser read(String option) {
+		return super.read(option);
+	}
 
 }

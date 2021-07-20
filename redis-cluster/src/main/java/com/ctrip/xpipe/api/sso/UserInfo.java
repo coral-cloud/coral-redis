@@ -5,10 +5,10 @@ import com.ctrip.xpipe.api.lifecycle.Ordered;
 /**
  * @author lepdou 2016-11-08
  */
-public interface UserInfo extends Ordered{
+public interface UserInfo extends Ordered {
 
-    String getUserId();
+	String getUserId();
 
-    void setUserId(String userId);
+	void setUserId(String userId);
 
 }

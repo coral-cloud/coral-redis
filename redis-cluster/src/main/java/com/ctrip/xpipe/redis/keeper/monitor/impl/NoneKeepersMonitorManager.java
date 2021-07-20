@@ -8,13 +8,13 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 13, 2016
  */
-public class NoneKeepersMonitorManager extends AbstractKeepersMonitorManager implements KeepersMonitorManager{
-	
-	public static class NoneKeeperMonitor implements KeeperMonitor{
-		
+public class NoneKeepersMonitorManager extends AbstractKeepersMonitorManager implements KeepersMonitorManager {
+
+	public static class NoneKeeperMonitor implements KeeperMonitor {
+
 		private KeeperStats keeperStats;
 		private ReplicationStoreStats replicationStoreStats = new DefaultReplicationStoreStats();
 

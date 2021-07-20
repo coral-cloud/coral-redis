@@ -23,47 +23,47 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 11, 2016
  */
-public class BecomeBackupAction extends AbstractChangePrimaryDcAction{
+public class BecomeBackupAction extends AbstractChangePrimaryDcAction {
 
 	private MultiDcService multiDcService;
-	
+
 	public BecomeBackupAction(DcMetaCache dcMetaCache, CurrentMetaManager currentMetaManager, SentinelManager sentinelManager, ExecutionLog executionLog,
 							  XpipeNettyClientKeyedObjectPool keyedObjectPool,
 							  MultiDcService multiDcService, ScheduledExecutorService scheduled, Executor executors) {
 		super(dcMetaCache, currentMetaManager, sentinelManager, executionLog, keyedObjectPool, scheduled, executors);
 		this.multiDcService = multiDcService;
 	}
-	
+
 	@Override
 	protected PrimaryDcChangeMessage doChangePrimaryDc(String clusterId, String shardId, String newPrimaryDc, MasterInfo masterInfo) {
-		
+
 		doChangeMetaCache(clusterId, shardId, newPrimaryDc);
 
 		changeSentinel(clusterId, shardId, null);
 
 		Pair<String, Integer> newMaster = chooseNewMaster(clusterId, shardId);
-		if(newMaster == null){
+		if (newMaster == null) {
 			executionLog.error("[doChangePrimaryDc][new master null]");
 			return new PrimaryDcChangeMessage(PRIMARY_DC_CHANGE_RESULT.FAIL, executionLog.getLog());
 		}
 		executionLog.info(String.format("[chooseNewMaster]%s:%d", newMaster.getKey(), newMaster.getValue()));
-		
+
 		makeKeepersOk(clusterId, shardId, newMaster);
 
 		List<RedisMeta> slaves = getAllSlaves(newMaster, dcMetaCache.getShardRedises(clusterId, shardId));
 
 		KeeperMeta activeKeeper = currentMetaManager.getKeeperActive(clusterId, shardId);
 		makeRedisesOk(new Pair<>(activeKeeper.getIp(), activeKeeper.getPort()), slaves);
-		
+
 		return new PrimaryDcChangeMessage(PRIMARY_DC_CHANGE_RESULT.SUCCESS, executionLog.getLog());
 	}
 
 	@Override
 	protected Pair<String, Integer> chooseNewMaster(String clusterId, String shardId) {
-		
+
 		BackupDcKeeperMasterChooserAlgorithm algorithm = new BackupDcKeeperMasterChooserAlgorithm(clusterId, shardId, dcMetaCache, currentMetaManager, multiDcService, scheduled);
 		return algorithm.choose();
 	}
@@ -76,7 +76,7 @@ public class BecomeBackupAction extends AbstractChangePrimaryDcAction{
 
 	@Override
 	protected void makeRedisesOk(Pair<String, Integer> newMaster, List<RedisMeta> slaves) {
-		
+
 		try {
 			executionLog.info("[makeRedisesOk]" + slaves + "->" + newMaster);
 			Command<Void> command = new DefaultSlaveOfJob(slaves, newMaster.getKey(), newMaster.getValue(), keyedObjectPool, scheduled, executors);

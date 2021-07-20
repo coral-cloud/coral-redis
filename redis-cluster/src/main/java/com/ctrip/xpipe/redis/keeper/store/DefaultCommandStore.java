@@ -31,13 +31,13 @@ import java.util.function.IntSupplier;
 
 /**
  * @author qing.gu
- *
- *         Aug 9, 2016
+ * <p>
+ * Aug 9, 2016
  */
 public class DefaultCommandStore extends AbstractStore implements CommandStore {
 
 	private final static Logger logger = LoggerFactory.getLogger(DefaultCommandStore.class);
-	
+
 	private final static Logger delayTraceLogger = KeeperLogger.getDelayTraceLog();
 
 	public static final long DEFAULT_COMMAND_READER_FLYING_THRESHOLD = 1 << 15;
@@ -47,9 +47,9 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 	private final String fileNamePrefix;
 
 	private final int maxFileSize;
-	
+
 	private final IntSupplier fileNumToKeep;
-	private final int minTimeMilliToGcAfterModified; 
+	private final int minTimeMilliToGcAfterModified;
 
 	private final FilenameFilter fileFilter;
 
@@ -61,15 +61,15 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 
 	private AtomicReference<CommandFileContext> cmdFileCtxRef = new AtomicReference<>();
 	private Object cmdFileCtxRefLock = new Object();
-	
+
 	private CommandStoreDelay commandStoreDelay;
 
 	public DefaultCommandStore(File file, int maxFileSize, KeeperMonitor keeperMonitor) throws IOException {
-		this(file, maxFileSize, 3600*1000, () -> 20, DEFAULT_COMMAND_READER_FLYING_THRESHOLD, keeperMonitor);
+		this(file, maxFileSize, 3600 * 1000, () -> 20, DEFAULT_COMMAND_READER_FLYING_THRESHOLD, keeperMonitor);
 	}
 
 	public DefaultCommandStore(File file, int maxFileSize, int minTimeMilliToGcAfterModified, IntSupplier fileNumToKeep, long commandReaderFlyingThreshold, KeeperMonitor keeperMonitor) throws IOException {
-		
+
 		this.baseDir = file.getParentFile();
 		this.fileNamePrefix = file.getName();
 		this.maxFileSize = maxFileSize;
@@ -77,7 +77,7 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 		this.commandReaderFlyingThreshold = commandReaderFlyingThreshold;
 		this.minTimeMilliToGcAfterModified = minTimeMilliToGcAfterModified;
 		this.commandStoreDelay = keeperMonitor.createCommandStoreDelay(this);
-		
+
 		fileFilter = new PrefixFileFilter(fileNamePrefix);
 
 		long currentStartOffset = findMaxStartOffset();
@@ -93,7 +93,7 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 	}
 
 	private long findMaxStartOffset() {
-		
+
 		long maxStartOffset = 0;
 		File[] files = allFiles();
 		if (files != null) {
@@ -108,8 +108,8 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 	}
 
 	private File[] allFiles() {
-		File []files = baseDir.listFiles((FilenameFilter) fileFilter);
-		if(files == null){
+		File[] files = baseDir.listFiles(fileFilter);
+		if (files == null) {
 			files = new File[0];
 		}
 		return files;
@@ -121,7 +121,7 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 
 	@Override
 	public int appendCommands(ByteBuf byteBuf) throws IOException {
-		
+
 		makeSureOpen();
 
 		rotateFileIfNenessary();
@@ -129,28 +129,28 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 		CommandFileContext cmdFileCtx = cmdFileCtxRef.get();
 
 		//delay monitor
-		if(delayTraceLogger.isDebugEnabled()) {
+		if (delayTraceLogger.isDebugEnabled()) {
 			delayTraceLogger.debug("[appendCommands][begin]{}");
 		}
 
 		commandStoreDelay.beginWrite();
-		
+
 		int wrote = ByteBufUtils.writeByteBufToFileChannel(byteBuf, cmdFileCtx.getChannel(), delayTraceLogger);
 
-		if(delayTraceLogger.isDebugEnabled()){
+		if (delayTraceLogger.isDebugEnabled()) {
 			logger.debug("[appendCommands]{}, {}, {}", cmdFileCtx, byteBuf.readableBytes(), cmdFileCtx.fileLength());
 		}
 
 		long offset = cmdFileCtx.totalLength() - 1;
-		
+
 		//delay monitor
-		if(delayTraceLogger.isDebugEnabled()){
+		if (delayTraceLogger.isDebugEnabled()) {
 			delayTraceLogger.debug("[appendCommands][ end ]{}", offset + 1);
 		}
 		commandStoreDelay.endWrite(offset + 1);
 
 		offsetNotifier.offsetIncreased(offset);
-		
+
 		return wrote;
 	}
 
@@ -160,7 +160,7 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 			return cmdFileCtxRef.get().totalLength();
 		}
 	}
-	
+
 	private void rotateFileIfNenessary() throws IOException {
 
 		CommandFileContext curCmdFileCtx = cmdFileCtxRef.get();
@@ -169,11 +169,11 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 			File newFile = new File(baseDir, fileNamePrefix + newStartOffset);
 			logger.info("Rotate to {}", newFile.getName());
 			synchronized (cmdFileCtxRefLock) {
-				
+
 				CommandFileContext newCmdFileCtx = new CommandFileContext(newStartOffset, newFile);
 				newCmdFileCtx.createIfNotExist();
 				cmdFileCtxRef.set(newCmdFileCtx);
-				
+
 				curCmdFileCtx.close();
 			}
 		}
@@ -199,7 +199,7 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 
 		rotateFileIfNenessary();
 
-		File[] files = baseDir.listFiles((FilenameFilter) fileFilter);
+		File[] files = baseDir.listFiles(fileFilter);
 		if (files != null) {
 			for (File file : files) {
 				long startOffset = extractStartOffset(file);
@@ -274,9 +274,9 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 			ReferenceFileRegion referenceFileRegion = referenceFileChannel.readTilEnd();
 
 			curPosition += referenceFileRegion.count();
-			
+
 			referenceFileRegion.setTotalPos(curPosition);
-			
+
 			if (referenceFileRegion.count() < 0) {
 				logger.error("[read]{}", referenceFileRegion);
 			}
@@ -289,7 +289,7 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 
 			debugPrint(current);
 
-			if(gate.isOpen() && (current >= flyingThreshhold)){
+			if (gate.isOpen() && (current >= flyingThreshhold)) {
 				logger.info("[increaseFlying][close gate]{}, {}", gate, current);
 				gate.close();
 				//just in case, before gate.close(), all flushed
@@ -299,26 +299,26 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 
 		private void debugPrint(long current) {
 
-			if(logger.isDebugEnabled() && (current > 4)){
+			if (logger.isDebugEnabled() && (current > 4)) {
 				int intCurrent = (int) current;
-				if((intCurrent & (intCurrent-1)) == 0){
+				if ((intCurrent & (intCurrent - 1)) == 0) {
 					logger.debug("[flying]{}, {}", gate, current);
 				}
 			}
 		}
 
-		private void checkOpenGate(long current){
+		private void checkOpenGate(long current) {
 
 			debugPrint(current);
 
-			if(!gate.isOpen() && (current <= (flyingThreshhold >> 2))){
+			if (!gate.isOpen() && (current <= (flyingThreshhold >> 2))) {
 				logger.info("[decreaseFlying][open gate]{}, {}", gate, flying);
 				gate.open();
 			}
 		}
 
 		@Override
-		public void flushed(ReferenceFileRegion referenceFileRegion){
+		public void flushed(ReferenceFileRegion referenceFileRegion) {
 			checkOpenGate(flying.decrementAndGet());
 		}
 
@@ -391,14 +391,14 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 
 				logger.debug("[addCommandsListener] {}", referenceFileRegion);
 
-				if(delayTraceLogger.isDebugEnabled()){
+				if (delayTraceLogger.isDebugEnabled()) {
 					delayTraceLogger.debug("[write][begin]{}, {}", listener, referenceFileRegion.getTotalPos());
 				}
 				commandStoreDelay.beginSend(listener, referenceFileRegion.getTotalPos());
-				
+
 				ChannelFuture future = listener.onCommand(referenceFileRegion);
-						
-				if(future != null){
+
+				if (future != null) {
 					CommandReader finalCmdReader = cmdReader;
 					future.addListener(new ChannelFutureListener() {
 						@Override
@@ -406,7 +406,7 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 
 							finalCmdReader.flushed(referenceFileRegion);
 							commandStoreDelay.flushSucceed(listener, referenceFileRegion.getTotalPos());
-							if(logger.isDebugEnabled()){
+							if (logger.isDebugEnabled()) {
 								delayTraceLogger.debug("[write][ end ]{}, {}", listener, referenceFileRegion.getTotalPos());
 							}
 						}
@@ -432,50 +432,50 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 	@Override
 	public void close() throws IOException {
 
-		if(cmpAndSetClosed()){
+		if (cmpAndSetClosed()) {
 			logger.info("[close]{}", this);
 			CommandFileContext commandFileContext = cmdFileCtxRef.get();
 			if (commandFileContext != null) {
 				commandFileContext.close();
 			}
-		}else{
+		} else {
 			logger.warn("[close][already closed]{}", this);
 		}
 	}
 
 	@Override
 	public void destroy() throws Exception {
-		
+
 		logger.info("[destroy]{}", this);
-		File [] files = allFiles();
-		if(files != null){
-			for(File file : files){
+		File[] files = allFiles();
+		if (files != null) {
+			for (File file : files) {
 				boolean result = file.delete();
 				logger.info("[destroy][delete file]{}, {}", file, result);
 			}
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("CommandStore:%s", baseDir);
 	}
 
-	public String simpleDesc(){
+	public String simpleDesc() {
 
 		File desc1 = baseDir.getParentFile();
 		File desc2 = null;
-		if(desc1 != null){
+		if (desc1 != null) {
 			desc2 = desc1.getParentFile();
 		}
 		return String.format("%s.%s",
-				desc2 == null?null:desc2.getName(),
-				desc1 == null?null:desc1.getName());
+				desc2 == null ? null : desc2.getName(),
+				desc1 == null ? null : desc1.getName());
 	}
 
 	@Override
 	public long lowestAvailableOffset() {
-		
+
 		long minCmdOffset = Long.MAX_VALUE; // start from zero
 		File[] files = allFiles();
 
@@ -492,7 +492,7 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 
 	@Override
 	public void gc() {
-		
+
 		for (File cmdFile : allFiles()) {
 			long fileStartOffset = extractStartOffset(cmdFile);
 			if (canDeleteCmdFile(lowestReadingOffset(), fileStartOffset, cmdFile.length(),
@@ -502,13 +502,13 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 			}
 		}
 	}
-	
+
 	protected boolean canDeleteCmdFile(long lowestReadingOffset, long fileStartOffset, long fileSize, long lastModified) {
-		
+
 		boolean lowestReading = (fileStartOffset + fileSize < lowestReadingOffset);
-		
+
 		logger.debug("[canDeleteCmdFile][lowestReading]{}, {}+{}<{}", lowestReading, fileStartOffset, fileSize, lowestReadingOffset);
-		if(!lowestReading){
+		if (!lowestReading) {
 			return false;
 		}
 
@@ -516,19 +516,16 @@ public class DefaultCommandStore extends AbstractStore implements CommandStore {
 		boolean time = now.getTime() - lastModified >= minTimeMilliToGcAfterModified;
 
 		logger.debug("[canDeleteCmdFile][time]{}, {} - {} > {}", time, now, new Date(lastModified), minTimeMilliToGcAfterModified);
-		if(!time){
+		if (!time) {
 			return false;
 		}
 
 		long totalLength = totalLength();
-		long totalKeep = (long)fileSize * fileNumToKeep.getAsInt();
+		long totalKeep = fileSize * fileNumToKeep.getAsInt();
 		boolean fileKeep = totalLength - (fileStartOffset + fileSize) > totalKeep;
-		
+
 		logger.debug("[canDeleteCmdFile][fileKeep]{}, {} - {} > {}({}*{})", fileKeep, totalLength, (fileStartOffset + fileSize), totalKeep, fileSize, fileNumToKeep);
-		if(!fileKeep){
-			return false;
-		}
-		return true;
+		return fileKeep;
 	}
-	
+
 }

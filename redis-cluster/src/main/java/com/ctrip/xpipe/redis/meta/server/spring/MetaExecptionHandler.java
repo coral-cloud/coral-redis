@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 5, 2016
  */
 @ControllerAdvice
-public class MetaExecptionHandler extends AbstractExceptionHandler{
+public class MetaExecptionHandler extends AbstractExceptionHandler {
 
 }

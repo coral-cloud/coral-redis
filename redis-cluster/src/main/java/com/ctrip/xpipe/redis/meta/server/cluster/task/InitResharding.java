@@ -12,13 +12,13 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 26, 2016
  */
-public class InitResharding extends AbstractDirectMoveSharding{
-	
+public class InitResharding extends AbstractDirectMoveSharding {
+
 	private Set<Integer> emptySlots;
-	
+
 	public InitResharding(SlotManager slotManager, Set<Integer> emptySlots, ClusterServers<?> servers, ZkClient zkClient) {
 		super(slotManager, servers, zkClient);
 		this.emptySlots = emptySlots;
@@ -35,7 +35,7 @@ public class InitResharding extends AbstractDirectMoveSharding{
 	}
 
 	@Override
-	protected void doReset(){
-		
+	protected void doReset() {
+
 	}
 }

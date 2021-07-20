@@ -4,8 +4,8 @@ import com.ctrip.xpipe.api.lifecycle.Ordered;
 
 /**
  * @author marsqing
- *
- *         Dec 8, 2016 4:40:38 PM
+ * <p>
+ * Dec 8, 2016 4:40:38 PM
  */
 public class DummyMetricProxy implements MetricProxy {
 

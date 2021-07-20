@@ -12,27 +12,27 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月24日 下午2:24:38
  */
-public class DefaultPsync extends AbstractReplicationStorePsync{
-	
+public class DefaultPsync extends AbstractReplicationStorePsync {
+
 	private ReplicationStoreManager replicationStoreManager;
-	
+
 	private Endpoint masterEndPoint;
-	
-	
-	public DefaultPsync(SimpleObjectPool<NettyClient> clientPool, 
-			Endpoint masterEndPoint, ReplicationStoreManager replicationStoreManager, ScheduledExecutorService scheduled) {
+
+
+	public DefaultPsync(SimpleObjectPool<NettyClient> clientPool,
+						Endpoint masterEndPoint, ReplicationStoreManager replicationStoreManager, ScheduledExecutorService scheduled) {
 		super(clientPool, true, scheduled);
 		this.masterEndPoint = masterEndPoint;
 		this.replicationStoreManager = replicationStoreManager;
 		currentReplicationStore = getCurrentReplicationStore();
 	}
-	
-	@Override		
+
+	@Override
 	protected final ReplicationStore getCurrentReplicationStore() {
-		
+
 		try {
 			return replicationStoreManager.createIfNotExist();
 		} catch (IOException e) {
@@ -44,14 +44,14 @@ public class DefaultPsync extends AbstractReplicationStorePsync{
 
 	@Override
 	public String toString() {
-		return getName() + "->"  + masterEndPoint;
+		return getName() + "->" + masterEndPoint;
 	}
-	
+
 	@Override
 	protected void doWhenFullSyncToNonFreshReplicationStore(String replId) throws IOException {
-		
+
 		ReplicationStore oldStore = currentReplicationStore;
-		if(oldStore != null){
+		if (oldStore != null) {
 			try {
 				getLogger().info("[doWhenFullSyncToNonFreshReplicationStore][full sync][replication store out of time, destroy]{}, {}", this, currentReplicationStore);
 				oldStore.close();
@@ -63,9 +63,9 @@ public class DefaultPsync extends AbstractReplicationStorePsync{
 		getLogger().info("[doWhenFullSyncToNonFreshReplicationStore][set keepermeta]{}", replId);
 		currentReplicationStore = createReplicationStore();
 	}
-	
+
 	private ReplicationStore createReplicationStore() {
-		
+
 		try {
 			return replicationStoreManager.create();
 		} catch (IOException e) {

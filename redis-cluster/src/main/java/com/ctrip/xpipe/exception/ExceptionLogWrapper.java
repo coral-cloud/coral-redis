@@ -5,18 +5,18 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Nov 25, 2016
  */
 public class ExceptionLogWrapper {
-	
+
 	private Logger logger = LoggerFactory.getLogger(ExceptionLogWrapper.class);
-	
-	public void execute(Runnable run){
-		
-		try{
+
+	public void execute(Runnable run) {
+
+		try {
 			run.run();
-		}catch(Throwable th){
+		} catch (Throwable th) {
 			logger.error("[execute]", th);
 		}
 	}

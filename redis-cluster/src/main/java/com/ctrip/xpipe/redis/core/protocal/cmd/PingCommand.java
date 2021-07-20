@@ -12,15 +12,15 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Nov 30, 2016
  */
-public class PingCommand extends AbstractRedisCommand<String>{
+public class PingCommand extends AbstractRedisCommand<String> {
 
 	private static final Logger logger = LoggerFactory.getLogger(PingCommand.class);
 
 	public static int DEFAULT_PINT_TIME_OUT_MILLI = 500;
-	
+
 	public static final String PING = "PING";
 
 	public static final String PONG = "PONG";

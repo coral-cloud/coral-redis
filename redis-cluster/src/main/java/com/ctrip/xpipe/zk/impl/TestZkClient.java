@@ -9,45 +9,45 @@ import org.apache.curator.framework.CuratorFramework;
 
 /**
  * @author marsqing
- *
- *         Jun 16, 2016 12:05:57 PM
+ * <p>
+ * Jun 16, 2016 12:05:57 PM
  */
 public class TestZkClient extends AbstractLifecycle implements ZkClient, TopElement {
 
 	private volatile CuratorFramework client;
-	
+
 	private ZkConfig zkConfig = new DefaultZkConfig();
-	
+
 	public static final String ZK_ADDRESS_KEY = "zkAddress";
-	
+
 	private String address = System.getProperty(ZK_ADDRESS_KEY, "localhost:2181");
-	
+
 	protected void doInitialize() throws Exception {
-		
+
 	}
-	
+
 	@Override
 	protected void doStart() throws Exception {
-		
+
 	}
 
 	@Override
 	protected void doStop() throws Exception {
-		if(client != null){
+		if (client != null) {
 			client.close();
 			client = null;
 		}
 	}
-	
+
 	@Override
 	public synchronized CuratorFramework get() {
-		
-		if(!getLifecycleState().isStarted()){
+
+		if (!getLifecycleState().isStarted()) {
 			logger.info("[get][not startted, return null]");
 			return null;
 		}
-				
-		if(client != null){
+
+		if (client != null) {
 			return client;
 		}
 
@@ -59,25 +59,25 @@ public class TestZkClient extends AbstractLifecycle implements ZkClient, TopElem
 		}
 		return client;
 	}
-	
+
 	@Override
 	public void setZkAddress(String address) {
 		this.address = address;
 	}
-	
+
 	@Override
-	public String getZkAddress(){
+	public String getZkAddress() {
 		return this.address;
 	}
-	
+
 	public void setClient(CuratorFramework client) {
 		this.client = client;
 	}
-	
+
 	public void setZkConfig(ZkConfig zkConfig) {
 		this.zkConfig = zkConfig;
 	}
-	
+
 	@Override
 	public int getOrder() {
 		return Ordered.HIGHEST_PRECEDENCE + 1;

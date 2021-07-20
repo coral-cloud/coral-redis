@@ -28,11 +28,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 24, 2016
  */
-public class DefaultRedisMasterReplication extends AbstractRedisMasterReplication{
-	
+public class DefaultRedisMasterReplication extends AbstractRedisMasterReplication {
+
 	private volatile PARTIAL_STATE partialState = PARTIAL_STATE.UNKNOWN;
 
 	private ScheduledFuture<?> replConfFuture;
@@ -52,24 +52,24 @@ public class DefaultRedisMasterReplication extends AbstractRedisMasterReplicatio
 
 	@Override
 	protected void doConnect(Bootstrap b) {
-		
+
 		redisMaster.setMasterState(MASTER_STATE.REDIS_REPL_CONNECTING);
 
 		tryConnect(b).addListener(new ChannelFutureListener() {
-			
+
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				
-				if(!future.isSuccess()){
-					
+
+				if (!future.isSuccess()) {
+
 					logger.error("[operationComplete][fail connect with master]" + redisMaster, future.cause());
-					
+
 					scheduled.schedule(new Runnable() {
 						@Override
 						public void run() {
-							try{
+							try {
 								connectWithMaster();
-							}catch(Throwable th){
+							} catch (Throwable th) {
 								logger.error("[run][connectUntilConnected]" + DefaultRedisMasterReplication.this, th);
 							}
 						}
@@ -78,17 +78,17 @@ public class DefaultRedisMasterReplication extends AbstractRedisMasterReplicatio
 			}
 		});
 	}
-	
-	
+
+
 	@Override
 	public void masterConnected(Channel channel) {
-		
+
 		redisMaster.setMasterState(MASTER_STATE.REDIS_REPL_HANDSHAKE);
-		
+
 		super.masterConnected(channel);
 		cancelReplConf();
 	}
-	
+
 	@Override
 	public void masterDisconntected(Channel channel) {
 		super.masterDisconntected(channel);
@@ -115,13 +115,13 @@ public class DefaultRedisMasterReplication extends AbstractRedisMasterReplicatio
 	}
 
 	private void refreshReplDownSince() {
-		if(getRedisMaster().getMasterState() == MASTER_STATE.REDIS_REPL_CONNECTED) {
+		if (getRedisMaster().getMasterState() == MASTER_STATE.REDIS_REPL_CONNECTED) {
 			logger.warn("[refreshReplDownSince]set state to MASTER_STATE.REDIS_REPL_NONE, and refresh repl_down_since");
 			redisKeeperServer.getKeeperMonitor().getReplicationStoreStats().refreshReplDownSince(System.currentTimeMillis());
 			getRedisMaster().setMasterState(MASTER_STATE.REDIS_REPL_NONE);
 		}
 	}
-	
+
 	public void setMasterConnectRetryDelaySeconds(int masterConnectRetryDelaySeconds) {
 		this.masterConnectRetryDelaySeconds = masterConnectRetryDelaySeconds;
 	}
@@ -138,53 +138,53 @@ public class DefaultRedisMasterReplication extends AbstractRedisMasterReplicatio
 		if (logger.isInfoEnabled()) {
 			logger.info("[scheduleReplconf]" + this);
 		}
-		
+
 		cancelReplConf();
 
 		replConfFuture = scheduled.scheduleWithFixedDelay(new AbstractExceptionLogTask() {
-			
+
 			@Override
 			protected void doRun() throws Exception {
-				
+
 				logger.debug("[run][send ack]{}", masterChannel);
-				
+
 				Command<Object> command = createReplConf();
 				command.execute();
-				
+
 			}
 
 		}, 0, REPLCONF_INTERVAL_MILLI, TimeUnit.MILLISECONDS);
 	}
 
 	protected void cancelReplConf() {
-		
+
 		if (replConfFuture != null) {
 			replConfFuture.cancel(true);
 			replConfFuture = null;
 		}
 	}
-	
+
 	protected Command<Object> createReplConf() {
-		
+
 		return new Replconf(clientPool, ReplConfType.ACK, scheduled, String.valueOf(redisMaster.getCurrentReplicationStore().getEndOffset()));
 	}
 
 	@Override
 	protected void psyncFail(Throwable cause) {
-		
+
 		logger.info("[psyncFail][close channel, wait for reconnect]" + this, cause);
 		masterChannel.close();
 	}
 
 	@Override
 	protected Psync createPsync() {
-		
+
 		Psync psync = new DefaultPsync(clientPool, redisMaster.masterEndPoint(), redisMaster.getReplicationStoreManager(), scheduled);
 		psync.addPsyncObserver(this);
 		psync.addPsyncObserver(redisKeeperServer);
 		return psync;
 	}
-	
+
 	@Override
 	public PARTIAL_STATE partialState() {
 		return partialState;
@@ -195,7 +195,7 @@ public class DefaultRedisMasterReplication extends AbstractRedisMasterReplicatio
 	protected void doBeginWriteRdb(EofType eofType, long masterRdbOffset) throws IOException {
 
 		redisMaster.setMasterState(MASTER_STATE.REDIS_REPL_TRANSFER);
-		
+
 		partialState = PARTIAL_STATE.FULL;
 		redisMaster.getCurrentReplicationStore().getMetaStore().setMasterAddress((DefaultEndPoint) redisMaster.masterEndPoint());
 	}
@@ -206,12 +206,12 @@ public class DefaultRedisMasterReplication extends AbstractRedisMasterReplicatio
 		redisMaster.setMasterState(MASTER_STATE.REDIS_REPL_CONNECTED);
 		redisKeeperServer.getKeeperMonitor().getReplicationStoreStats().refreshReplDownSince(0);
 		scheduleReplconf();
-		
+
 	}
 
 	@Override
-	protected void doOnContinue(){
-		
+	protected void doOnContinue() {
+
 		logger.info("[doOnContinue]{}", this);
 		redisMaster.setMasterState(MASTER_STATE.REDIS_REPL_CONNECTED);
 		redisKeeperServer.getKeeperMonitor().getReplicationStoreStats().refreshReplDownSince(0);
@@ -220,7 +220,7 @@ public class DefaultRedisMasterReplication extends AbstractRedisMasterReplicatio
 		} catch (IOException e) {
 			logger.error("[doOnContinue]" + this, e);
 		}
-		
+
 		scheduleReplconf();
 		partialState = PARTIAL_STATE.PARTIAL;
 		redisKeeperServer.getRedisKeeperServerState().initPromotionState();
@@ -233,10 +233,10 @@ public class DefaultRedisMasterReplication extends AbstractRedisMasterReplicatio
 
 	@Override
 	protected void doOnFullSync() {
-		
+
 		try {
 			logger.info("[doOnFullSync]{}", this);
-			RdbDumper rdbDumper  = new RedisMasterReplicationRdbDumper(this, redisKeeperServer, resourceManager);
+			RdbDumper rdbDumper = new RedisMasterReplicationRdbDumper(this, redisKeeperServer, resourceManager);
 			setRdbDumper(rdbDumper);
 			redisKeeperServer.setRdbDumper(rdbDumper, true);
 		} catch (SetRdbDumperException e) {

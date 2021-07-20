@@ -10,43 +10,39 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 18, 2016
  */
 public class MetaUtils {
 
-	public static String toString(List<? extends Redis> redises){
+	public static String toString(List<? extends Redis> redises) {
 
 		return StringUtil.join(",", (redis) -> redis.desc(), redises);
 	}
-	
-	public static boolean same(KeeperMeta keeperMeta1, KeeperMeta keeperMeta2){
-		
+
+	public static boolean same(KeeperMeta keeperMeta1, KeeperMeta keeperMeta2) {
+
 		return true;
 	}
 
-	public static boolean same(RedisMeta redisMeta1, RedisMeta redisMeta2){
+	public static boolean same(RedisMeta redisMeta1, RedisMeta redisMeta2) {
 
 		return true;
-		
+
 	}
 
 	public static boolean theSame(Redis redisMeta1, Redis redisMeta2) {
-		
-		if(redisMeta1== null){
+
+		if (redisMeta1 == null) {
 			return redisMeta2 == null;
-		}else if(redisMeta2 == null){
-			return false;
-		}
-		
-		if(!ObjectUtils.equals(redisMeta1.getIp(), redisMeta2.getIp())){
+		} else if (redisMeta2 == null) {
 			return false;
 		}
 
-		if(!ObjectUtils.equals(redisMeta1.getPort(), redisMeta2.getPort())){
+		if (!ObjectUtils.equals(redisMeta1.getIp(), redisMeta2.getIp())) {
 			return false;
 		}
-		
-		return true;
+
+		return ObjectUtils.equals(redisMeta1.getPort(), redisMeta2.getPort());
 	}
 }

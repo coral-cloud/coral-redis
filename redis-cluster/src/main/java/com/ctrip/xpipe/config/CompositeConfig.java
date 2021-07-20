@@ -7,30 +7,30 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 9, 2016
  */
-public class CompositeConfig extends AbstractConfig{
+public class CompositeConfig extends AbstractConfig {
 
 	private List<Config> configs = new LinkedList<>();
 
-	public CompositeConfig(Config ... configsArgu) {
-		for(Config config : configsArgu){
+	public CompositeConfig(Config... configsArgu) {
+		for (Config config : configsArgu) {
 			configs.add(config);
 		}
 	}
-	
-	public void addConfig(Config config){
-		
+
+	public void addConfig(Config config) {
+
 		configs.add(config);
 	}
-	
+
 	@Override
 	public String get(String key) {
-		
-		for(Config config : configs){
-			String value = config.get(key); 
-			if( value != null){
+
+		for (Config config : configs) {
+			String value = config.get(key);
+			if (value != null) {
 				return value;
 			}
 		}

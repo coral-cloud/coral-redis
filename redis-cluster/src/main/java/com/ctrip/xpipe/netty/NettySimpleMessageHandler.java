@@ -11,42 +11,42 @@ import java.nio.charset.Charset;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月21日 下午2:57:59
  */
-public class NettySimpleMessageHandler extends ChannelDuplexHandler{
-	
+public class NettySimpleMessageHandler extends ChannelDuplexHandler {
+
 	private Charset charset = Codec.defaultCharset;
-	
+
 	public NettySimpleMessageHandler() {
-		
+
 	}
+
 	public NettySimpleMessageHandler(Charset charset) {
 		this.charset = charset;
 	}
 
-	
-	
+
 	@Override
 	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-		
+
 		ByteBufAllocator allocator = ctx.alloc();
-		
-		byte []data = null;
-		
-		if(msg instanceof String){
-			data = ((String)msg).getBytes(charset); 
-		}else if(msg instanceof byte[]){
-			data = (byte[])msg;
+
+		byte[] data = null;
+
+		if (msg instanceof String) {
+			data = ((String) msg).getBytes(charset);
+		} else if (msg instanceof byte[]) {
+			data = (byte[]) msg;
 		}
-		
-		if(data != null){
+
+		if (data != null) {
 			ByteBuf byteBuf = allocator.buffer(data.length);
 			byteBuf.writeBytes(data);
 			super.write(ctx, byteBuf, promise);
 			return;
 		}
-		
+
 		super.write(ctx, msg, promise);
 	}
 }

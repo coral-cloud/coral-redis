@@ -12,11 +12,11 @@ import java.util.List;
  */
 public interface ProxyRouteParser extends ProxyOptionParser {
 
-    void removeNextNodes();
+	void removeNextNodes();
 
-    String getContent();
+	String getContent();
 
-    List<ProxyEndpoint> getNextEndpoints();
+	List<ProxyEndpoint> getNextEndpoints();
 
-    String getFinalStation();
+	String getFinalStation();
 }

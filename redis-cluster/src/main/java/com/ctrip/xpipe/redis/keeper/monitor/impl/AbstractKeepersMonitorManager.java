@@ -19,23 +19,23 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Feb 20, 2017
  */
-public abstract class AbstractKeepersMonitorManager implements KeepersMonitorManager{
+public abstract class AbstractKeepersMonitorManager implements KeepersMonitorManager {
 
 	private static final int DEFAULT_SCHEDULED_CORE_POOL_SIZE = Math.min(OsUtils.getCpuCount(), 4);
-	
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	private Map<RedisKeeperServer, KeeperMonitor> keeperMonitors = new ConcurrentHashMap<>();
 
-	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(DEFAULT_SCHEDULED_CORE_POOL_SIZE ,
+	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(DEFAULT_SCHEDULED_CORE_POOL_SIZE,
 			XpipeThreadFactory.create("globalStatsMetricUpdater"));
-	
+
 	@Override
 	public KeeperMonitor getOrCreate(RedisKeeperServer redisKeeperServer) {
-		
+
 		return MapUtils.getOrCreate(keeperMonitors, redisKeeperServer, new ObjectFactory<KeeperMonitor>() {
 
 			@Override

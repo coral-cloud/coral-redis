@@ -22,14 +22,14 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Sep 7, 2016
  */
-public class ConsoleNotifycationTask extends AbstractLifecycle implements MetaServerStateChangeHandler, TopElement{
-	
+public class ConsoleNotifycationTask extends AbstractLifecycle implements MetaServerStateChangeHandler, TopElement {
+
 	private int retryDelayBase = 10000;
 	private int maxScheduled = 4;
-	
+
 	@Autowired
 	private ConsoleService consoleService;
 
@@ -38,17 +38,17 @@ public class ConsoleNotifycationTask extends AbstractLifecycle implements MetaSe
 	private ScheduledExecutorService scheduled;
 
 	private String dc = FoundationService.DEFAULT.getDataCenter();
-	
+
 	private OneThreadTaskExecutor oneThreadTaskExecutor;
 
-	public ConsoleNotifycationTask(){
-		
+	public ConsoleNotifycationTask() {
+
 	}
-	
+
 	public ConsoleNotifycationTask(int retryDelayBase) {
 		this.retryDelayBase = retryDelayBase;
 	}
-	
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
@@ -56,7 +56,7 @@ public class ConsoleNotifycationTask extends AbstractLifecycle implements MetaSe
 		executors = DefaultExecutorFactory.createAllowCoreTimeout("ConsoleNotifycationTask", OsUtils.defaultMaxCoreThreadCount()).createExecutorService();
 		oneThreadTaskExecutor = new OneThreadTaskExecutor(getRetryFactory(), executors);
 	}
-	
+
 	@Override
 	protected void doDispose() throws Exception {
 		oneThreadTaskExecutor.destroy();
@@ -64,10 +64,10 @@ public class ConsoleNotifycationTask extends AbstractLifecycle implements MetaSe
 		scheduled.shutdown();
 		super.doDispose();
 	}
-	
+
 	@Override
 	public void keeperActiveElected(final String clusterId, final String shardId, final KeeperMeta activeKeeper) {
-		logger.info("[keeperActiveElected][called]{},{},{}",clusterId,shardId,activeKeeper);
+		logger.info("[keeperActiveElected][called]{},{},{}", clusterId, shardId, activeKeeper);
 		Command<Void> command = new AbstractCommand<Void>() {
 
 			@Override
@@ -77,25 +77,25 @@ public class ConsoleNotifycationTask extends AbstractLifecycle implements MetaSe
 
 			@Override
 			protected void doExecute() throws Exception {
-				logger.info("[keeperActiveElected][execute]{},{},{}",clusterId,shardId,activeKeeper);
+				logger.info("[keeperActiveElected][execute]{},{},{}", clusterId, shardId, activeKeeper);
 				consoleService.keeperActiveChanged(dc, clusterId, shardId, activeKeeper);
 				future().setSuccess();
 			}
 
 			@Override
 			protected void doReset() {
-				
+
 			}
 		};
 		oneThreadTaskExecutor.executeCommand(command);
 	}
 
-	
+
 	@SuppressWarnings("rawtypes")
 	protected RetryCommandFactory getRetryFactory() {
 		return DefaultRetryCommandFactory.retryForever(scheduled, retryDelayBase);
 	}
-	
+
 	public void setConsoleService(ConsoleService consoleService) {
 		this.consoleService = consoleService;
 	}

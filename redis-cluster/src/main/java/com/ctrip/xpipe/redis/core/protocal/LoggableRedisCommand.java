@@ -6,7 +6,7 @@ package com.ctrip.xpipe.redis.core.protocal;
  * Mar 23, 2018
  */
 public interface LoggableRedisCommand<T> extends RedisCommand<T> {
-    void logResponse(boolean isResponseLoggable);
+	void logResponse(boolean isResponseLoggable);
 
-    void logRequest(boolean isRequestLoggable);
+	void logRequest(boolean isRequestLoggable);
 }

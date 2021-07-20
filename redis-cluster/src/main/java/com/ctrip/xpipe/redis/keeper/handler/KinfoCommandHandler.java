@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.ctrip.xpipe.redis.keeper.handler;
 
@@ -18,7 +18,7 @@ public class KinfoCommandHandler extends AbstractCommandHandler {
 
 	@Override
 	public String[] getCommands() {
-		return new String[] { "kinfo" };
+		return new String[]{"kinfo"};
 	}
 
 	@Override

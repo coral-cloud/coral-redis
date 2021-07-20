@@ -8,20 +8,20 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 5, 2016
  */
-public interface DynamicStateManager extends Observer{
-	
+public interface DynamicStateManager extends Observer {
+
 	void add(ClusterMeta clusterMeta);
 
 	void remove(String clusterId);
-	
+
 	void removeBySlot(int slotId);
-	
+
 	Set<String> allClusters();
-	
+
 	void ping(KeeperInstanceMeta keeperInstanceMeta);
-	
-	
+
+
 }

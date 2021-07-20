@@ -13,15 +13,15 @@ import com.ctrip.xpipe.redis.meta.server.rest.ForwardInfo;
 
 /**
  * @author marsqing
- *
- *         May 25, 2016 2:37:05 PM
+ * <p>
+ * May 25, 2016 2:37:05 PM
  */
-public interface MetaServer extends ClusterServer, TopElement{
+public interface MetaServer extends ClusterServer, TopElement {
 
 	PrimaryDcCheckMessage changePrimaryDcCheck(String clusterId, String shardId, String newPrimaryDc, ForwardInfo forwardInfo);
-	
+
 	MetaServerConsoleService.PreviousPrimaryDcMessage makeMasterReadOnly(String clusterId, String shardId, boolean readOnly, ForwardInfo forwardInfo);
-	
+
 	PrimaryDcChangeMessage doChangePrimaryDc(String clusterId, String shardId, String newPrimaryDc, MetaServerConsoleService.PrimaryDcChangeRequest request, ForwardInfo forwardInfo);
 
 	KeeperMeta getActiveKeeper(String clusterId, String shardId, ForwardInfo forwardInfo);

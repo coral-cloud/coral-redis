@@ -27,218 +27,218 @@ import java.util.concurrent.*;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Jul 22, 2016
+ * <p>
+ * Jul 22, 2016
  */
 public class AbstractClusterServers<T extends ClusterServer> extends AbstractLifecycleObservable implements ClusterServers<T>, TopElement {
 
-    private Map<Integer, T> servers = new ConcurrentHashMap<>();
+	private Map<Integer, T> servers = new ConcurrentHashMap<>();
 
-    @Autowired
-    private MetaServerConfig metaServerConfig;
+	@Autowired
+	private MetaServerConfig metaServerConfig;
 
-    @Autowired
-    private ZkClient zkClient;
+	@Autowired
+	private ZkClient zkClient;
 
-    @Autowired
-    private T currentServer;
+	@Autowired
+	private T currentServer;
 
-    private PathChildrenCache serversCache;
+	private PathChildrenCache serversCache;
 
-    @Autowired
-    private RemoteClusterServerFactory<T> remoteClusterServerFactory;
+	@Autowired
+	private RemoteClusterServerFactory<T> remoteClusterServerFactory;
 
-    private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1, XpipeThreadFactory.create(getClass().getSimpleName()));
+	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1, XpipeThreadFactory.create(getClass().getSimpleName()));
 
-    private ScheduledFuture<?> future;
+	private ScheduledFuture<?> future;
 
-    @Override
-    protected void doInitialize() throws Exception {
+	@Override
+	protected void doInitialize() throws Exception {
 
-    }
+	}
 
-    @Override
-    protected void doStart() throws Exception {
+	@Override
+	protected void doStart() throws Exception {
 
-        CuratorFramework client = zkClient.get();
+		CuratorFramework client = zkClient.get();
 
-        serversCache = new PathChildrenCache(client, MetaZkConfig.getMetaServerRegisterPath(), true,
-        XpipeThreadFactory.create(String.format("PathChildrenCache(%d)", currentServer.getServerId())));
-        serversCache.getListenable().addListener(new ChildrenChanged());
-        serversCache.start();
+		serversCache = new PathChildrenCache(client, MetaZkConfig.getMetaServerRegisterPath(), true,
+				XpipeThreadFactory.create(String.format("PathChildrenCache(%d)", currentServer.getServerId())));
+		serversCache.getListenable().addListener(new ChildrenChanged());
+		serversCache.start();
 
-        future = scheduled.scheduleWithFixedDelay(new AbstractExceptionLogTask() {
-            @Override
-            public void doRun() {
-                try {
-                    childrenChanged();
-                } catch (Throwable th) {
-                    logger.error("[doStart]", th);
-                }
+		future = scheduled.scheduleWithFixedDelay(new AbstractExceptionLogTask() {
+			@Override
+			public void doRun() {
+				try {
+					childrenChanged();
+				} catch (Throwable th) {
+					logger.error("[doStart]", th);
+				}
 
-            }
-        }, 1000, metaServerConfig.getClusterServersRefreshMilli(), TimeUnit.MILLISECONDS);
+			}
+		}, 1000, metaServerConfig.getClusterServersRefreshMilli(), TimeUnit.MILLISECONDS);
 
-    }
+	}
 
-    protected class ChildrenChanged implements PathChildrenCacheListener {
+	protected class ChildrenChanged implements PathChildrenCacheListener {
 
-        @Override
-        public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
+		@Override
+		public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
 
-            logger.info("[childEvent]{}, {}", event.getType(), ZkUtils.toString(event.getData()));
-            childrenChanged();
-        }
-    }
+			logger.info("[childEvent]{}, {}", event.getType(), ZkUtils.toString(event.getData()));
+			childrenChanged();
+		}
+	}
 
-    @Override
-    public T currentClusterServer() {
+	@Override
+	public T currentClusterServer() {
 
-        return currentServer;
-    }
+		return currentServer;
+	}
 
-    @Override
-    public T getClusterServer(int serverId) {
-        return servers.get(serverId);
-    }
+	@Override
+	public T getClusterServer(int serverId) {
+		return servers.get(serverId);
+	}
 
-    @Override
-    public int getOrder() {
-        return 0;
-    }
+	@Override
+	public int getOrder() {
+		return 0;
+	}
 
-    //for test
-    public String getServerIdFromPath(String path, String serverBasePath) {
+	//for test
+	public String getServerIdFromPath(String path, String serverBasePath) {
 
-        int index = path.indexOf(serverBasePath);
-        if (index >= 0) {
-            path = path.substring(index + serverBasePath.length());
-        }
-        if (path.startsWith("/")) {
-            path = path.substring(1);
-        }
+		int index = path.indexOf(serverBasePath);
+		if (index >= 0) {
+			path = path.substring(index + serverBasePath.length());
+		}
+		if (path.startsWith("/")) {
+			path = path.substring(1);
+		}
 
-        return path;
-    }
+		return path;
+	}
 
-    private synchronized void childrenChanged() throws ClusterException {
+	private synchronized void childrenChanged() throws ClusterException {
 
-        try {
-            logger.info("[childrenChanged][start][{}]{}", currentServerId(), servers);
-            List<ChildData> allServers = serversCache.getCurrentData();
-            String serverBasePath = MetaZkConfig.getMetaServerRegisterPath();
+		try {
+			logger.info("[childrenChanged][start][{}]{}", currentServerId(), servers);
+			List<ChildData> allServers = serversCache.getCurrentData();
+			String serverBasePath = MetaZkConfig.getMetaServerRegisterPath();
 
-            Set<Integer> currentServers = new HashSet<>();
-            for (ChildData childData : allServers) {
+			Set<Integer> currentServers = new HashSet<>();
+			for (ChildData childData : allServers) {
 
-                String serverIdStr = getServerIdFromPath(childData.getPath(), serverBasePath);
-                int serverId = Integer.parseInt(serverIdStr);
-                byte[] data = childData.getData();
-                ClusterServerInfo info = Codec.DEFAULT.decode(data, ClusterServerInfo.class);
+				String serverIdStr = getServerIdFromPath(childData.getPath(), serverBasePath);
+				int serverId = Integer.parseInt(serverIdStr);
+				byte[] data = childData.getData();
+				ClusterServerInfo info = Codec.DEFAULT.decode(data, ClusterServerInfo.class);
 
-                logger.debug("[childrenChanged][{}]{},{}", currentServerId(), serverId, info);
-                currentServers.add(serverId);
+				logger.debug("[childrenChanged][{}]{},{}", currentServerId(), serverId, info);
+				currentServers.add(serverId);
 
-                ClusterServer server = servers.get(serverId);
-                if (server == null) {
-                    logger.info("[childrenChanged][{}][createNew]{}{}", currentServerId(), serverId, info);
-                    T remoteServer = remoteClusterServerFactory.createClusterServer(serverId, info);
-                    servers.put(serverId, remoteServer);
-                    logger.info("[childrenChanged][{}][createNew]{}", currentServerId(), servers);
-                    serverAdded(remoteServer);
-                } else {
-                    if (!info.equals(server.getClusterInfo())) {
-                        logger.info("[childrenChanged][{}][clusterInfoChanged]{}{}", currentServerId(), serverId, info, server.getClusterInfo());
-                        T newServer = remoteClusterServerFactory.createClusterServer(serverId, info);
-                        servers.put(serverId, newServer);
-                        serverChanged(server, newServer);
-                    }
-                }
-            }
+				ClusterServer server = servers.get(serverId);
+				if (server == null) {
+					logger.info("[childrenChanged][{}][createNew]{}{}", currentServerId(), serverId, info);
+					T remoteServer = remoteClusterServerFactory.createClusterServer(serverId, info);
+					servers.put(serverId, remoteServer);
+					logger.info("[childrenChanged][{}][createNew]{}", currentServerId(), servers);
+					serverAdded(remoteServer);
+				} else {
+					if (!info.equals(server.getClusterInfo())) {
+						logger.info("[childrenChanged][{}][clusterInfoChanged]{}{}", currentServerId(), serverId, info, server.getClusterInfo());
+						T newServer = remoteClusterServerFactory.createClusterServer(serverId, info);
+						servers.put(serverId, newServer);
+						serverChanged(server, newServer);
+					}
+				}
+			}
 
-            for (Integer old : servers.keySet()) {
-                if (!currentServers.contains(old)) {
-                    ClusterServer serverInfo = servers.remove(old);
-                    logger.info("[childrenChanged][remote not exist][{}]{}, {}, current:{}", currentServerId(), old, serverInfo);
-                    remoteDelted(serverInfo);
+			for (Integer old : servers.keySet()) {
+				if (!currentServers.contains(old)) {
+					ClusterServer serverInfo = servers.remove(old);
+					logger.info("[childrenChanged][remote not exist][{}]{}, {}, current:{}", currentServerId(), old, serverInfo);
+					remoteDelted(serverInfo);
 
-                }
-            }
+				}
+			}
 
-            logger.info("[childrenChanged][ end ][{}]{}", currentServerId(), servers);
-        } catch (Exception e) {
-            throw new ClusterException("[childrenChanged]", e);
-        }
-    }
-
-
-    private Object currentServerId() {
-        return currentServer.getServerId();
-    }
-
-    private void remoteDelted(ClusterServer serverInfo) {
-        notifyObservers(new NodeDeleted<ClusterServer>(serverInfo));
-    }
-
-    private void serverChanged(ClusterServer oldServer, ClusterServer newServer) {
-        notifyObservers(new NodeModified<ClusterServer>(oldServer, newServer));
-    }
-
-    private void serverAdded(ClusterServer remoteServer) {
-        notifyObservers(new NodeAdded<ClusterServer>(remoteServer));
-    }
-
-    public void setMetaServerConfig(MetaServerConfig metaServerConfig) {
-        this.metaServerConfig = metaServerConfig;
-    }
-
-    public void setZkClient(ZkClient zkClient) {
-        this.zkClient = zkClient;
-    }
-
-    public void setCurrentServer(T currentServer) {
-        this.currentServer = currentServer;
-    }
-
-    public void setRemoteClusterServerFactory(RemoteClusterServerFactory<T> remoteClusterServerFactory) {
-        this.remoteClusterServerFactory = remoteClusterServerFactory;
-    }
-
-    @Override
-    public Set<T> allClusterServers() {
-        return new HashSet<>(servers.values());
-    }
+			logger.info("[childrenChanged][ end ][{}]{}", currentServerId(), servers);
+		} catch (Exception e) {
+			throw new ClusterException("[childrenChanged]", e);
+		}
+	}
 
 
-    @Override
-    protected void doStop() throws Exception {
+	private Object currentServerId() {
+		return currentServer.getServerId();
+	}
 
-        serversCache.close();
-        if (future != null) {
-            future.cancel(true);
-            future = null;
-        }
-    }
+	private void remoteDelted(ClusterServer serverInfo) {
+		notifyObservers(new NodeDeleted<ClusterServer>(serverInfo));
+	}
 
-    @Override
-    public void refresh() throws ClusterException {
-        childrenChanged();
-    }
+	private void serverChanged(ClusterServer oldServer, ClusterServer newServer) {
+		notifyObservers(new NodeModified<ClusterServer>(oldServer, newServer));
+	}
 
-    @Override
-    public boolean exist(int serverId) {
-        return servers.get(serverId) != null;
-    }
+	private void serverAdded(ClusterServer remoteServer) {
+		notifyObservers(new NodeAdded<ClusterServer>(remoteServer));
+	}
 
-    @Override
-    public Map<Integer, ClusterServerInfo> allClusterServerInfos() {
+	public void setMetaServerConfig(MetaServerConfig metaServerConfig) {
+		this.metaServerConfig = metaServerConfig;
+	}
 
-        Map<Integer, ClusterServerInfo> result = new HashMap<>();
-        for (Entry<Integer, T> entry : servers.entrySet()) {
-            result.put(entry.getKey(), entry.getValue().getClusterInfo());
-        }
-        return result;
-    }
+	public void setZkClient(ZkClient zkClient) {
+		this.zkClient = zkClient;
+	}
+
+	public void setCurrentServer(T currentServer) {
+		this.currentServer = currentServer;
+	}
+
+	public void setRemoteClusterServerFactory(RemoteClusterServerFactory<T> remoteClusterServerFactory) {
+		this.remoteClusterServerFactory = remoteClusterServerFactory;
+	}
+
+	@Override
+	public Set<T> allClusterServers() {
+		return new HashSet<>(servers.values());
+	}
+
+
+	@Override
+	protected void doStop() throws Exception {
+
+		serversCache.close();
+		if (future != null) {
+			future.cancel(true);
+			future = null;
+		}
+	}
+
+	@Override
+	public void refresh() throws ClusterException {
+		childrenChanged();
+	}
+
+	@Override
+	public boolean exist(int serverId) {
+		return servers.get(serverId) != null;
+	}
+
+	@Override
+	public Map<Integer, ClusterServerInfo> allClusterServerInfos() {
+
+		Map<Integer, ClusterServerInfo> result = new HashMap<>();
+		for (Entry<Integer, T> entry : servers.entrySet()) {
+			result.put(entry.getKey(), entry.getValue().getClusterInfo());
+		}
+		return result;
+	}
 
 
 }

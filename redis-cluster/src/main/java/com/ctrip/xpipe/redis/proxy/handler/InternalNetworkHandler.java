@@ -14,32 +14,32 @@ import org.slf4j.LoggerFactory;
  */
 public class InternalNetworkHandler extends ChannelInboundHandlerAdapter {
 
-    private Logger logger = LoggerFactory.getLogger(InternalNetworkHandler.class);
+	private Logger logger = LoggerFactory.getLogger(InternalNetworkHandler.class);
 
-    private String[] internalIpPrefix;
+	private String[] internalIpPrefix;
 
-    public InternalNetworkHandler(String... internalIpPrefix) {
-        this.internalIpPrefix = internalIpPrefix;
-    }
+	public InternalNetworkHandler(String... internalIpPrefix) {
+		this.internalIpPrefix = internalIpPrefix;
+	}
 
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        Channel channel = ctx.channel();
-        if(!isInternalNetwork(channel)) {
-            logger.error("[not internal network] {}, close channel", channel.remoteAddress());
-            channel.close();
-        }
-        super.channelActive(ctx);
-    }
+	@Override
+	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+		Channel channel = ctx.channel();
+		if (!isInternalNetwork(channel)) {
+			logger.error("[not internal network] {}, close channel", channel.remoteAddress());
+			channel.close();
+		}
+		super.channelActive(ctx);
+	}
 
-    private boolean isInternalNetwork(Channel channel) {
-        String remoteHost = IpUtils.getIp(channel.remoteAddress());
-        String[] splittedBytes = IpUtils.splitIpAddr(remoteHost);
-        for(int i = 0; internalIpPrefix != null && i < internalIpPrefix.length; i++) {
-            if(!splittedBytes[i].equals(internalIpPrefix[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
+	private boolean isInternalNetwork(Channel channel) {
+		String remoteHost = IpUtils.getIp(channel.remoteAddress());
+		String[] splittedBytes = IpUtils.splitIpAddr(remoteHost);
+		for (int i = 0; internalIpPrefix != null && i < internalIpPrefix.length; i++) {
+			if (!splittedBytes[i].equals(internalIpPrefix[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

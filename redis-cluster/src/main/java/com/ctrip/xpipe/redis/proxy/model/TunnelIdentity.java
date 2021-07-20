@@ -10,50 +10,50 @@ import io.netty.channel.Channel;
  */
 public class TunnelIdentity {
 
-    private Channel frontend;
+	private Channel frontend;
 
-    private Channel backend;
+	private Channel backend;
 
-    private String destination;
+	private String destination;
 
-    private String source;
+	private String source;
 
-    public TunnelIdentity(Channel frontend, String destination, String source) {
-        this.frontend = frontend;
-        this.destination = destination;
-        this.source = source;
-    }
+	public TunnelIdentity(Channel frontend, String destination, String source) {
+		this.frontend = frontend;
+		this.destination = destination;
+		this.source = source;
+	}
 
-    public Channel getFrontend() {
-        return frontend;
-    }
+	public Channel getFrontend() {
+		return frontend;
+	}
 
-    public TunnelIdentity setFrontend(Channel frontend) {
-        this.frontend = frontend;
-        return this;
-    }
+	public TunnelIdentity setFrontend(Channel frontend) {
+		this.frontend = frontend;
+		return this;
+	}
 
-    public Channel getBackend() {
-        return backend;
-    }
+	public Channel getBackend() {
+		return backend;
+	}
 
-    public TunnelIdentity setBackend(Channel backend) {
-        this.backend = backend;
-        return this;
-    }
+	public TunnelIdentity setBackend(Channel backend) {
+		this.backend = backend;
+		return this;
+	}
 
-    public String getDestination() {
-        return destination;
-    }
+	public String getDestination() {
+		return destination;
+	}
 
-    public TunnelIdentity setDestination(String destination) {
-        this.destination = destination;
-        return this;
-    }
+	public TunnelIdentity setDestination(String destination) {
+		this.destination = destination;
+		return this;
+	}
 
-    @Override
-    public String toString() {
-        return String.format("%s-%s-%s-%s", source, ChannelUtil.getRemoteAddr(frontend),
-                ChannelUtil.getDesc(backend), destination);
-    }
+	@Override
+	public String toString() {
+		return String.format("%s-%s-%s-%s", source, ChannelUtil.getRemoteAddr(frontend),
+				ChannelUtil.getDesc(backend), destination);
+	}
 }

@@ -15,16 +15,16 @@ import io.netty.channel.ChannelFuture;
  */
 public class DefaultProxyedConnectionFactory implements ProxyedConnectionFactory {
 
-    private ProxyResourceManager resourceManager;
+	private ProxyResourceManager resourceManager;
 
-    public DefaultProxyedConnectionFactory(ProxyResourceManager resourceManager) {
-        this.resourceManager = resourceManager;
-    }
+	public DefaultProxyedConnectionFactory(ProxyResourceManager resourceManager) {
+		this.resourceManager = resourceManager;
+	}
 
-    @Override
-    public ChannelFuture getProxyedConnectionChannelFuture(ProxyConnectProtocol protocol, Bootstrap bootstrap) {
-        ProxyEndpointSelector selector = resourceManager.createProxyEndpointSelector(protocol);
-        ProxyEndpoint proxyEndpoint = selector.nextHop();
-        return bootstrap.connect(proxyEndpoint.getHost(), proxyEndpoint.getPort());
-    }
+	@Override
+	public ChannelFuture getProxyedConnectionChannelFuture(ProxyConnectProtocol protocol, Bootstrap bootstrap) {
+		ProxyEndpointSelector selector = resourceManager.createProxyEndpointSelector(protocol);
+		ProxyEndpoint proxyEndpoint = selector.nextHop();
+		return bootstrap.connect(proxyEndpoint.getHost(), proxyEndpoint.getPort());
+	}
 }

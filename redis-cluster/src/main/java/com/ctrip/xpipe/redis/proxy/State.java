@@ -7,11 +7,11 @@ package com.ctrip.xpipe.redis.proxy;
  */
 public interface State<C extends State> {
 
-    C nextAfterSuccess();
+	C nextAfterSuccess();
 
-    C nextAfterFail();
+	C nextAfterFail();
 
-    String name();
+	String name();
 
-    boolean isValidNext(C c);
+	boolean isValidNext(C c);
 }

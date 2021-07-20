@@ -14,12 +14,13 @@ import java.util.List;
 
 /**
  * for client router system
- * @author shyin
  *
+ * @author shyin
+ * <p>
  * Dec 22, 2016
  */
-public interface OuterClientService extends Ordered{
-	
+public interface OuterClientService extends Ordered {
+
 	OuterClientService DEFAULT = ServicesUtil.getOuterClientService();
 
 	String serviceName();
@@ -31,7 +32,7 @@ public interface OuterClientService extends Ordered{
 	void markInstanceDown(ClusterShardHostPort clusterShardHostPort) throws OuterClientException;
 
 	MigrationPublishResult doMigrationPublish(String clusterName, String primaryDcName, List<InetSocketAddress> newMasters) throws OuterClientException;
-	
+
 	MigrationPublishResult doMigrationPublish(String clusterName, String shardName, String primaryDcName, InetSocketAddress newMaster) throws OuterClientException;
 
 	ClusterInfo getClusterInfo(String clusterName) throws Exception;
@@ -46,29 +47,29 @@ public interface OuterClientService extends Ordered{
 		}
 	}
 
-	class MigrationPublishResult extends AbstractInfo{
+	class MigrationPublishResult extends AbstractInfo {
 
 		private boolean Success;
 		private String Message;
-		
+
 		private String startTime;
 		private String endTime;
 		private String publishAddress;
 		private String clusterName;
 		private String primaryDcName;
 		private List<InetSocketAddress> newMasters;
-		
+
 		public MigrationPublishResult() {
-			
+
 		}
-		
+
 		public MigrationPublishResult(String publishAddress, String clusterName, String primaryDcName, List<InetSocketAddress> newMasters) {
 			this.publishAddress = publishAddress;
 			this.clusterName = clusterName;
 			this.primaryDcName = primaryDcName;
 			this.newMasters = newMasters;
 		}
-		
+
 		public boolean isSuccess() {
 			return Success;
 		}
@@ -84,7 +85,7 @@ public interface OuterClientService extends Ordered{
 		public void setMessage(String message) {
 			Message = message;
 		}
-		
+
 		public String getPublishAddress() {
 			return publishAddress;
 		}
@@ -116,7 +117,7 @@ public interface OuterClientService extends Ordered{
 		public void setNewMasters(List<InetSocketAddress> newMasters) {
 			this.newMasters = newMasters;
 		}
-		
+
 		public String getStartTime() {
 			return startTime;
 		}
@@ -132,7 +133,7 @@ public interface OuterClientService extends Ordered{
 		public void setEndTime(String endTime) {
 			this.endTime = endTime;
 		}
-		
+
 	}
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -156,7 +157,7 @@ public interface OuterClientService extends Ordered{
 			}
 		}
 
-		public void mapIdc(DC_TRANSFORM_DIRECTION direction){
+		public void mapIdc(DC_TRANSFORM_DIRECTION direction) {
 
 			masterIDC = direction.transform(masterIDC);
 
@@ -245,7 +246,7 @@ public interface OuterClientService extends Ordered{
 			this.instances = instances;
 		}
 
-		public void mapIdc(DC_TRANSFORM_DIRECTION direction){
+		public void mapIdc(DC_TRANSFORM_DIRECTION direction) {
 
 			if (instances != null) {
 				instances.forEach(instanceMeta -> instanceMeta.mapIdc(direction));
@@ -280,7 +281,8 @@ public interface OuterClientService extends Ordered{
 			}
 
 		}
-		void mapIdc(DC_TRANSFORM_DIRECTION direction){
+
+		void mapIdc(DC_TRANSFORM_DIRECTION direction) {
 			env = direction.transform(env);
 		}
 

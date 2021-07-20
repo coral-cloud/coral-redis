@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 public interface KeeperTokenManager {
 
-    MetaServerKeeperService.KeeperContainerTokenStatusResponse
-    refreshKeeperTokenStatus(MetaServerKeeperService.KeeperContainerTokenStatusRequest request);
+	MetaServerKeeperService.KeeperContainerTokenStatusResponse
+	refreshKeeperTokenStatus(MetaServerKeeperService.KeeperContainerTokenStatusRequest request);
 
-    boolean closeKeeperRateLimit();
+	boolean closeKeeperRateLimit();
 }

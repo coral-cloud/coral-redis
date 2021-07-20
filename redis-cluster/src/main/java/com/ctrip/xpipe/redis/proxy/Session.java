@@ -18,33 +18,33 @@ import io.netty.channel.Channel;
  */
 public interface Session extends Lifecycle, Releasable, Observable {
 
-    Tunnel tunnel();
+	Tunnel tunnel();
 
-    Channel getChannel();
+	Channel getChannel();
 
-    void markReadable();
+	void markReadable();
 
-    void markUnReadable();
+	void markUnReadable();
 
-    SessionMeta getSessionMeta();
+	SessionMeta getSessionMeta();
 
-    SESSION_TYPE getSessionType();
+	SESSION_TYPE getSessionType();
 
-    SessionState getSessionState();
+	SessionState getSessionState();
 
-    void tryWrite(ByteBuf byteBuf);
+	void tryWrite(ByteBuf byteBuf);
 
-    void setWritableState(SessionWritableState state);
+	void setWritableState(SessionWritableState state);
 
-    void addSessionEventHandler(SessionEventHandler handler);
+	void addSessionEventHandler(SessionEventHandler handler);
 
-    SessionMonitor getSessionMonitor();
+	SessionMonitor getSessionMonitor();
 
-    enum SessionWritableState {
-        WRITABLE, UNWRITABLE
-    }
+	enum SessionWritableState {
+		WRITABLE, UNWRITABLE
+	}
 
-    // no exception throw for release
-    @Override
-    void release();
+	// no exception throw for release
+	@Override
+	void release();
 }

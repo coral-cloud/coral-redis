@@ -9,17 +9,17 @@ import java.io.Serializable;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 5, 2016
  */
 public class MetaClone {
 
 	private static Logger logger = LoggerFactory.getLogger(MetaClone.class);
-	
-	public static <T extends Serializable> T clone(T obj){
+
+	public static <T extends Serializable> T clone(T obj) {
 		try {
 			return SerializationUtils.clone(obj);
-		}catch (SerializationException e){
+		} catch (SerializationException e) {
 			logger.error("[clone]", e);
 			throw e;
 		}

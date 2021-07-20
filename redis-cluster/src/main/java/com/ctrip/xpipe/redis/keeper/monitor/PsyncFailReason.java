@@ -7,6 +7,6 @@ package com.ctrip.xpipe.redis.keeper.monitor;
  */
 public enum PsyncFailReason {
 
-    TOKEN_LACK,
-    MASTER_DISCONNECTED,
+	TOKEN_LACK,
+	MASTER_DISCONNECTED,
 }

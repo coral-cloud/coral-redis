@@ -4,14 +4,15 @@ import com.ctrip.xpipe.redis.core.entity.RedisMeta;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Nov 3, 2016
  */
-public interface MetaServerMultiDcService extends MetaServerService{
+public interface MetaServerMultiDcService extends MetaServerService {
 
 
 	/**
 	 * used by backup dc
+	 *
 	 * @param clusterId
 	 * @param shardId
 	 * @param ip

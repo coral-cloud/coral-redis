@@ -13,50 +13,50 @@ import java.util.concurrent.Executors;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 15, 2016
  */
-public class ParallelCommandChain extends AbstractCommandChain{
-	
+public class ParallelCommandChain extends AbstractCommandChain {
+
 	private Executor executors;
 	private List<CommandFuture<?>> completed = new LinkedList<>();
 
 	private boolean isLoggable = true;
 
-	public ParallelCommandChain(Executor executors){
+	public ParallelCommandChain(Executor executors) {
 		this.executors = executors;
-		if(this.executors == null){
+		if (this.executors == null) {
 			this.executors = Executors.newCachedThreadPool(XpipeThreadFactory.create("ParallelCommandChain"));
 		}
 	}
 
-	public ParallelCommandChain(Executor executors, boolean loggable){
+	public ParallelCommandChain(Executor executors, boolean loggable) {
 		this.executors = executors;
-		if(this.executors == null){
+		if (this.executors == null) {
 			this.executors = Executors.newCachedThreadPool(XpipeThreadFactory.create("ParallelCommandChain"));
 		}
 		isLoggable = loggable;
 	}
 
-	public ParallelCommandChain(Command<?> ...commands) {
+	public ParallelCommandChain(Command<?>... commands) {
 		this(null, commands);
 	}
 
-	public ParallelCommandChain(ExecutorService executors, Command<?> ...commands) {
+	public ParallelCommandChain(ExecutorService executors, Command<?>... commands) {
 		super(commands);
-		if(executors == null){
+		if (executors == null) {
 			executors = Executors.newCachedThreadPool(XpipeThreadFactory.create("ParallelCommandChain"));
 		}
 		this.executors = executors;
-		
+
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
 	protected void doExecute() throws Exception {
 		super.doExecute();
-		
-		for(int i=0; i < commands.size() ;i++){
+
+		for (int i = 0; i < commands.size(); i++) {
 			executors.execute(new Runnable() {
 				@Override
 				public void run() {
@@ -75,45 +75,45 @@ public class ParallelCommandChain extends AbstractCommandChain{
 	}
 
 	private void addComplete(CommandFuture<?> commandFuture) {
-		
-		
+
+
 		synchronized (completed) {
 			completed.add(commandFuture);
 		}
-		
-		if(future().isCancelled()){
+
+		if (future().isCancelled()) {
 			return;
 		}
-		
-		if(completed.size() >= commands.size()){
-			if(isLoggable) {
+
+		if (completed.size() >= commands.size()) {
+			if (isLoggable) {
 				getLogger().info("[addComplete][all complete]{}, {}", completed.size(), getResult().size());
 			}
 			boolean fail = false;
-			for(CommandFuture<?> future : completed){
-				if(!future.isSuccess()){
+			for (CommandFuture<?> future : completed) {
+				if (!future.isSuccess()) {
 					fail = true;
 					break;
 				}
 			}
 			synchronized (this) {
-				if(!future().isDone()){
-					if(!fail){
+				if (!future().isDone()) {
+					if (!fail) {
 						future().setSuccess(getResult());
-					}else{
+					} else {
 						future().setFailure(new CommandChainException("parallel fail", getResult()));
 					}
 				}
 			}
 		}
 	}
-	
+
 	@Override
 	protected void doCancel() {
-		
+
 		List<CommandFuture<?>> executed = new LinkedList<>(getResult());
 		executed.removeAll(completed);
-		for(CommandFuture<?> future : executed){
+		for (CommandFuture<?> future : executed) {
 			future.cancel(true);
 		}
 		super.doCancel();

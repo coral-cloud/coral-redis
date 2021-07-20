@@ -7,40 +7,40 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 2, 2016
  */
-public class RetryByteBufReadPolicy implements ByteBufReadPolicy{
-	
+public class RetryByteBufReadPolicy implements ByteBufReadPolicy {
+
 	private Logger logger = LoggerFactory.getLogger(RetryByteBufReadPolicy.class);
-	
+
 	private int retry = 3;
 
-	public RetryByteBufReadPolicy(){
+	public RetryByteBufReadPolicy() {
 	}
 
-	public RetryByteBufReadPolicy(int retry){
+	public RetryByteBufReadPolicy(int retry) {
 		this.retry = retry;
 	}
-	
-	
+
+
 	@Override
 	public void read(Channel channel, ByteBuf byteBuf, ByteBufReadAction byteBufReadAction) throws ByteBufReadPolicyException {
 
-		for(int i = 0; i < retry ; ){
+		for (int i = 0; i < retry; ) {
 			try {
 				int before = byteBuf.readableBytes();
 				byteBufReadAction.read(channel, byteBuf);
 				int after = byteBuf.readableBytes();
-				if( after <= 0 ){
+				if (after <= 0) {
 					break;
 				}
-				if(after < before){
+				if (after < before) {
 					//go on
 					continue;
-				}else if(after == before){
+				} else if (after == before) {
 					i++;
-				}else{
+				} else {
 					logger.error("[channelRead][size increased after read!]{} < {}", before, after);
 					break;
 				}

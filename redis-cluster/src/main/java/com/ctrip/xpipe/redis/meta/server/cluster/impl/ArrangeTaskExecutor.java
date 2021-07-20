@@ -16,54 +16,54 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 27, 2016
  */
 @Component
-public class ArrangeTaskExecutor extends AbstractLifecycle implements TopElement, Runnable{
-	
+public class ArrangeTaskExecutor extends AbstractLifecycle implements TopElement, Runnable {
+
 	private BlockingQueue<ReshardingTask> tasks = new LinkedBlockingQueue<>();
-	
-	private int waitTaskTimeoutMilli =  60000;
-	
+
+	private int waitTaskTimeoutMilli = 60000;
+
 	private CommandFuture<Void> currentTask = null;
-	
+
 	@Autowired
 	private CurrentClusterServer currentClusterServer;
-	
+
 	private AtomicLong totalTasks = new AtomicLong(0);
-	
+
 	public static final String ARRANGE_TASK_EXECUTOR_START = "ArrangeTaskExecutorStart";
-	
+
 	private Thread taskThread;
-	
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 
 	}
-	
+
 	@Override
 	protected void doStart() throws Exception {
 
 		startTaskThread();
 	}
-	
+
 	private void startTaskThread() {
 
-		if(!Boolean.parseBoolean(System.getProperty(ARRANGE_TASK_EXECUTOR_START, "true"))){
+		if (!Boolean.parseBoolean(System.getProperty(ARRANGE_TASK_EXECUTOR_START, "true"))) {
 			logger.info("[startTaskThread][system start false property]{}", ARRANGE_TASK_EXECUTOR_START);
 			return;
 		}
 
-		if(shouldExit()){
+		if (shouldExit()) {
 			logger.info("[startTaskThread][should exit]");
 			return;
 		}
 
-		if(taskThread == null){
+		if (taskThread == null) {
 			taskThread = XpipeThreadFactory.create(
-					String.format("ArrangeTaskExecutor-(%d)", currentClusterServer.getServerId()) ).newThread(this);
+					String.format("ArrangeTaskExecutor-(%d)", currentClusterServer.getServerId())).newThread(this);
 			taskThread.start();
 		}
 	}
@@ -71,29 +71,29 @@ public class ArrangeTaskExecutor extends AbstractLifecycle implements TopElement
 
 	@Override
 	protected void doStop() throws Exception {
-		if(taskThread != null){
+		if (taskThread != null) {
 			taskThread.interrupt();
 		}
 	}
-	
-	public void offer(ReshardingTask task){
-		
+
+	public void offer(ReshardingTask task) {
+
 		logger.info("[offer]{}", task);
-		if(tasks.offer(task)){
+		if (tasks.offer(task)) {
 			totalTasks.incrementAndGet();
-		}else{
+		} else {
 			logger.error("[offset][fail]{}", task);
 		}
-		
+
 		startTaskThread();
 	}
-	
-	public void clearTasks(){
-		
+
+	public void clearTasks() {
+
 		logger.info("[clearTasks]{}", tasks);
 		tasks.clear();
-		
-		if(currentTask != null){
+
+		if (currentTask != null) {
 			currentTask.cancel(true);
 		}
 	}
@@ -104,55 +104,52 @@ public class ArrangeTaskExecutor extends AbstractLifecycle implements TopElement
 	}
 
 	private boolean shouldExit() {
-		
-		if(getLifecycleState().isStarted() || getLifecycleState().isStarting()){
-			return false;
-		}
-		return true;
+
+		return !getLifecycleState().isStarted() && !getLifecycleState().isStarting();
 	}
 
 	@Override
 	public void run() {
-		
-		while(!shouldExit()){
-			try{
+
+		while (!shouldExit()) {
+			try {
 				executeTask();
-			}catch(Throwable th){
+			} catch (Throwable th) {
 				logger.error("[run]", th);
 			}
 		}
 		logger.info("[run][break]");
-		
+
 		taskThread = null;
 	}
 
-	
+
 	public long getTotalTasks() {
 		return totalTasks.get();
 	}
 
 	private void executeTask() throws InterruptedException {
-		
+
 		ReshardingTask task = null;
-		try{
+		try {
 			task = tasks.take();
-			
-			if(shouldExit()){
+
+			if (shouldExit()) {
 				logger.info("[executeTask][exit drop task]{}", task);
 				return;
 			}
-			
+
 			logger.info("[executeTask][begin]{}", task);
 			currentTask = task.execute();
-			if(!currentTask.await(waitTaskTimeoutMilli, TimeUnit.MILLISECONDS)){
+			if (!currentTask.await(waitTaskTimeoutMilli, TimeUnit.MILLISECONDS)) {
 				logger.info("[executeTask][task timeout]{}", waitTaskTimeoutMilli);
 				currentTask.cancel(true);
 				return;
 			}
-			if(!currentTask.isSuccess()){
+			if (!currentTask.isSuccess()) {
 				logger.error("[executTask][fail]" + task, currentTask.cause());
 			}
-		}finally{
+		} finally {
 			logger.info("[executeTask][ end ]{}", task);
 			currentTask = null;
 		}

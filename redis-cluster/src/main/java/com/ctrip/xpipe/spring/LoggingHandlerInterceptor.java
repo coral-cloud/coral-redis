@@ -10,18 +10,18 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 30, 2016
  */
-public class LoggingHandlerInterceptor implements HandlerInterceptor{
-	
+public class LoggingHandlerInterceptor implements HandlerInterceptor {
+
 	private Logger logger = LoggerFactory.getLogger(LoggingHandlerInterceptor.class);
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		
-		if(log(request)){
+
+		if (log(request)) {
 			logger.info("[preHandle]{}", request.getRequestURI());
 		}
 		return true;
@@ -29,17 +29,14 @@ public class LoggingHandlerInterceptor implements HandlerInterceptor{
 
 	private boolean log(HttpServletRequest request) {
 		String path = request.getRequestURL().toString();
-		if(path.startsWith("/")){
-			return true;
-		}
-		return false;
+		return path.startsWith("/");
 	}
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-			ModelAndView modelAndView) throws Exception {
+						   ModelAndView modelAndView) throws Exception {
 
-		if(log(request)){
+		if (log(request)) {
 			logger.info("[postHandle]{}, {}", request.getRequestURI(), modelAndView);
 		}
 	}
@@ -48,11 +45,11 @@ public class LoggingHandlerInterceptor implements HandlerInterceptor{
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 
-		if(log(request)){
-			if(ex != null){
-				logger.error("[afterCompletion]" +  request.getRequestURI(), ex);
-			}else{
-				logger.info("[afterCompletion]{}", request.getRequestURI());				
+		if (log(request)) {
+			if (ex != null) {
+				logger.error("[afterCompletion]" + request.getRequestURI(), ex);
+			} else {
+				logger.info("[afterCompletion]{}", request.getRequestURI());
 			}
 		}
 	}

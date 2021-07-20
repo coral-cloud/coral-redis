@@ -2,41 +2,42 @@ package com.ctrip.xpipe.api.lifecycle;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 6, 2016
  */
-public interface LifecycleState{
-	
+public interface LifecycleState {
+
 	/**
 	 * just created!
+	 *
 	 * @return
 	 */
 	boolean isEmpty();
 
 	boolean isInitializing();
-	
+
 	boolean isInitialized();
-	
+
 	boolean isStarting();
-	
+
 	boolean isStarted();
-	
+
 	boolean isStopping();
-	
+
 	boolean isStopped();
-	
+
 	boolean isPositivelyStopped();
-	
+
 	boolean isDisposing();
-	
+
 	boolean isDisposed();
 
 	boolean isPositivelyDisposed();
 
 	String getPhaseName();
-	
+
 	void setPhaseName(String name);
-	
+
 	/**
 	 * rollback to previous state
 	 */

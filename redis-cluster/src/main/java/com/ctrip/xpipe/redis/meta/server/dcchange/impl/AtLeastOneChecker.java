@@ -17,19 +17,19 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 1, 2016
  */
-public class AtLeastOneChecker implements HealthChecker{
-	
-	private static Logger logger = LoggerFactory.getLogger(AtLeastOneChecker.class); 
-	
+public class AtLeastOneChecker implements HealthChecker {
+
+	private static Logger logger = LoggerFactory.getLogger(AtLeastOneChecker.class);
+
 	private List<RedisMeta> redises;
-	
+
 	private XpipeNettyClientKeyedObjectPool pool;
-	
+
 	private ScheduledExecutorService scheduled;
-	
+
 	public AtLeastOneChecker(List<RedisMeta> list, XpipeNettyClientKeyedObjectPool pool, ScheduledExecutorService scheduled) {
 		this.redises = list;
 		this.pool = pool;

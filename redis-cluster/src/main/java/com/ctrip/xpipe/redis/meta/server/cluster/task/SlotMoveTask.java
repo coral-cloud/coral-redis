@@ -5,17 +5,16 @@ import com.ctrip.xpipe.redis.meta.server.cluster.ClusterServer;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 26, 2016
  */
-public interface SlotMoveTask extends Command<Void>{
-	
+public interface SlotMoveTask extends Command<Void> {
+
 	int getSlot();
-	
+
 	ClusterServer getFrom();
-	
+
 	ClusterServer getTo();
-	
-	
+
 
 }

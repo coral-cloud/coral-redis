@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author wenchao.meng
- *
- *         2016年5月9日 下午5:31:00
+ * <p>
+ * 2016年5月9日 下午5:31:00
  */
 public class DefaultFullSyncListener implements FullSyncListener {
 
@@ -33,7 +33,7 @@ public class DefaultFullSyncListener implements FullSyncListener {
 
 	@Override
 	public void onFileData(ReferenceFileRegion referenceFileRegion) {
-		
+
 		if (referenceFileRegion == null) {
 
 			if (logger.isInfoEnabled()) {
@@ -84,7 +84,7 @@ public class DefaultFullSyncListener implements FullSyncListener {
 
 	@Override
 	public ChannelFuture onCommand(ReferenceFileRegion referenceFileRegion) {
-		
+
 		return redisSlave.onCommand(referenceFileRegion);
 	}
 

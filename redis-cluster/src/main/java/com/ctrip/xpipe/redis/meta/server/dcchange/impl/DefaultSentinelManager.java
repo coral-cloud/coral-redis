@@ -28,40 +28,40 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 9, 2016
  */
 @Component
-public class DefaultSentinelManager implements SentinelManager{
-	
+public class DefaultSentinelManager implements SentinelManager {
+
 	private static int DEFAULT_SENTINEL_QUORUM = Integer.parseInt(System.getProperty("DEFAULT_SENTINEL_QUORUM", "3"));
 	private static int DEFAULT_SENTINEL_ADD_SIZE = Integer.parseInt(System.getProperty("DEFAULT_SENTINEL_ADD_SIZE", "5"));
 
 	public static int DEFAULT_MIGRATION_SENTINEL_COMMAND_TIMEOUT_MILLI = Integer.parseInt(System.getProperty("MIGRATE_SENTINEL_TIMEOUT", "100"));
 
 	private static Logger logger = LoggerFactory.getLogger(DefaultSentinelManager.class);
-	
+
 	@Resource(name = AbstractSpringConfigContext.SCHEDULED_EXECUTOR)
 	private ScheduledExecutorService scheduled;
-	
+
 	@Autowired
 	private DcMetaCache dcMetaCache;
 
 	@Resource(name = MetaServerContextConfig.CLIENT_POOL)
 	private XpipeNettyClientKeyedObjectPool keyedClientPool;
-	
-	public DefaultSentinelManager(){
-		
+
+	public DefaultSentinelManager() {
+
 	}
-	
+
 	public DefaultSentinelManager(DcMetaCache dcMetaCache, XpipeNettyClientKeyedObjectPool keyedClientPool) {
 		this.dcMetaCache = dcMetaCache;
 		this.keyedClientPool = keyedClientPool;
 	}
-	
+
 	@Override
 	public void addSentinel(String clusterId, String shardId, HostPort redisMaster, ExecutionLog executionLog) {
-		
+
 //		String sentinelMonitorName = dcMetaCache.getSentinelMonitorName(clusterId, shardId);
 //	//	String allSentinels = dcMetaCache.getSentinel(clusterId, shardId).getAddress();
 //
@@ -96,13 +96,13 @@ public class DefaultSentinelManager implements SentinelManager{
 	}
 
 	private boolean checkEmpty(String sentinelMonitorName, String allSentinels, ExecutionLog executionLog) {
-		
-		if(StringUtil.isEmpty(sentinelMonitorName)){
+
+		if (StringUtil.isEmpty(sentinelMonitorName)) {
 			executionLog.warn("sentinelMonitorName empty, exit!");
 			return true;
 		}
-		
-		if(StringUtil.isEmpty(allSentinels)){
+
+		if (StringUtil.isEmpty(allSentinels)) {
 			executionLog.warn("allSentinels empty, exit!");
 			return true;
 		}
@@ -145,16 +145,16 @@ public class DefaultSentinelManager implements SentinelManager{
 	}
 
 	private List<Sentinel> getRealSentinels(List<InetSocketAddress> sentinels, String sentinelMonitorName, ExecutionLog executionLog) {
-		
+
 		List<Sentinel> realSentinels = null;
-		for(InetSocketAddress sentinelAddress: sentinels){
-			
+		for (InetSocketAddress sentinelAddress : sentinels) {
+
 			SimpleObjectPool<NettyClient> clientPool = keyedClientPool.getKeyPool(new DefaultEndPoint(sentinelAddress));
 			Sentinels sentinelsCommand = new Sentinels(clientPool, sentinelMonitorName, scheduled, DEFAULT_MIGRATION_SENTINEL_COMMAND_TIMEOUT_MILLI);
 			try {
 				realSentinels = sentinelsCommand.execute().get();
 				executionLog.info(String.format("get sentinels from %s : %s", sentinelAddress, realSentinels));
-				if(null != realSentinels) {
+				if (null != realSentinels) {
 					realSentinels.add(new Sentinel(sentinelAddress.toString(), sentinelAddress.getHostString(), sentinelAddress.getPort()));
 					break;
 				}
@@ -163,8 +163,8 @@ public class DefaultSentinelManager implements SentinelManager{
 				executionLog.warn("[getRealSentinels]get sentinels from " + sentinelAddress + "," + e.getMessage());
 			}
 		}
-		
-		
+
+
 		return realSentinels;
 	}
 

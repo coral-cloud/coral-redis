@@ -3,15 +3,15 @@ package com.ctrip.xpipe.redis.meta.server.meta;
 import com.ctrip.xpipe.api.lifecycle.Releasable;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use= JsonTypeInfo.Id.MINIMAL_CLASS)
+@JsonTypeInfo(use = JsonTypeInfo.Id.MINIMAL_CLASS)
 public interface CurrentShardMeta extends Releasable {
 
-    boolean watchIfNotWatched();
+	boolean watchIfNotWatched();
 
-    void addResource(Releasable releasable);
+	void addResource(Releasable releasable);
 
-    String getClusterId();
+	String getClusterId();
 
-    String getShardId();
+	String getShardId();
 
 }

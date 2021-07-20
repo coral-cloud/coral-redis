@@ -4,8 +4,8 @@ import org.slf4j.MDC;
 
 /**
  * @author marsqing
- *
- *         Dec 20, 2016 1:52:46 PM
+ * <p>
+ * Dec 20, 2016 1:52:46 PM
  */
 public class MDCUtil {
 

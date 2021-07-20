@@ -8,64 +8,64 @@ import org.slf4j.LoggerFactory;
 
 public class CausalChain extends AbstractCommandChain {
 
-    private static final Logger logger = LoggerFactory.getLogger(CausalChain.class);
+	private static final Logger logger = LoggerFactory.getLogger(CausalChain.class);
 
-    private boolean failContinue = false;
+	private boolean failContinue = false;
 
-    @Override
-    protected void doExecute() throws Exception {
-        super.doExecute();
-        executeChain();
-    }
+	@Override
+	protected void doExecute() throws Exception {
+		super.doExecute();
+		executeChain();
+	}
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected void executeChain() {
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	protected void executeChain() {
 
-        if(future().isCancelled()) {
-            return;
-        }
+		if (future().isCancelled()) {
+			return;
+		}
 
-        CommandFuture<?> currentFuture = executeNext();
-        if(currentFuture == null) {
-            future().setSuccess(getResult());
-            return;
-        }
-        Command next = getCommand(executeCount());
-        if (next instanceof Causal) {
-            CausalCommand nextCommand = (CausalCommand) getCommand(executeCount());
-            if (nextCommand != null) {
-                nextCommand.getCausation(currentFuture);
-            }
-        }
-        currentFuture.addListener(new CommandFutureListener() {
+		CommandFuture<?> currentFuture = executeNext();
+		if (currentFuture == null) {
+			future().setSuccess(getResult());
+			return;
+		}
+		Command next = getCommand(executeCount());
+		if (next instanceof Causal) {
+			CausalCommand nextCommand = (CausalCommand) getCommand(executeCount());
+			if (nextCommand != null) {
+				nextCommand.getCausation(currentFuture);
+			}
+		}
+		currentFuture.addListener(new CommandFutureListener() {
 
-            @Override
-            public void operationComplete(CommandFuture commandFuture) throws Exception {
+			@Override
+			public void operationComplete(CommandFuture commandFuture) throws Exception {
 
-                if(commandFuture.isSuccess()) {
-                    executeChain();
-                } else {
-                    failExecuteNext(commandFuture);
-                }
-            }
-        });
-    }
+				if (commandFuture.isSuccess()) {
+					executeChain();
+				} else {
+					failExecuteNext(commandFuture);
+				}
+			}
+		});
+	}
 
-    private void failExecuteNext(CommandFuture<?> commandFuture) {
+	private void failExecuteNext(CommandFuture<?> commandFuture) {
 
-        Command<?> next = getCommand(executeCount());
+		Command<?> next = getCommand(executeCount());
 
-        // break chain or not depend on next command when next command is causal
-        if (next instanceof Causal || failContinue) {
-            executeChain();
-            return;
-        }
+		// break chain or not depend on next command when next command is causal
+		if (next instanceof Causal || failContinue) {
+			executeChain();
+			return;
+		}
 
-        future().setFailure(new CommandChainException("causal chain, fail stop", commandFuture.cause(), getResult()));
-    }
+		future().setFailure(new CommandChainException("causal chain, fail stop", commandFuture.cause(), getResult()));
+	}
 
-    protected Logger getLogger() {
-        return logger;
-    }
+	protected Logger getLogger() {
+		return logger;
+	}
 
 }

@@ -29,44 +29,44 @@ import java.util.concurrent.TimeUnit;
 @Profile(AbstractProfile.PROFILE_NAME_PRODUCTION)
 public class Production extends AbstractProfile {
 
-    public static final String GLOBAL_ENDPOINT_MANAGER = "globalProxyEndpointManager";
+	public static final String GLOBAL_ENDPOINT_MANAGER = "globalProxyEndpointManager";
 
-    public static final String CLIENT_SSL_HANDLER_FACTORY = "clientSslHandlerFactory";
+	public static final String CLIENT_SSL_HANDLER_FACTORY = "clientSslHandlerFactory";
 
-    public static final String SERVER_SSL_HANDLER_FACTORY = "serverSslHandlerFactory";
+	public static final String SERVER_SSL_HANDLER_FACTORY = "serverSslHandlerFactory";
 
-    public static final String BACKEND_EVENTLOOP_GROUP = "backendEventLoopGroup";
+	public static final String BACKEND_EVENTLOOP_GROUP = "backendEventLoopGroup";
 
-    public static final String GLOBAL_SCHEDULED = "globalScheduled";
+	public static final String GLOBAL_SCHEDULED = "globalScheduled";
 
-    private ProxyConfig config = new DefaultProxyConfig();
+	private ProxyConfig config = new DefaultProxyConfig();
 
-    @Bean
-    public ProxyConfig getProxyConfig() {
-        return config;
-    }
+	@Bean
+	public ProxyConfig getProxyConfig() {
+		return config;
+	}
 
-    @Bean(name = CLIENT_SSL_HANDLER_FACTORY)
-    public NettySslHandlerFactory clientSslHandlerFactory() {
-        return new NettyClientSslHandlerFactory(config);
-    }
+	@Bean(name = CLIENT_SSL_HANDLER_FACTORY)
+	public NettySslHandlerFactory clientSslHandlerFactory() {
+		return new NettyClientSslHandlerFactory(config);
+	}
 
-    @Bean(name = SERVER_SSL_HANDLER_FACTORY)
-    public NettySslHandlerFactory serverSslHandlerFactory() {
-        return new NettyServerSslHandlerFactory(config);
-    }
+	@Bean(name = SERVER_SSL_HANDLER_FACTORY)
+	public NettySslHandlerFactory serverSslHandlerFactory() {
+		return new NettyServerSslHandlerFactory(config);
+	}
 
-    @Bean(name = GLOBAL_SCHEDULED)
-    public ScheduledExecutorService getScheduled() {
-        int corePoolSize = Math.min(OsUtils.getCpuCount(), 4);
-        return MoreExecutors.getExitingScheduledExecutorService(
-                new ScheduledThreadPoolExecutor(corePoolSize, XpipeThreadFactory.create(GLOBAL_SCHEDULED)),
-                1, TimeUnit.SECONDS
-        );
-    }
+	@Bean(name = GLOBAL_SCHEDULED)
+	public ScheduledExecutorService getScheduled() {
+		int corePoolSize = Math.min(OsUtils.getCpuCount(), 4);
+		return MoreExecutors.getExitingScheduledExecutorService(
+				new ScheduledThreadPoolExecutor(corePoolSize, XpipeThreadFactory.create(GLOBAL_SCHEDULED)),
+				1, TimeUnit.SECONDS
+		);
+	}
 
-    @Bean(name = GLOBAL_ENDPOINT_MANAGER)
-    public ProxyEndpointManager getProxyResourceManager() {
-        return new DefaultProxyEndpointManager(() -> config.endpointHealthCheckIntervalSec());
-    }
+	@Bean(name = GLOBAL_ENDPOINT_MANAGER)
+	public ProxyEndpointManager getProxyResourceManager() {
+		return new DefaultProxyEndpointManager(() -> config.endpointHealthCheckIntervalSec());
+	}
 }

@@ -9,8 +9,8 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * @author wenchao.meng
- *
- *         Aug 29, 2016
+ * <p>
+ * Aug 29, 2016
  */
 public class CatUtils {
 
@@ -19,8 +19,8 @@ public class CatUtils {
 	private static ExecutorService executors = DefaultExecutorFactory.createAllowCoreTimeoutAbortPolicy("CatUtils").createExecutorService();
 
 	public static void newFutureTaskTransaction(final String type, final String name, final CommandFuture<?> future) {
-		
-		if(!CatConfig.isCatenabled()){
+
+		if (!CatConfig.isCatenabled()) {
 			return;
 		}
 

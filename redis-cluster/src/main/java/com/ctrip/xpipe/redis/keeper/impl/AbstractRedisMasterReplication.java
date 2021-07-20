@@ -56,8 +56,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author wenchao.meng
- *
- *         Aug 24, 2016
+ * <p>
+ * Aug 24, 2016
  */
 public abstract class AbstractRedisMasterReplication extends AbstractLifecycle implements RedisMasterReplication {
 
@@ -148,9 +148,9 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 		}
 		Endpoint endpoint = redisMaster.masterEndPoint();
 		String masterInfo = endpoint.toString();
-		if(isMasterConnectThroughProxy()) {
+		if (isMasterConnectThroughProxy()) {
 			masterInfo = String.format("endpoint: %s, proxy info: %s", endpoint.toString(),
-					((ProxyEnabled)endpoint).getProxyProtocol());
+					((ProxyEnabled) endpoint).getProxyProtocol());
 		}
 		logger.info("[startReplication]{}", masterInfo);
 		connectWithMaster();
@@ -189,9 +189,9 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 			scheduled.schedule(new Runnable() {
 				@Override
 				public void run() {
-					try{
+					try {
 						connectWithMaster();
-					}catch(Throwable th){
+					} catch (Throwable th) {
 						logger.error("[doConnect0][connectUntilConnected]" + AbstractRedisMasterReplication.this, th);
 					}
 				}
@@ -202,7 +202,7 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 	protected abstract void doConnect(Bootstrap b);
 
 	protected ChannelFuture tryConnect(Bootstrap b) {
-		if(isMasterConnectThroughProxy()) {
+		if (isMasterConnectThroughProxy()) {
 			return tryConnectThroughProxy(b);
 		} else {
 			Endpoint endpoint = redisMaster.masterEndPoint();
@@ -219,7 +219,7 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 	private ChannelFuture tryConnectThroughProxy(Bootstrap b) {
 		ProxyEnabledEndpoint endpoint = (ProxyEnabledEndpoint) redisMaster.masterEndPoint();
 		ProxyConnectProtocol protocol = endpoint.getProxyProtocol();
-		if(selector == null) {
+		if (selector == null) {
 			selector = resourceManager.createProxyEndpointSelector(protocol);
 		}
 		ProxyEndpoint nextHop = selector.nextHop();
@@ -231,7 +231,7 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 	@Override
 	public void handleResponse(Channel channel, ByteBuf byteBuf) throws XpipeException {
 
-		if(!(getLifecycleState().isStarted() || getLifecycleState().isStarting())){
+		if (!(getLifecycleState().isStarted() || getLifecycleState().isStarting())) {
 			throw new RedisMasterReplicationStateException(this,
 					String.format("not stated: %s, do not receive message:%d, %s", getLifecycleState().getPhaseName(), byteBuf.readableBytes(), ByteBufUtils.readToString(byteBuf)));
 		}
@@ -240,7 +240,7 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 		clientPool.getObject().handleResponse(channel, byteBuf);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	public void masterConnected(Channel channel) {
 
@@ -252,7 +252,7 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 		}
 		checkTimeout(channel);
 
-		if(isMasterConnectThroughProxy()) {
+		if (isMasterConnectThroughProxy()) {
 			ProxyEnabledEndpoint endpoint = (ProxyEnabledEndpoint) redisMaster.masterEndPoint();
 			channel.writeAndFlush(endpoint.getProxyProtocol().output());
 		}
@@ -272,11 +272,11 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 
 				@Override
 				public void operationComplete(CommandFuture commandFuture) throws Exception {
-					if(commandFuture.isSuccess()){
+					if (commandFuture.isSuccess()) {
 						sendReplicationCommand();
-					}else{
+					} else {
 						logger.error("[operationComplete][listeningPortCommand] close channel{} and wait for reconnect",
-                                ChannelUtil.getDesc(channel), commandFuture.cause());
+								ChannelUtil.getDesc(channel), commandFuture.cause());
 						channel.close();
 					}
 				}
@@ -292,7 +292,7 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 
 			@Override
 			public void operationComplete(CommandFuture<Object> commandFuture) throws Exception {
-				if(commandFuture.isSuccess()){
+				if (commandFuture.isSuccess()) {
 					redisMaster.setKeeper();
 				}
 			}
@@ -304,22 +304,22 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 		logger.info("[checkTimeout]{} ms, {}", replTimeoutMilli, ChannelUtil.getDesc(channel));
 		final ScheduledFuture<?> repliTimeoutCheckFuture = scheduled.scheduleAtFixedRate(new AbstractExceptionLogTask() {
 
-					@Override
-					protected void doRun() throws Exception {
+			@Override
+			protected void doRun() throws Exception {
 
-						long current = System.currentTimeMillis();
-						if ((current - repl_transfer_lastio) >= replTimeoutMilli) {
-							logger.info("[doRun][no interaction with master for a long time, close connection]{}, {}", channel, AbstractRedisMasterReplication.this);
-							channel.close();
-						}
-					}
+				long current = System.currentTimeMillis();
+				if ((current - repl_transfer_lastio) >= replTimeoutMilli) {
+					logger.info("[doRun][no interaction with master for a long time, close connection]{}, {}", channel, AbstractRedisMasterReplication.this);
+					channel.close();
+				}
+			}
 		}, replTimeoutMilli, replTimeoutMilli, TimeUnit.MILLISECONDS);
-		
+
 		channel.closeFuture().addListener(new ChannelFutureListener() {
-			
+
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				
+
 				logger.info("[cancelTimeout]{}ms, {}", replTimeoutMilli, channel);
 				repliTimeoutCheckFuture.cancel(true);
 			}
@@ -358,7 +358,7 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 	}
 
 	protected void sendReplicationCommand() throws CommandExecutionException {
-		if(canSendPsync()) {
+		if (canSendPsync()) {
 			executeCommand(psyncCommand());
 		} else {
 			EventMonitor.DEFAULT.logAlertEvent("[lack-token]" + redisKeeperServer.getShardId());
@@ -399,7 +399,7 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 	protected ChannelDuplexHandler createHandler() {
 
 		KeeperConfig keeperConfig = redisKeeperServer.getKeeperConfig();
-		return new NettySlaveHandler(this, redisKeeperServer, keeperConfig != null? keeperConfig.getTrafficReportIntervalMillis() : KeeperConfig.DEFAULT_TRAFFIC_REPORT_INTERVAL_MILLIS);
+		return new NettySlaveHandler(this, redisKeeperServer, keeperConfig != null ? keeperConfig.getTrafficReportIntervalMillis() : KeeperConfig.DEFAULT_TRAFFIC_REPORT_INTERVAL_MILLIS);
 	}
 
 	@Override
@@ -498,14 +498,14 @@ public abstract class AbstractRedisMasterReplication extends AbstractLifecycle i
 	public RdbDumper getRdbDumper() {
 		return rdbDumper.get();
 	}
-	
+
 	@Override
 	public RedisMaster redisMaster() {
 		return redisMaster;
 	}
 
 	private int initCommandTimeoutMilli() {
-		if(isMasterConnectThroughProxy()) {
+		if (isMasterConnectThroughProxy()) {
 			return AbstractRedisMasterReplication.PROXYED_REPLICATION_COMMAND_TIMEOUT_MILLI;
 		}
 		return AbstractRedisCommand.DEFAULT_REDIS_COMMAND_TIME_OUT_MILLI;

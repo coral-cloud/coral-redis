@@ -6,6 +6,6 @@ import java.util.Set;
 
 public interface ClusterTypeAware {
 
-    Set<ClusterType> getSupportClusterTypes();
+	Set<ClusterType> getSupportClusterTypes();
 
 }

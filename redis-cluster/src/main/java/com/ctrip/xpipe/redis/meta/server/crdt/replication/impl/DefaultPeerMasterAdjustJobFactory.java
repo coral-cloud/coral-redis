@@ -27,49 +27,49 @@ import static com.ctrip.xpipe.spring.AbstractSpringConfigContext.GLOBAL_EXECUTOR
 @Component
 public class DefaultPeerMasterAdjustJobFactory implements PeerMasterAdjustJobFactory {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected DcMetaCache dcMetaCache;
+	protected DcMetaCache dcMetaCache;
 
-    protected CurrentMetaManager currentMetaManager;
+	protected CurrentMetaManager currentMetaManager;
 
-    private Executor executors;
+	private Executor executors;
 
-    protected ScheduledExecutorService scheduled;
+	protected ScheduledExecutorService scheduled;
 
-    private XpipeNettyClientKeyedObjectPool keyedObjectPool;
+	private XpipeNettyClientKeyedObjectPool keyedObjectPool;
 
 
-    @Autowired
-    public DefaultPeerMasterAdjustJobFactory(DcMetaCache dcMetaCache, CurrentMetaManager currentMetaManager,
-                                             @Qualifier(CLIENT_POOL) XpipeNettyClientKeyedObjectPool keyedObjectPool,
-                                             @Qualifier(GLOBAL_EXECUTOR) Executor executors) {
-        this.dcMetaCache = dcMetaCache;
-        this.currentMetaManager = currentMetaManager;
-        this.keyedObjectPool = keyedObjectPool;
-        this.executors = executors;
+	@Autowired
+	public DefaultPeerMasterAdjustJobFactory(DcMetaCache dcMetaCache, CurrentMetaManager currentMetaManager,
+											 @Qualifier(CLIENT_POOL) XpipeNettyClientKeyedObjectPool keyedObjectPool,
+											 @Qualifier(GLOBAL_EXECUTOR) Executor executors) {
+		this.dcMetaCache = dcMetaCache;
+		this.currentMetaManager = currentMetaManager;
+		this.keyedObjectPool = keyedObjectPool;
+		this.executors = executors;
 
-        this.scheduled = Executors.newScheduledThreadPool(1, XpipeThreadFactory.create("PeerMasterAdjustJobSchedule"));
-    }
+		this.scheduled = Executors.newScheduledThreadPool(1, XpipeThreadFactory.create("PeerMasterAdjustJobSchedule"));
+	}
 
-    public PeerMasterAdjustJob buildPeerMasterAdjustJob(String clusterId, String shardId) {
-        Set<String> upstreamPeerDcs = currentMetaManager.getUpstreamPeerDcs(clusterId, shardId);
-        if (upstreamPeerDcs.isEmpty()) {
-            logger.info("[buildPeerMasterAdjustJob][{}][{}] unknown any upstream dcs, skip adjust", clusterId, shardId);
-            return null;
-        }
+	public PeerMasterAdjustJob buildPeerMasterAdjustJob(String clusterId, String shardId) {
+		Set<String> upstreamPeerDcs = currentMetaManager.getUpstreamPeerDcs(clusterId, shardId);
+		if (upstreamPeerDcs.isEmpty()) {
+			logger.info("[buildPeerMasterAdjustJob][{}][{}] unknown any upstream dcs, skip adjust", clusterId, shardId);
+			return null;
+		}
 
-        RedisMeta currentMaster = currentMetaManager.getCurrentCRDTMaster(clusterId, shardId);
-        if (null == currentMaster) {
-            logger.info("[buildPeerMasterAdjustJob][{}][{}] unknown current master, skip adjust", clusterId, shardId);
-            return null;
-        }
+		RedisMeta currentMaster = currentMetaManager.getCurrentCRDTMaster(clusterId, shardId);
+		if (null == currentMaster) {
+			logger.info("[buildPeerMasterAdjustJob][{}][{}] unknown current master, skip adjust", clusterId, shardId);
+			return null;
+		}
 
-        List<RedisMeta> allPeerMasters = currentMetaManager.getAllPeerMasters(clusterId, shardId);
-        return new PeerMasterAdjustJob(clusterId, shardId, allPeerMasters,
-                Pair.of(currentMaster.getIp(), currentMaster.getPort()), false,
-                keyedObjectPool.getKeyPool(new DefaultEndPoint(currentMaster.getIp(), currentMaster.getPort())),
-                scheduled, executors);
-    }
+		List<RedisMeta> allPeerMasters = currentMetaManager.getAllPeerMasters(clusterId, shardId);
+		return new PeerMasterAdjustJob(clusterId, shardId, allPeerMasters,
+				Pair.of(currentMaster.getIp(), currentMaster.getPort()), false,
+				keyedObjectPool.getKeyPool(new DefaultEndPoint(currentMaster.getIp(), currentMaster.getPort())),
+				scheduled, executors);
+	}
 
 }

@@ -14,20 +14,20 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 23, 2016
  */
-public class DefaultZkConfig implements ZkConfig{
-	
+public class DefaultZkConfig implements ZkConfig {
+
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	public static String KEY_ZK_NAMESPACE = "key_zk_namespace";
-	
+
 	private int zkSessionTimeoutMillis = Integer.parseInt(System.getProperty("ZK.SESSION.TIMEOUT", "5000"));
 	private int zkConnectionTimeoutMillis = Integer.parseInt(System.getProperty("ZK.CONN.TIMEOUT", "3000"));
 	private int zkRetries = 3;
 	private String zkNameSpace = System.getProperty(KEY_ZK_NAMESPACE, DEFAULT_ZK_NAMESPACE);
-	
+
 	@Override
 	public int getZkConnectionTimeoutMillis() {
 		return zkConnectionTimeoutMillis;
@@ -46,7 +46,7 @@ public class DefaultZkConfig implements ZkConfig{
 	public String getZkNamespace() {
 		return zkNameSpace;
 	}
-	
+
 	public void setZkNameSpace(String zkNameSpace) {
 		this.zkNameSpace = zkNameSpace;
 	}
@@ -59,7 +59,7 @@ public class DefaultZkConfig implements ZkConfig{
 	public void setZkRetries(int zkRetries) {
 		this.zkRetries = zkRetries;
 	}
-	
+
 	@Override
 	public int getSleepMsBetweenRetries() {
 		return 100;
@@ -69,7 +69,7 @@ public class DefaultZkConfig implements ZkConfig{
 	public int getZkSessionTimeoutMillis() {
 		return zkSessionTimeoutMillis;
 	}
-	
+
 	public void setZkSessionTimeoutMillis(int zkSessionTimeoutMillis) {
 		this.zkSessionTimeoutMillis = zkSessionTimeoutMillis;
 	}
@@ -95,8 +95,8 @@ public class DefaultZkConfig implements ZkConfig{
 		CuratorFramework curatorFramework = builder.build();
 		curatorFramework.start();
 		curatorFramework.blockUntilConnected(waitForZkConnectedMillis(), TimeUnit.MILLISECONDS);
-		
+
 		return curatorFramework;
 	}
-	
+
 }

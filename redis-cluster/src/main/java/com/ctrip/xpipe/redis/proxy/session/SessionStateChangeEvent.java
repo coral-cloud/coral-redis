@@ -9,20 +9,20 @@ import com.ctrip.xpipe.api.observer.Event;
  */
 public class SessionStateChangeEvent implements Event {
 
-    private SessionState previous;
+	private SessionState previous;
 
-    private SessionState current;
+	private SessionState current;
 
-    public SessionStateChangeEvent(SessionState previous, SessionState current) {
-        this.previous = previous;
-        this.current = current;
-    }
+	public SessionStateChangeEvent(SessionState previous, SessionState current) {
+		this.previous = previous;
+		this.current = current;
+	}
 
-    public SessionState getPrevious() {
-        return previous;
-    }
+	public SessionState getPrevious() {
+		return previous;
+	}
 
-    public SessionState getCurrent() {
-        return current;
-    }
+	public SessionState getCurrent() {
+		return current;
+	}
 }

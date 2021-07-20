@@ -7,12 +7,12 @@ package com.ctrip.xpipe.redis.proxy.session;
  */
 public interface SessionEventHandler {
 
-    void onInit();
+	void onInit();
 
-    void onEstablished();
+	void onEstablished();
 
-    void onWritable();
+	void onWritable();
 
-    void onNotWritable();
+	void onNotWritable();
 
 }

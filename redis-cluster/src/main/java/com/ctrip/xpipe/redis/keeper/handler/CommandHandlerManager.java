@@ -13,19 +13,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月22日 上午11:47:11
  */
-public class CommandHandlerManager extends AbstractCommandHandler{
+public class CommandHandlerManager extends AbstractCommandHandler {
 
-	private Map<String, CommandHandler>  handlers = new ConcurrentHashMap<String, CommandHandler>();
+	private Map<String, CommandHandler> handlers = new ConcurrentHashMap<String, CommandHandler>();
 
 	public CommandHandlerManager() {
 		initCommands();
 	}
 
 	private void initCommands() {
-		
+
 		putHandler(new ReplconfHandler());
 		putHandler(new PsyncHandler());
 		putHandler(new PingCommandHandler());
@@ -42,15 +42,15 @@ public class CommandHandlerManager extends AbstractCommandHandler{
 	}
 
 	private void putHandler(CommandHandler handler) {
-		
-		for(String commandName : handler.getCommands()){
-			
+
+		for (String commandName : handler.getCommands()) {
+
 			handlers.put(commandName.toLowerCase(), handler);
 		}
 	}
 
 	@Override
-	public String[] getCommands() {		
+	public String[] getCommands() {
 		return handlers.keySet().toArray(new String[handlers.size()]);
 	}
 
@@ -86,13 +86,13 @@ public class CommandHandlerManager extends AbstractCommandHandler{
 			}
 		});
 	}
-	
+
 	private void innerDoHandle(String[] args, RedisClient redisClient, CommandHandler handler) throws Exception {
 		String[] newArgs = new String[args.length - 1];
 		System.arraycopy(args, 1, newArgs, 0, args.length - 1);
-		if(handler.isLog(newArgs)){
+		if (handler.isLog(newArgs)) {
 			logger.info("[doHandle]{},{}", redisClient, StringUtil.join(" ", args));
-		}else{
+		} else {
 			logger.debug("[doHandle]{},{}", redisClient, StringUtil.join(" ", args));
 		}
 		handler.handle(newArgs, redisClient);

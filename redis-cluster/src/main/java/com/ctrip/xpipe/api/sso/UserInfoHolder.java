@@ -9,8 +9,8 @@ import com.ctrip.xpipe.utils.ServicesUtil;
  */
 public interface UserInfoHolder extends Ordered {
 
-  UserInfoHolder DEFAULT = ServicesUtil.getUserInfoHolder();
+	UserInfoHolder DEFAULT = ServicesUtil.getUserInfoHolder();
 
-  UserInfo getUser();
+	UserInfo getUser();
 
 }

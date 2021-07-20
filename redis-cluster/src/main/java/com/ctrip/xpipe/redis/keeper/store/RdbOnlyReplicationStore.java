@@ -9,8 +9,8 @@ import java.io.IOException;
 
 /**
  * @author marsqing
- *
- *         Jul 22, 2016 10:40:00 AM
+ * <p>
+ * Jul 22, 2016 10:40:00 AM
  */
 public class RdbOnlyReplicationStore implements ReplicationStore {
 
@@ -37,17 +37,17 @@ public class RdbOnlyReplicationStore implements ReplicationStore {
 			public String getReplId() {
 				return replId;
 			}
-			
+
 			@Override
 			public String getReplId2() {
 				throw new UnsupportedOperationException();
 			}
-			
+
 			@Override
 			public Long getSecondReplIdOffset() {
 				throw new UnsupportedOperationException();
 			}
-			
+
 			@Override
 			public ReplicationStoreMeta shiftReplicationId(String newReplId, Long currentOffset) throws IOException {
 				throw new UnsupportedOperationException();
@@ -96,7 +96,7 @@ public class RdbOnlyReplicationStore implements ReplicationStore {
 
 			@Override
 			public ReplicationStoreMeta rdbBegun(String masterRunid, long beginOffset, String rdbFile, EofType eofType,
-					String cmdFilePrefix) throws IOException {
+												 String cmdFilePrefix) throws IOException {
 				throw new UnsupportedOperationException();
 			}
 
@@ -106,7 +106,7 @@ public class RdbOnlyReplicationStore implements ReplicationStore {
 				throw new UnsupportedOperationException();
 			}
 
-			
+
 			@Override
 			public void setRdbFileSize(long rdbFileSize) throws IOException {
 			}
@@ -131,7 +131,7 @@ public class RdbOnlyReplicationStore implements ReplicationStore {
 	public long getEndOffset() {
 		return -1L;
 	}
-	
+
 	@Override
 	public long firstAvailableOffset() {
 		throw new UnsupportedOperationException();

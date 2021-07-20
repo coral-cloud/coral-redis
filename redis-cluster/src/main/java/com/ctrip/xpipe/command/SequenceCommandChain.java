@@ -7,57 +7,58 @@ import com.ctrip.xpipe.exception.ExceptionUtils;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
-public class SequenceCommandChain extends AbstractCommandChain{
-	
+public class SequenceCommandChain extends AbstractCommandChain {
+
 	private boolean failContinue = false;
 
 	public SequenceCommandChain(String tag) {
 		super(tag);
 	}
 
-	public SequenceCommandChain(boolean failContinue){
+	public SequenceCommandChain(boolean failContinue) {
 		this.failContinue = failContinue;
 	}
-	
-	public SequenceCommandChain(Command<?> ... commands) {
+
+	public SequenceCommandChain(Command<?>... commands) {
 		this(false, commands);
 	}
 
-	public SequenceCommandChain(boolean failContinue, Command<?> ... commands) {
+	public SequenceCommandChain(boolean failContinue, Command<?>... commands) {
 		super(commands);
 		this.failContinue = failContinue;
 	}
+
 	@Override
 	protected void doExecute() throws Exception {
 		super.doExecute();
-		
+
 		executeChain();
 	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void executeChain(){
-		
-		if(future().isCancelled()){
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public void executeChain() {
+
+		if (future().isCancelled()) {
 			return;
 		}
-		
+
 		CommandFuture<?> currentFuture = executeNext();
-		if(currentFuture == null){
+		if (currentFuture == null) {
 			future().setSuccess(getResult());
 			return;
 		}
-		
+
 		currentFuture.addListener(new CommandFutureListener() {
 
 			@Override
 			public void operationComplete(CommandFuture commandFuture) throws Exception {
-				
-				if(commandFuture.isSuccess()){
+
+				if (commandFuture.isSuccess()) {
 					executeChain();
-				}else{
+				} else {
 					failExecuteNext(commandFuture);
 				}
 			}
@@ -66,12 +67,12 @@ public class SequenceCommandChain extends AbstractCommandChain{
 
 	private void failExecuteNext(CommandFuture<?> commandFuture) {
 		logFail(commandFuture);
-		
-		if(failContinue){
+
+		if (failContinue) {
 			executeChain();
 			return;
 		}
-		
+
 		future().setFailure(new CommandChainException("sequence chain, fail stop", commandFuture.cause(), getResult()));
 	}
 

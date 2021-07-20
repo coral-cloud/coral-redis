@@ -9,21 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 23, 2016
  */
-public abstract class AbstractRemoteClusterSeverFactory<T extends ClusterServer> implements RemoteClusterServerFactory<T>{
+public abstract class AbstractRemoteClusterSeverFactory<T extends ClusterServer> implements RemoteClusterServerFactory<T> {
 
 	@Autowired
 	private MetaServerConfig config;
-	
+
 	@Autowired
 	protected T currentClusterServer;
 
 	@Override
 	public T createClusterServer(int serverId, ClusterServerInfo clusterServerInfo) {
-		
-		if(serverId == config.getMetaServerId()){
+
+		if (serverId == config.getMetaServerId()) {
 			return currentClusterServer;
 		}
 		return doCreateRemoteServer(serverId, clusterServerInfo);

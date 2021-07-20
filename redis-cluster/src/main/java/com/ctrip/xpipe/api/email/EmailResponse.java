@@ -8,9 +8,9 @@ import java.util.Properties;
  * Apr 23, 2018
  */
 public interface EmailResponse {
-    Properties getProperties();
+	Properties getProperties();
 
-    enum KEYS {
-        CHECK_INFO
-    }
+	enum KEYS {
+		CHECK_INFO
+	}
 }

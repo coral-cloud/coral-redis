@@ -8,8 +8,8 @@ import java.util.Date;
 
 /**
  * @author wenchao.meng
- *
- *         Mar 16, 2017
+ * <p>
+ * Mar 16, 2017
  */
 public class DateTimeUtils {
 
@@ -24,7 +24,7 @@ public class DateTimeUtils {
 	}
 
 	public static String timeAsString(long timeMilli) {
-		if(timeMilli < 0){
+		if (timeMilli < 0) {
 			return String.format("wrong time: %d", timeMilli);
 		}
 		return FastDateFormat.getInstance(format).format(new Date(timeMilli));

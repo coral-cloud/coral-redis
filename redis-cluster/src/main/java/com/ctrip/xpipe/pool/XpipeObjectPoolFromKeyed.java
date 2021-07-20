@@ -6,16 +6,16 @@ import com.ctrip.xpipe.api.pool.SimpleObjectPool;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
-public class XpipeObjectPoolFromKeyed<K, V> implements SimpleObjectPool<V>{
-	
-	
+public class XpipeObjectPoolFromKeyed<K, V> implements SimpleObjectPool<V> {
+
+
 	private SimpleKeyedObjectPool<K, V> keyedObjectPool;
-	
+
 	private K key;
-	
+
 	public XpipeObjectPoolFromKeyed(SimpleKeyedObjectPool<K, V> keyedObjectPool, K key) {
 		this.key = key;
 		this.keyedObjectPool = keyedObjectPool;
@@ -23,13 +23,13 @@ public class XpipeObjectPoolFromKeyed<K, V> implements SimpleObjectPool<V>{
 
 	@Override
 	public V borrowObject() throws BorrowObjectException {
-		
+
 		return keyedObjectPool.borrowObject(key);
 	}
-	
+
 	@Override
-	public void returnObject(V obj) throws ReturnObjectException{
-		
+	public void returnObject(V obj) throws ReturnObjectException {
+
 		keyedObjectPool.returnObject(key, obj);
 	}
 

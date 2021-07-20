@@ -7,20 +7,20 @@ package com.ctrip.xpipe.redis.proxy.tunnel;
  */
 public class TunnelStateChangeEvent {
 
-    private TunnelState previous;
+	private TunnelState previous;
 
-    private TunnelState current;
+	private TunnelState current;
 
-    public TunnelStateChangeEvent(TunnelState oldState, TunnelState newState) {
-        this.previous = oldState;
-        this.current = newState;
-    }
+	public TunnelStateChangeEvent(TunnelState oldState, TunnelState newState) {
+		this.previous = oldState;
+		this.current = newState;
+	}
 
-    public TunnelState getPrevious() {
-        return previous;
-    }
+	public TunnelState getPrevious() {
+		return previous;
+	}
 
-    public TunnelState getCurrent() {
-        return current;
-    }
+	public TunnelState getCurrent() {
+		return current;
+	}
 }

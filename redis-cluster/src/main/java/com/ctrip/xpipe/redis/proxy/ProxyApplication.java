@@ -13,20 +13,20 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class ProxyApplication {
 
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
-        System.setProperty("spring.profiles.active", "production");
-        SpringApplication application = new SpringApplication(ProxyApplication.class);
+		System.setProperty("spring.profiles.active", "production");
+		SpringApplication application = new SpringApplication(ProxyApplication.class);
 
-        application.run(args);
+		application.run(args);
 
-    }
+	}
 
-    private static void initComponentRegistry(ConfigurableApplicationContext context) throws Exception {
+	private static void initComponentRegistry(ConfigurableApplicationContext context) throws Exception {
 
-        final ComponentRegistry registry = new SpringComponentRegistry(context);
-        registry.initialize();
-        registry.start();
-        ComponentRegistryHolder.initializeRegistry(registry);
-    }
+		final ComponentRegistry registry = new SpringComponentRegistry(context);
+		registry.initialize();
+		registry.start();
+		ComponentRegistryHolder.initializeRegistry(registry);
+	}
 }

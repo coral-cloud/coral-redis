@@ -15,27 +15,27 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultProxyReqResProtocol implements ProxyRequestResponseProtocol {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultProxyReqResProtocol.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultProxyReqResProtocol.class);
 
-    private ProxyReqResProtocolParser parser;
+	private ProxyReqResProtocolParser parser;
 
-    private String content;
+	private String content;
 
-    public DefaultProxyReqResProtocol(ProxyReqResProtocolParser parser) {
-        this.parser = parser;
-    }
+	public DefaultProxyReqResProtocol(ProxyReqResProtocolParser parser) {
+		this.parser = parser;
+	}
 
-    public DefaultProxyReqResProtocol(String content) {
-        this.content = content;
-    }
+	public DefaultProxyReqResProtocol(String content) {
+		this.content = content;
+	}
 
-    @Override
-    public String getContent() {
-        return content == null ? parser.getContent() : content;
-    }
+	@Override
+	public String getContent() {
+		return content == null ? parser.getContent() : content;
+	}
 
-    @Override
-    public ByteBuf output() {
-        return new SimpleStringParser(String.format("%s %s", ProxyProtocol.KEY_WORD, getContent())).format();
-    }
+	@Override
+	public ByteBuf output() {
+		return new SimpleStringParser(String.format("%s %s", ProxyProtocol.KEY_WORD, getContent())).format();
+	}
 }

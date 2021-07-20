@@ -1,4 +1,3 @@
-
 package com.ctrip.xpipe.redis.keeper.impl;
 
 import com.ctrip.xpipe.api.endpoint.Endpoint;
@@ -17,10 +16,11 @@ import io.netty.channel.nio.NioEventLoopGroup;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * @author wenchao.meng
- *
- *         May 22, 2016 6:36:21 PM
+ * <p>
+ * May 22, 2016 6:36:21 PM
  */
 public class DefaultRedisMaster extends AbstractLifecycle implements RedisMaster {
 
@@ -29,13 +29,13 @@ public class DefaultRedisMaster extends AbstractLifecycle implements RedisMaster
 	private ReplicationStoreManager replicationStoreManager;
 
 	private Endpoint endpoint;
-	
+
 	private AtomicBoolean isKeeper = new AtomicBoolean(false);
-	
+
 	private ScheduledExecutorService scheduled;
-	
+
 	private MASTER_STATE masterState = MASTER_STATE.REDIS_REPL_NONE;
-	
+
 	private RedisMasterReplication redisMasterReplication;
 
 	private NioEventLoopGroup nioEventLoopGroup;
@@ -55,7 +55,7 @@ public class DefaultRedisMaster extends AbstractLifecycle implements RedisMaster
 		redisMasterReplication = new DefaultRedisMasterReplication(this, this.redisKeeperServer, nioEventLoopGroup,
 				this.scheduled, resourceManager);
 	}
-	
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
@@ -73,10 +73,10 @@ public class DefaultRedisMaster extends AbstractLifecycle implements RedisMaster
 		redisMasterReplication.stop();
 		super.doStop();
 	}
-	
+
 	@Override
 	protected void doDispose() throws Exception {
-		
+
 		redisMasterReplication.dispose();
 		super.doDispose();
 	}
@@ -85,7 +85,7 @@ public class DefaultRedisMaster extends AbstractLifecycle implements RedisMaster
 	public ReplicationStoreManager getReplicationStoreManager() {
 		return replicationStoreManager;
 	}
-	
+
 	@Override
 	public ReplicationStore getCurrentReplicationStore() {
 
@@ -103,23 +103,23 @@ public class DefaultRedisMaster extends AbstractLifecycle implements RedisMaster
 		return redisMasterReplication.partialState();
 	}
 
-	
+
 	@Override
 	public RdbDumper createRdbDumper() throws CreateRdbDumperException {
-		
-		if(masterState != MASTER_STATE.REDIS_REPL_CONNECTED){
+
+		if (masterState != MASTER_STATE.REDIS_REPL_CONNECTED) {
 			logger.info("[createRdbDumper][master state not connected, dumper not allowed]{}", redisMasterReplication);
 			throw new CreateRdbDumperException(this, "master state not connected, dumper not allowed:" + masterState);
 		}
 		return new RedisMasterNewRdbDumper(this, redisKeeperServer, nioEventLoopGroup, scheduled, keeperResourceManager);
 	}
-	
+
 	public MASTER_STATE getMasterState() {
 		return masterState;
 	}
-	
+
 	public void setMasterState(MASTER_STATE masterState) {
-		
+
 		logger.info("[setMasterState]{}, {}", this, masterState);
 		this.masterState = masterState;
 	}

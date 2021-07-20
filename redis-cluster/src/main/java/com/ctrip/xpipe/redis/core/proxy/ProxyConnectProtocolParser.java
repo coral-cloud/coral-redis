@@ -13,13 +13,13 @@ import io.netty.buffer.ByteBuf;
 @SuppressWarnings("unchecked")
 public interface ProxyConnectProtocolParser extends ProxyProtocolParser {
 
-    @Override
-    ProxyConnectProtocol read(String protocol);
+	@Override
+	ProxyConnectProtocol read(String protocol);
 
-    @Override
-    ProxyConnectProtocol read(ByteBuf byteBuf);
+	@Override
+	ProxyConnectProtocol read(ByteBuf byteBuf);
 
-    void addProxyOptionParser(ProxyOptionParser parser);
+	void addProxyOptionParser(ProxyOptionParser parser);
 
-    void removeProxyOptionParser(ProxyOptionParser parser);
+	void removeProxyOptionParser(ProxyOptionParser parser);
 }

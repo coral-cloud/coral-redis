@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author wenchao.meng
- *
- *         Sep 9, 2016
+ * <p>
+ * Sep 9, 2016
  */
 @Component
 public class DefaultKeeperActiveElectAlgorithmManager implements KeeperActiveElectAlgorithmManager {

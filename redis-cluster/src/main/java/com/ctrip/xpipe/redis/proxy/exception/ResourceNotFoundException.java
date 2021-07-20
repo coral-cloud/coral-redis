@@ -9,15 +9,15 @@ import com.ctrip.xpipe.exception.XpipeRuntimeException;
  * May 12, 2018
  */
 public class ResourceNotFoundException extends XpipeRuntimeException {
-    public ResourceNotFoundException(String message) {
-        super(message);
-    }
+	public ResourceNotFoundException(String message) {
+		super(message);
+	}
 
-    public ResourceNotFoundException(String message, Throwable th) {
-        super(message, th);
-    }
+	public ResourceNotFoundException(String message, Throwable th) {
+		super(message, th);
+	}
 
-    public <T extends Enum<T>> ResourceNotFoundException(ErrorMessage<T> errorMessage, Throwable th) {
-        super(errorMessage, th);
-    }
+	public <T extends Enum<T>> ResourceNotFoundException(ErrorMessage<T> errorMessage, Throwable th) {
+		super(errorMessage, th);
+	}
 }

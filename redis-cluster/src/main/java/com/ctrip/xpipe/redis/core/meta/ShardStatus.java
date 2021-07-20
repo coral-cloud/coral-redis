@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author marsqing
- *
- *         Jun 13, 2016 2:05:38 PM
+ * <p>
+ * Jun 13, 2016 2:05:38 PM
  */
 public class ShardStatus {
 
@@ -52,9 +52,9 @@ public class ShardStatus {
 	public void setRedisMaster(RedisMeta redisMaster) {
 		this.redisMaster.set(redisMaster);
 	}
-	
-	public static ObjectFactory<ShardStatus> getFactory(){
-		
+
+	public static ObjectFactory<ShardStatus> getFactory() {
+
 		return new ObjectFactory<ShardStatus>() {
 
 			@Override

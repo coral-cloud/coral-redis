@@ -4,10 +4,10 @@ import com.ctrip.xpipe.redis.keeper.RedisClient;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月25日 下午4:45:08
  */
-public class PingCommandHandler extends AbstractCommandHandler{
+public class PingCommandHandler extends AbstractCommandHandler {
 
 	@Override
 	public String[] getCommands() {

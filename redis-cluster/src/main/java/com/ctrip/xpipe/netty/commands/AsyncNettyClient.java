@@ -17,76 +17,76 @@ import org.slf4j.LoggerFactory;
  */
 public class AsyncNettyClient extends DefaultNettyClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(AsyncNettyClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(AsyncNettyClient.class);
 
-    private ChannelFuture future;
+	private ChannelFuture future;
 
-    public AsyncNettyClient(ChannelFuture future, Endpoint endpoint) {
-        super(future.channel());
-        this.future = future;
-        this.desc.set(String.format("L(%s)->R(%s:%d)", "UNKNOWN", endpoint.getHost(), endpoint.getPort()));
-        future.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) {
-                logger.info("[async][connected] endpint: {}, channel: {}", endpoint, ChannelUtil.getDesc(future.channel()));
-                if(endpoint instanceof ProxyEnabled) {
-                    desc.set(String.format("%s, %s:%d", ChannelUtil.getDesc(future.channel()), endpoint.getHost(), endpoint.getPort()));
-                } else {
-                    desc.set(ChannelUtil.getDesc(future.channel()));
-                }
-            }
-        });
-        future.channel().closeFuture().addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                logger.info("[async][closed] endpoint: {}, channel: {}", endpoint, ChannelUtil.getDesc(future.channel()));
-            }
-        });
-    }
+	public AsyncNettyClient(ChannelFuture future, Endpoint endpoint) {
+		super(future.channel());
+		this.future = future;
+		this.desc.set(String.format("L(%s)->R(%s:%d)", "UNKNOWN", endpoint.getHost(), endpoint.getPort()));
+		future.addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) {
+				logger.info("[async][connected] endpint: {}, channel: {}", endpoint, ChannelUtil.getDesc(future.channel()));
+				if (endpoint instanceof ProxyEnabled) {
+					desc.set(String.format("%s, %s:%d", ChannelUtil.getDesc(future.channel()), endpoint.getHost(), endpoint.getPort()));
+				} else {
+					desc.set(ChannelUtil.getDesc(future.channel()));
+				}
+			}
+		});
+		future.channel().closeFuture().addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				logger.info("[async][closed] endpoint: {}, channel: {}", endpoint, ChannelUtil.getDesc(future.channel()));
+			}
+		});
+	}
 
 
-    @Override
-    public void sendRequest(ByteBuf byteBuf) {
-        if(future.channel() != null && future.channel().isActive()) {
-            super.sendRequest(byteBuf);
-        } else {
-            future.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if(future.isSuccess()) {
-                        logger.info("[async][send][{}]", desc);
-                        AsyncNettyClient.super.sendRequest(byteBuf);
-                    } else {
-                        logger.warn("[async][wont-send][{}]", desc);
-                    }
-                }
-            });
-        }
-    }
+	@Override
+	public void sendRequest(ByteBuf byteBuf) {
+		if (future.channel() != null && future.channel().isActive()) {
+			super.sendRequest(byteBuf);
+		} else {
+			future.addListener(new ChannelFutureListener() {
+				@Override
+				public void operationComplete(ChannelFuture future) throws Exception {
+					if (future.isSuccess()) {
+						logger.info("[async][send][{}]", desc);
+						AsyncNettyClient.super.sendRequest(byteBuf);
+					} else {
+						logger.warn("[async][wont-send][{}]", desc);
+					}
+				}
+			});
+		}
+	}
 
-    @Override
-    public void sendRequest(ByteBuf byteBuf, ByteBufReceiver byteBufReceiver) {
-        if(future.channel() != null && future.channel().isActive()) {
-            super.sendRequest(byteBuf, byteBufReceiver);
-        } else {
-            future.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if(future.isSuccess()) {
-                        logger.info("[async][send][{}] {}", desc, byteBufReceiver.getClass().getSimpleName());
-                        AsyncNettyClient.super.sendRequest(byteBuf, byteBufReceiver);
-                    } else {
-                        logger.warn("[async][wont-send][{}] {}", desc, byteBufReceiver.getClass().getSimpleName());
-                        byteBufReceiver.clientClosed(AsyncNettyClient.this);
-                    }
-                }
-            });
-        }
-    }
+	@Override
+	public void sendRequest(ByteBuf byteBuf, ByteBufReceiver byteBufReceiver) {
+		if (future.channel() != null && future.channel().isActive()) {
+			super.sendRequest(byteBuf, byteBufReceiver);
+		} else {
+			future.addListener(new ChannelFutureListener() {
+				@Override
+				public void operationComplete(ChannelFuture future) throws Exception {
+					if (future.isSuccess()) {
+						logger.info("[async][send][{}] {}", desc, byteBufReceiver.getClass().getSimpleName());
+						AsyncNettyClient.super.sendRequest(byteBuf, byteBufReceiver);
+					} else {
+						logger.warn("[async][wont-send][{}] {}", desc, byteBufReceiver.getClass().getSimpleName());
+						byteBufReceiver.clientClosed(AsyncNettyClient.this);
+					}
+				}
+			});
+		}
+	}
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 
 }

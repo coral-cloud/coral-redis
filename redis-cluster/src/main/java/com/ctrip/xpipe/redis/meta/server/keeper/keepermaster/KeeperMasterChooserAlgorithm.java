@@ -4,11 +4,11 @@ import com.ctrip.xpipe.tuple.Pair;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Nov 4, 2016
  */
-public interface KeeperMasterChooserAlgorithm{
-	
+public interface KeeperMasterChooserAlgorithm {
+
 	Pair<String, Integer> choose();
 
 }

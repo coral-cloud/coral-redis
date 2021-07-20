@@ -14,32 +14,32 @@ import java.util.concurrent.Executor;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jan 3, 2017
  */
-public class KeyedOneThreadTaskExecutor<K> implements Destroyable{
-	
+public class KeyedOneThreadTaskExecutor<K> implements Destroyable {
+
 	private static Logger logger = LoggerFactory.getLogger(KeyedOneThreadTaskExecutor.class);
-	
+
 	private Map<K, OneThreadTaskExecutor> keyedExecutor = new ConcurrentHashMap<>();
 
 	protected Executor executors;
-	
-	public KeyedOneThreadTaskExecutor(Executor executors){
+
+	public KeyedOneThreadTaskExecutor(Executor executors) {
 		this.executors = executors;
 	}
 
-	public void execute(K key, Command<?> command){
-		
+	public void execute(K key, Command<?> command) {
+
 		OneThreadTaskExecutor oneThreadTaskExecutor = getOrCreate(key);
 		oneThreadTaskExecutor.executeCommand(command);
 	}
 
-	
+
 	protected OneThreadTaskExecutor getOrCreate(K key) {
-		
+
 		return MapUtils.getOrCreate(keyedExecutor, key, new ObjectFactory<OneThreadTaskExecutor>() {
-			
+
 			@Override
 			public OneThreadTaskExecutor create() {
 				return createTaskExecutor();
@@ -53,9 +53,9 @@ public class KeyedOneThreadTaskExecutor<K> implements Destroyable{
 
 	@Override
 	public void destroy() throws Exception {
-		
+
 		logger.info("[destroy]{}", this);
-		for(Entry<K, OneThreadTaskExecutor> entry : keyedExecutor.entrySet()){
+		for (Entry<K, OneThreadTaskExecutor> entry : keyedExecutor.entrySet()) {
 			entry.getValue().destroy();
 		}
 	}

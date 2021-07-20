@@ -10,77 +10,77 @@ import java.util.Map;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Mar 22, 2018
+ * <p>
+ * Mar 22, 2018
  */
 public class InfoResultExtractor {
 
-    protected static Logger logger = LoggerFactory.getLogger(InfoResultExtractor.class);
+	protected static Logger logger = LoggerFactory.getLogger(InfoResultExtractor.class);
 
-    private String result;
-    private Map<String, String> keyValues;
+	private String result;
+	private Map<String, String> keyValues;
 
-    public InfoResultExtractor(String result) {
-        this.result = result;
-    }
+	public InfoResultExtractor(String result) {
+		this.result = result;
+	}
 
-    public String extract(String key) {
-        return extract(key, (value) -> value);
-    }
+	public String extract(String key) {
+		return extract(key, (value) -> value);
+	}
 
-    public <T> T extract(String key, Function<String, T> function) {
-        genKeyValues();
+	public <T> T extract(String key, Function<String, T> function) {
+		genKeyValues();
 
-        return function.apply(keyValues.get(key));
-    }
+		return function.apply(keyValues.get(key));
+	}
 
-    public Integer extractAsInteger(String key) {
+	public Integer extractAsInteger(String key) {
 
-        return extract(key, (value) -> value == null ? null : Integer.parseInt(value));
-    }
+		return extract(key, (value) -> value == null ? null : Integer.parseInt(value));
+	}
 
-    public Long extractAsLong(String key) {
-        return extract(key, (value) -> value == null ? null : Long.parseLong(value));
-    }
+	public Long extractAsLong(String key) {
+		return extract(key, (value) -> value == null ? null : Long.parseLong(value));
+	}
 
-    public Map<String, String> extract(String[] keys) {
+	public Map<String, String> extract(String[] keys) {
 
-        genKeyValues();
+		genKeyValues();
 
-        HashMap<String, String> result = new HashMap<>();
-        for (String key : keys) {
-            result.put(key, keyValues.get(key));
-        }
-        return result;
-    }
+		HashMap<String, String> result = new HashMap<>();
+		for (String key : keys) {
+			result.put(key, keyValues.get(key));
+		}
+		return result;
+	}
 
-    private void genKeyValues() {
+	private void genKeyValues() {
 
-        if (keyValues == null) {
-            synchronized (this) {
-                if (keyValues == null) {
-                    keyValues = new HashMap<>();
-                    String[] split = result.split("[\r\n]+");
-                    for (String line : split) {
-                        if(line == null || line.isEmpty()) {
-                            continue;
-                        }
-                        if (line.startsWith("#")) {
-                            continue;
-                        }
-                        int splitterIndex = line.indexOf(":");
-                        if (splitterIndex < 0 || splitterIndex >= line.length()) {
-                            logger.warn("[wrong format]{}", line);
-                            continue;
-                        }
+		if (keyValues == null) {
+			synchronized (this) {
+				if (keyValues == null) {
+					keyValues = new HashMap<>();
+					String[] split = result.split("[\r\n]+");
+					for (String line : split) {
+						if (line == null || line.isEmpty()) {
+							continue;
+						}
+						if (line.startsWith("#")) {
+							continue;
+						}
+						int splitterIndex = line.indexOf(":");
+						if (splitterIndex < 0 || splitterIndex >= line.length()) {
+							logger.warn("[wrong format]{}", line);
+							continue;
+						}
 
-                        keyValues.put(line.substring(0, splitterIndex).trim(),
-                                line.substring(splitterIndex + 1).trim());
-                    }
-                }
-            }
-        }
+						keyValues.put(line.substring(0, splitterIndex).trim(),
+								line.substring(splitterIndex + 1).trim());
+					}
+				}
+			}
+		}
 
-    }
+	}
 
 }

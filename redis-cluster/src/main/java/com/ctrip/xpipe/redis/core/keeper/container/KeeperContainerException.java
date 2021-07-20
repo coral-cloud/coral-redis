@@ -9,15 +9,15 @@ import com.ctrip.xpipe.redis.core.exception.RedisRuntimeException;
 @SuppressWarnings("serial")
 public class KeeperContainerException extends RedisRuntimeException {
 
-    public KeeperContainerException(String message) {
-        super(message);
-    }
+	public KeeperContainerException(String message) {
+		super(message);
+	}
 
-    public KeeperContainerException(String message, Throwable th) {
-        super(message, th);
-    }
+	public KeeperContainerException(String message, Throwable th) {
+		super(message, th);
+	}
 
-    public <T extends Enum<T>> KeeperContainerException(ErrorMessage<T> errorMessage, Throwable th) {
-        super(errorMessage, th);
-    }
+	public <T extends Enum<T>> KeeperContainerException(ErrorMessage<T> errorMessage, Throwable th) {
+		super(errorMessage, th);
+	}
 }

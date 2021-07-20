@@ -14,38 +14,38 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 5, 2016
  */
-public class DefaultKeeperHeartBeatManager extends AbstractObservable implements KeeperHeartBeatManager{
-	
+public class DefaultKeeperHeartBeatManager extends AbstractObservable implements KeeperHeartBeatManager {
+
 	private Long lastHeartBeatTime = System.currentTimeMillis();
-	
+
 	private ScheduledExecutorService scheduledExecutor;
-	
+
 	private volatile ScheduledFuture<?> timeOutFuture;
-	
+
 	private volatile AtomicBoolean isAlive = new AtomicBoolean(true);
-	
+
 	private KeeperKey keeperKey;
-	
+
 	public DefaultKeeperHeartBeatManager(KeeperKey keeperKey, ScheduledExecutorService scheduledExecutor) {
-		
+
 		this.keeperKey = keeperKey;
 		this.scheduledExecutor = scheduledExecutor;
 		scheduleTimeout();
 	}
 
 	private void scheduleTimeout() {
-		
+
 		timeOutFuture = scheduledExecutor.schedule(new TimeoutAction(), HEART_BEAT_INTERVAL_MILLI * 3, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public void ping(KeeperInstanceMeta keeperInstanceMeta) {
-		
+
 		lastHeartBeatTime = System.currentTimeMillis();
-		if(isAlive.compareAndSet(false, true)){
+		if (isAlive.compareAndSet(false, true)) {
 			keeperAlive();
 		}
 		cancelFuture();
@@ -54,8 +54,8 @@ public class DefaultKeeperHeartBeatManager extends AbstractObservable implements
 
 
 	private void cancelFuture() {
-		
-		if(timeOutFuture != null){
+
+		if (timeOutFuture != null) {
 			timeOutFuture.cancel(true);
 			timeOutFuture = null;
 		}
@@ -66,13 +66,13 @@ public class DefaultKeeperHeartBeatManager extends AbstractObservable implements
 		return isAlive.get();
 	}
 
-	class TimeoutAction implements Runnable{
+	class TimeoutAction implements Runnable {
 
 		@Override
 		public void run() {
-			try{
+			try {
 				keeperDead();
-			}catch(Throwable th){
+			} catch (Throwable th) {
 				logger.error("[run]", th);
 			}
 		}
@@ -87,18 +87,18 @@ public class DefaultKeeperHeartBeatManager extends AbstractObservable implements
 	}
 
 	private void keeperAlive() {
-		
+
 		logger.info("[keeperAlive]{}", keeperKey);
 		notifyObservers(new NodeAdded<KeeperKey>(keeperKey));
 	}
-	
+
 	public Long getLastHeartBeatTime() {
 		return lastHeartBeatTime;
 	}
 
 
 	@Override
-	public void close(){
+	public void close() {
 		cancelFuture();
 	}
 }

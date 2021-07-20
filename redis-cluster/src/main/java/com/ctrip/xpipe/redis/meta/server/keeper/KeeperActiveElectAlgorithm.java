@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 6, 2016
  */
 public interface KeeperActiveElectAlgorithm {

@@ -12,18 +12,18 @@ import io.netty.channel.Channel;
  */
 public class MonitorOptionParser extends AbstractProxyOptionParser implements ProxyReqResOptionParser<String> {
 
-    @Override
-    public String output() {
-        return output;
-    }
+	@Override
+	public String output() {
+		return output;
+	}
 
-    @Override
-    public PROXY_OPTION option() {
-        return PROXY_OPTION.MONITOR;
-    }
+	@Override
+	public PROXY_OPTION option() {
+		return PROXY_OPTION.MONITOR;
+	}
 
-    @Override
-    public String getContent() {
-        return output;
-    }
+	@Override
+	public String getContent() {
+		return output;
+	}
 }

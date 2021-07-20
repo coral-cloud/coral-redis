@@ -12,8 +12,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author wenchao.meng
- *
- *         Jul 9, 2016
+ * <p>
+ * Jul 9, 2016
  */
 public class RetryNTimes<V> extends AbstractRetryTemplate<V> {
 
@@ -54,7 +54,7 @@ public class RetryNTimes<V> extends AbstractRetryTemplate<V> {
 
 		for (int i = 0; n == -1 || i <= n; i++) {
 
-			if(destroyed.get()){
+			if (destroyed.get()) {
 				logger.info("[execute][destroyed return null]{}", this);
 				return null;
 			}
@@ -64,7 +64,7 @@ public class RetryNTimes<V> extends AbstractRetryTemplate<V> {
 				retryPolicy.retryWaitMilli(true);
 			}
 
-			if(destroyed.get()){
+			if (destroyed.get()) {
 				logger.info("[execute][destroyed return null]{}", this);
 				return null;
 			}
@@ -72,7 +72,7 @@ public class RetryNTimes<V> extends AbstractRetryTemplate<V> {
 			try {
 				logger.debug("[execute]{}, {}", i, command);
 				CommandFuture<V> future = command.execute();
-				if(future == null){
+				if (future == null) {
 					return null;
 				}
 				return future.get(retryPolicy.waitTimeoutMilli(), TimeUnit.MILLISECONDS);
@@ -92,10 +92,10 @@ public class RetryNTimes<V> extends AbstractRetryTemplate<V> {
 
 	protected static Exception getOriginalException(Throwable e) {
 		if (e instanceof ExecutionException) {
-			return (Exception) ((null == e.getCause())?e : getOriginalException(e.getCause()));
+			return (Exception) ((null == e.getCause()) ? e : getOriginalException(e.getCause()));
 		}
 		if (e instanceof InvocationTargetException) {
-			return (Exception) ((null == e.getCause())?e : getOriginalException(e.getCause()));
+			return (Exception) ((null == e.getCause()) ? e : getOriginalException(e.getCause()));
 		}
 		return (Exception) e;
 

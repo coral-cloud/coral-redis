@@ -12,16 +12,16 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Sep 14, 2016
  */
 public class ParserManager {
-	
+
 	public static List<RedisClientProtocol<?>> parsers;
 	protected static final Logger logger = LoggerFactory.getLogger(ParserManager.class);
-	
+
 	static {
-		
+
 		parsers = new ArrayList<>(10);
 		parsers.add(new ArrayParser());
 		parsers.add(new SimpleStringParser());
@@ -29,15 +29,15 @@ public class ParserManager {
 		parsers.add(new RedisErrorParser());
 		parsers.add(new BulkStringParser(""));
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T> ByteBuf parse(T o){
-		
-		for(RedisClientProtocol parser : parsers){
-			if(parser.supportes(o.getClass())){
-				
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public static <T> ByteBuf parse(T o) {
+
+		for (RedisClientProtocol parser : parsers) {
+			if (parser.supportes(o.getClass())) {
+
 				Constructor constructor = getConstructor(parser.getClass(), o.getClass());
-				if(constructor == null){
+				if (constructor == null) {
 					logger.warn("[getOptionParser][support argument, but can not find constructor]{},{}", parser, o);
 					continue;
 				}
@@ -56,18 +56,18 @@ public class ParserManager {
 
 	@SuppressWarnings("rawtypes")
 	private static <T> Constructor<?> getConstructor(Class<T> clazz, Class argument) {
-		
-		for(Constructor<?>  constructor : clazz.getConstructors()){
-			Class<?>[]paraTypes = constructor.getParameterTypes();
-			if(paraTypes.length != 1){
+
+		for (Constructor<?> constructor : clazz.getConstructors()) {
+			Class<?>[] paraTypes = constructor.getParameterTypes();
+			if (paraTypes.length != 1) {
 				continue;
 			}
-			if(paraTypes[0].isAssignableFrom(argument)){
+			if (paraTypes[0].isAssignableFrom(argument)) {
 				return constructor;
 			}
 		}
 		return null;
 	}
-	
+
 
 }

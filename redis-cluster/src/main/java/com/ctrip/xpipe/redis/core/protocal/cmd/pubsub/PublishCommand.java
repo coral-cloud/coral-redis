@@ -17,44 +17,44 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class PublishCommand extends AbstractRedisCommand<Object> {
 
-    private static final Logger logger = LoggerFactory.getLogger(PublishCommand.class);
+	private static final Logger logger = LoggerFactory.getLogger(PublishCommand.class);
 
-    private static final String PUBLISH_COMMAND_NAME = "publish";
+	private static final String PUBLISH_COMMAND_NAME = "publish";
 
-    private String pubChannel;
+	private String pubChannel;
 
-    private String message;
+	private String message;
 
-    public PublishCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled,
-                          String pubChannel, String message) {
-        super(clientPool, scheduled);
-        this.pubChannel = pubChannel;
-        this.message = message;
-    }
+	public PublishCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled,
+						  String pubChannel, String message) {
+		super(clientPool, scheduled);
+		this.pubChannel = pubChannel;
+		this.message = message;
+	}
 
-    public PublishCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli, String pubChannel, String message) {
-        super(clientPool, scheduled, commandTimeoutMilli);
-        this.pubChannel = pubChannel;
-        this.message = message;
-    }
+	public PublishCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli, String pubChannel, String message) {
+		super(clientPool, scheduled, commandTimeoutMilli);
+		this.pubChannel = pubChannel;
+		this.message = message;
+	}
 
-    @Override
-    protected Object format(Object payload) {
-        return payload;
-    }
+	@Override
+	protected Object format(Object payload) {
+		return payload;
+	}
 
-    @Override
-    public ByteBuf getRequest() {
-        return new RequestStringParser(getName(), pubChannel, message).format();
-    }
+	@Override
+	public ByteBuf getRequest() {
+		return new RequestStringParser(getName(), pubChannel, message).format();
+	}
 
-    @Override
-    public String getName() {
-        return PUBLISH_COMMAND_NAME;
-    }
+	@Override
+	public String getName() {
+		return PUBLISH_COMMAND_NAME;
+	}
 
-    @Override
-    protected Logger getLogger() {
-        return logger;
-    }
+	@Override
+	protected Logger getLogger() {
+		return logger;
+	}
 }

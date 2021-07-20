@@ -6,17 +6,17 @@ import com.ctrip.xpipe.utils.ObjectUtils;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 5, 2016
  */
 public class KeeperKey {
-	
+
 	private String clusterId;
 	private String shardId;
 	private String ip;
-	private int    port;
-	
-	public KeeperKey(String clusterId, String shardId, String ip, int port){
+	private int port;
+
+	public KeeperKey(String clusterId, String shardId, String ip, int port) {
 		this.clusterId = clusterId;
 		this.shardId = shardId;
 		this.ip = ip;
@@ -43,32 +43,29 @@ public class KeeperKey {
 	public int hashCode() {
 		return ObjectUtils.hashCode(clusterId, shardId, ip, port);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		
-		if(!(obj instanceof KeeperKey)){
+
+		if (!(obj instanceof KeeperKey)) {
 			return false;
 		}
 		KeeperKey other = (KeeperKey) obj;
-		if(!ObjectUtils.equals(clusterId, other.clusterId)){
+		if (!ObjectUtils.equals(clusterId, other.clusterId)) {
 			return false;
 		}
 
-		if(!ObjectUtils.equals(shardId, other.shardId)){
+		if (!ObjectUtils.equals(shardId, other.shardId)) {
 			return false;
 		}
 
-		if(!ObjectUtils.equals(ip, other.ip)){
+		if (!ObjectUtils.equals(ip, other.ip)) {
 			return false;
 		}
 
-		if(!ObjectUtils.equals(port, other.port)){
-			return false;
-		}
-		return true;
+		return ObjectUtils.equals(port, other.port);
 	}
-	
+
 	@Override
 	public String toString() {
 		return Codec.DEFAULT.encode(this);

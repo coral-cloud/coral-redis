@@ -20,46 +20,46 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class DefaultPingStats extends AbstractStats implements PingStats {
 
-    private Endpoint endpoint;
+	private Endpoint endpoint;
 
-    private HostPort target;
+	private HostPort target;
 
-    private volatile PingStatsResult result;
+	private volatile PingStatsResult result;
 
-    private SimpleObjectPool<NettyClient> objectPool;
+	private SimpleObjectPool<NettyClient> objectPool;
 
-    public DefaultPingStats(ScheduledExecutorService scheduled, Endpoint endpoint,
-                            SimpleKeyedObjectPool<Endpoint, NettyClient> keyedObjectPool) {
-        super(scheduled);
-        this.endpoint = endpoint;
-        this.target = new HostPort(endpoint.getHost(), endpoint.getPort());
-        this.objectPool = keyedObjectPool.getKeyPool(endpoint);
-        this.result = new PingStatsResult(-1, -1, target, target);
-    }
+	public DefaultPingStats(ScheduledExecutorService scheduled, Endpoint endpoint,
+							SimpleKeyedObjectPool<Endpoint, NettyClient> keyedObjectPool) {
+		super(scheduled);
+		this.endpoint = endpoint;
+		this.target = new HostPort(endpoint.getHost(), endpoint.getPort());
+		this.objectPool = keyedObjectPool.getKeyPool(endpoint);
+		this.result = new PingStatsResult(-1, -1, target, target);
+	}
 
-    @Override
-    public Endpoint getEndpoint() {
-        return endpoint;
-    }
+	@Override
+	public Endpoint getEndpoint() {
+		return endpoint;
+	}
 
-    @Override
-    public PingStatsResult getPingStatsResult() {
-        return result;
-    }
+	@Override
+	public PingStatsResult getPingStatsResult() {
+		return result;
+	}
 
-    @Override
-    protected void doTask() {
-        long start = System.currentTimeMillis();
-        new ProxyPingCommand(objectPool, getScheduled()).execute().addListener(commandFuture -> {
-            if(!commandFuture.isSuccess()) {
-                result = new PingStatsResult(start, Integer.MAX_VALUE, target, target);
-            }
-            ProxyPongEntity pong = commandFuture.getNow();
-            if(pong == null) {
-                return;
-            }
-            result = new PingStatsResult(start, System.currentTimeMillis(), target, pong.getDirect());
-        });
-    }
+	@Override
+	protected void doTask() {
+		long start = System.currentTimeMillis();
+		new ProxyPingCommand(objectPool, getScheduled()).execute().addListener(commandFuture -> {
+			if (!commandFuture.isSuccess()) {
+				result = new PingStatsResult(start, Integer.MAX_VALUE, target, target);
+			}
+			ProxyPongEntity pong = commandFuture.getNow();
+			if (pong == null) {
+				return;
+			}
+			result = new PingStatsResult(start, System.currentTimeMillis(), target, pong.getDirect());
+		});
+	}
 
 }

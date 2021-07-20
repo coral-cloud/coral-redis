@@ -12,14 +12,14 @@ import java.util.Random;
  */
 public class NaiveNextHopAlgorithm implements NextHopAlgorithm {
 
-    private Random random = new Random();
+	private Random random = new Random();
 
-    @Override
-    public ProxyEndpoint nextHop(List<ProxyEndpoint> endpoints) {
-        if (endpoints == null || endpoints.isEmpty()) {
-            return null;
-        }
-        int index = random.nextInt(endpoints.size());
-        return endpoints.get(index);
-    }
+	@Override
+	public ProxyEndpoint nextHop(List<ProxyEndpoint> endpoints) {
+		if (endpoints == null || endpoints.isEmpty()) {
+			return null;
+		}
+		int index = random.nextInt(endpoints.size());
+		return endpoints.get(index);
+	}
 }

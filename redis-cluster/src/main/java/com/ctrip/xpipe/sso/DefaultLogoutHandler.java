@@ -12,17 +12,17 @@ import java.io.IOException;
  */
 public class DefaultLogoutHandler implements LogoutHandler {
 
-    @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            response.sendRedirect("/");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	@Override
+	public void logout(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			response.sendRedirect("/");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    @Override
-    public int getOrder() {
-        return LOWEST_PRECEDENCE;
-    }
+	@Override
+	public int getOrder() {
+		return LOWEST_PRECEDENCE;
+	}
 }

@@ -14,53 +14,53 @@ import com.ctrip.xpipe.redis.proxy.resource.ResourceManager;
  */
 public class DefaultSessionMonitor extends AbstractStartStoppable implements SessionMonitor {
 
-    private SessionStats sessionStats;
+	private SessionStats sessionStats;
 
-    private OutboundBufferMonitor outboundBufferMonitor;
+	private OutboundBufferMonitor outboundBufferMonitor;
 
-    private SocketStats socketStats;
+	private SocketStats socketStats;
 
-    private ResourceManager resourceManager;
+	private ResourceManager resourceManager;
 
-    public static final String SESSION_MONITOR_SHOULD_START = "proxy.session.monitor.start";
+	public static final String SESSION_MONITOR_SHOULD_START = "proxy.session.monitor.start";
 
-    private static final boolean shouldStart = Boolean.parseBoolean(System.getProperty(SESSION_MONITOR_SHOULD_START, "true"));
+	private static final boolean shouldStart = Boolean.parseBoolean(System.getProperty(SESSION_MONITOR_SHOULD_START, "true"));
 
-    public DefaultSessionMonitor(ResourceManager resourceManager, Session session) {
-        this.resourceManager = resourceManager;
-        this.sessionStats = new DefaultSessionStats(resourceManager.getGlobalSharedScheduled());
-        this.outboundBufferMonitor = new DefaultOutboundBufferMonitor(session);
-        this.socketStats = new DefaultSocketStats(resourceManager.getGlobalSharedScheduled(), session);
-    }
+	public DefaultSessionMonitor(ResourceManager resourceManager, Session session) {
+		this.resourceManager = resourceManager;
+		this.sessionStats = new DefaultSessionStats(resourceManager.getGlobalSharedScheduled());
+		this.outboundBufferMonitor = new DefaultOutboundBufferMonitor(session);
+		this.socketStats = new DefaultSocketStats(resourceManager.getGlobalSharedScheduled(), session);
+	}
 
-    @Override
-    public SessionStats getSessionStats() {
-        return sessionStats;
-    }
+	@Override
+	public SessionStats getSessionStats() {
+		return sessionStats;
+	}
 
-    @Override
-    public OutboundBufferMonitor getOutboundBufferMonitor() {
-        return outboundBufferMonitor;
-    }
+	@Override
+	public OutboundBufferMonitor getOutboundBufferMonitor() {
+		return outboundBufferMonitor;
+	}
 
-    @Override
-    public SocketStats getSocketStats() {
-        return socketStats;
-    }
+	@Override
+	public SocketStats getSocketStats() {
+		return socketStats;
+	}
 
-    @Override
-    protected void doStart() throws Exception {
-        if(shouldStart && resourceManager.getProxyConfig().startMonitor()) {
-            sessionStats.start();
-            socketStats.start();
-        }
-    }
+	@Override
+	protected void doStart() throws Exception {
+		if (shouldStart && resourceManager.getProxyConfig().startMonitor()) {
+			sessionStats.start();
+			socketStats.start();
+		}
+	}
 
-    @Override
-    protected void doStop() throws Exception {
-        if(shouldStart && resourceManager.getProxyConfig().startMonitor()) {
-            sessionStats.stop();
-            socketStats.stop();
-        }
-    }
+	@Override
+	protected void doStop() throws Exception {
+		if (shouldStart && resourceManager.getProxyConfig().startMonitor()) {
+			sessionStats.stop();
+			socketStats.stop();
+		}
+	}
 }

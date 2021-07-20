@@ -21,29 +21,29 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 24, 2016
  */
-public class RdbonlyRedisMasterReplication extends AbstractRedisMasterReplication{
+public class RdbonlyRedisMasterReplication extends AbstractRedisMasterReplication {
 
 	private RdbOnlyReplicationStore rdbOnlyReplicationStore;
 	private DumpedRdbStore dumpedRdbStore;
-	
+
 	public RdbonlyRedisMasterReplication(RedisKeeperServer redisKeeperServer, RedisMaster redisMaster,
-                                         NioEventLoopGroup nioEventLoopGroup, ScheduledExecutorService scheduled,
-                                         RdbDumper rdbDumper, KeeperResourceManager resourceManager) {
+										 NioEventLoopGroup nioEventLoopGroup, ScheduledExecutorService scheduled,
+										 RdbDumper rdbDumper, KeeperResourceManager resourceManager) {
 		super(redisKeeperServer, redisMaster, nioEventLoopGroup, scheduled, resourceManager);
 		setRdbDumper(rdbDumper);
 	}
-	
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
-		
+
 		dumpedRdbStore = getRdbDumper().prepareRdbStore();
 		logger.info("[doInitialize][newRdbFile]{}", dumpedRdbStore);
 		rdbOnlyReplicationStore = new RdbOnlyReplicationStore(dumpedRdbStore);
-		
+
 	}
 
 
@@ -51,10 +51,10 @@ public class RdbonlyRedisMasterReplication extends AbstractRedisMasterReplicatio
 	protected void doConnect(Bootstrap b) {
 
 		tryConnect(b).addListener(new ChannelFutureListener() {
-			
+
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				if(!future.isSuccess()){
+				if (!future.isSuccess()) {
 					logger.info("[operationComplete][fail]", future.cause());
 					dumpFail(future.cause());
 				}
@@ -68,7 +68,7 @@ public class RdbonlyRedisMasterReplication extends AbstractRedisMasterReplicatio
 
 	@Override
 	protected Psync createPsync() {
-		
+
 		Psync psync = new RdbOnlyPsync(clientPool, rdbOnlyReplicationStore, scheduled);
 		psync.addPsyncObserver(this);
 		return psync;
@@ -90,7 +90,7 @@ public class RdbonlyRedisMasterReplication extends AbstractRedisMasterReplicatio
 
 	@Override
 	protected void doEndWriteRdb() {
-		
+
 		logger.info("[endWriteRdb]{}", this);
 		masterChannel.close();
 	}
@@ -102,7 +102,7 @@ public class RdbonlyRedisMasterReplication extends AbstractRedisMasterReplicatio
 
 	@Override
 	protected void doOnFullSync() {
-		
+
 	}
 
 	@Override

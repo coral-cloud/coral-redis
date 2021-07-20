@@ -10,5 +10,5 @@ import io.netty.handler.ssl.SslHandler;
  */
 public interface NettySslHandlerFactory {
 
-    SslHandler createSslHandler(SocketChannel channel);
+	SslHandler createSslHandler(SocketChannel channel);
 }

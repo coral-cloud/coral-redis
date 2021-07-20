@@ -2,11 +2,12 @@ package com.ctrip.xpipe.redis.core.metaserver;
 
 /**
  * used for console
- * @author wenchao.meng
  *
+ * @author wenchao.meng
+ * <p>
  * Aug 2, 2016
  */
-public interface MetaServerConsoleServiceManager{
+public interface MetaServerConsoleServiceManager {
 
 	MetaServerConsoleService getOrCreate(String metaServerAddress);
 

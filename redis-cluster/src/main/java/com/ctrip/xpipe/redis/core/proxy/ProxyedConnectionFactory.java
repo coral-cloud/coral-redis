@@ -11,5 +11,5 @@ import io.netty.channel.ChannelFuture;
  */
 public interface ProxyedConnectionFactory {
 
-    ChannelFuture getProxyedConnectionChannelFuture(ProxyConnectProtocol protocol, Bootstrap bootstrap);
+	ChannelFuture getProxyedConnectionChannelFuture(ProxyConnectProtocol protocol, Bootstrap bootstrap);
 }

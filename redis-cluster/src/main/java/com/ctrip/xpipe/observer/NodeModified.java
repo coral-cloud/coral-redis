@@ -2,13 +2,14 @@ package com.ctrip.xpipe.observer;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 25, 2016
  */
-public class NodeModified<V> extends AbstractEvent<V>{
-	
+public class NodeModified<V> extends AbstractEvent<V> {
+
 	private V oldNode, newNode;
-	public NodeModified(V oldNode, V newNode){
+
+	public NodeModified(V oldNode, V newNode) {
 		this.oldNode = oldNode;
 		this.newNode = newNode;
 	}
@@ -16,7 +17,7 @@ public class NodeModified<V> extends AbstractEvent<V>{
 	public V getOldNode() {
 		return oldNode;
 	}
-	
+
 	public V getNewNode() {
 		return newNode;
 	}

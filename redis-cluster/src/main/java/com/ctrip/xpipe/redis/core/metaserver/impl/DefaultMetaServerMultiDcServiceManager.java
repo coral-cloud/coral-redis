@@ -10,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author wenchao.meng
- *
- *         Sep 5, 2016
+ * <p>
+ * Sep 5, 2016
  */
 public class DefaultMetaServerMultiDcServiceManager implements MetaServerMultiDcServiceManager {
 

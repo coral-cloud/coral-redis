@@ -17,29 +17,29 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月22日 上午11:49:02
  */
-public class PsyncHandler extends AbstractCommandHandler{
-	
+public class PsyncHandler extends AbstractCommandHandler {
+
 	public static final int WAIT_OFFSET_TIME_MILLI = 60 * 1000;
-	
+
 	@Override
 	protected void doHandle(final String[] args, final RedisClient redisClient) throws Exception {
 		// in non-psync executor
 		final RedisKeeperServer redisKeeperServer = redisClient.getRedisKeeperServer();
-		
-		if(redisKeeperServer.rdbDumper() == null && redisKeeperServer.getReplicationStore().isFresh()){
+
+		if (redisKeeperServer.rdbDumper() == null && redisKeeperServer.getReplicationStore().isFresh()) {
 			redisClient.sendMessage(new RedisErrorParser(new NoMasterlinkRedisError("Can't SYNC while replicationstore fresh")).format());
 			return;
 		}
-		
-		if(!redisKeeperServer.getRedisKeeperServerState().psync(redisClient, args)){
+
+		if (!redisKeeperServer.getRedisKeeperServerState().psync(redisClient, args)) {
 			return;
 		}
-		
-		final RedisSlave redisSlave  = redisClient.becomeSlave();
-		if(redisSlave == null){
+
+		final RedisSlave redisSlave = redisClient.becomeSlave();
+		if (redisSlave == null) {
 			logger.warn("[doHandle][psync client already slave]" + redisClient);
 			try {
 				redisClient.close();
@@ -48,18 +48,18 @@ public class PsyncHandler extends AbstractCommandHandler{
 			}
 			return;
 		}
-		
+
 		// transfer to psync executor, which will do psync dedicatedly
 		redisSlave.processPsyncSequentially(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				try{
+				try {
 					innerDoHandle(args, redisSlave, redisKeeperServer);
-				}catch(Throwable th){
+				} catch (Throwable th) {
 					try {
 						logger.error("[run]" + redisClient, th);
-						if(redisSlave.isOpen()){
+						if (redisSlave.isOpen()) {
 							redisSlave.close();
 						}
 					} catch (IOException e) {
@@ -69,31 +69,31 @@ public class PsyncHandler extends AbstractCommandHandler{
 			}
 		});
 	}
-	
+
 	protected void innerDoHandle(final String[] args, final RedisSlave redisSlave, RedisKeeperServer redisKeeperServer) {
-		
+
 		KeeperConfig keeperConfig = redisKeeperServer.getKeeperConfig();
 		KeeperRepl keeperRepl = redisKeeperServer.getKeeperRepl();
-		
-		Long 	   offsetRequest = Long.valueOf(args[1]);
-		String 	   replIdRequest = args[0];
-		
-		if(replIdRequest.equals("?")){
+
+		Long offsetRequest = Long.valueOf(args[1]);
+		String replIdRequest = args[0];
+
+		if (replIdRequest.equals("?")) {
 			doFullSync(redisSlave);
-		}else if(replIdRequest.equals(keeperRepl.replId()) || (replIdRequest.equals(keeperRepl.replId2()) && offsetRequest <= keeperRepl.secondReplIdOffset())){
-			
+		} else if (replIdRequest.equals(keeperRepl.replId()) || (replIdRequest.equals(keeperRepl.replId2()) && offsetRequest <= keeperRepl.secondReplIdOffset())) {
+
 			Long beginOffset = keeperRepl.getBeginOffset();
 			Long endOffset = keeperRepl.getEndOffset();
-			
-			if(offsetRequest < beginOffset){
-				logger.info("[innerDoHandle][offset < beginOffset][begin, end, request]{}, {}, {}" , beginOffset , endOffset, offsetRequest);
+
+			if (offsetRequest < beginOffset) {
+				logger.info("[innerDoHandle][offset < beginOffset][begin, end, request]{}, {}, {}", beginOffset, endOffset, offsetRequest);
 				redisSlave.getRedisKeeperServer().getKeeperMonitor().getKeeperStats().increatePartialSyncError();
 				doFullSync(redisSlave);
-			}else if(offsetRequest > endOffset +1){
+			} else if (offsetRequest > endOffset + 1) {
 				logger.info("[innerDoHandle][wait for offset]{}, {} > {} + 1", redisSlave, offsetRequest, endOffset);
 				waitForoffset(args, redisSlave, keeperRepl.replId(), offsetRequest);
-			}else{
-				if(endOffset - offsetRequest < keeperConfig.getReplicationStoreMaxCommandsToTransferBeforeCreateRdb()) {
+			} else {
+				if (endOffset - offsetRequest < keeperConfig.getReplicationStoreMaxCommandsToTransferBeforeCreateRdb()) {
 					doPartialSync(redisSlave, keeperRepl.replId(), offsetRequest);
 				} else {
 					logger.info("[innerDoHandle][too much commands to transfer]{} - {} < {}", endOffset, offsetRequest, keeperConfig.getReplicationStoreMaxCommandsToTransferBeforeCreateRdb());
@@ -101,7 +101,7 @@ public class PsyncHandler extends AbstractCommandHandler{
 					doFullSync(redisSlave);
 				}
 			}
-		}else{
+		} else {
 			logger.info("current repl info: {}", keeperRepl);
 			redisSlave.getRedisKeeperServer().getKeeperMonitor().getKeeperStats().increatePartialSyncError();
 			doFullSync(redisSlave);
@@ -115,7 +115,7 @@ public class PsyncHandler extends AbstractCommandHandler{
 
 			logger.info("[waitForoffset][begin wait]{}", redisSlave);
 			boolean result = replicationStore.awaitCommandsOffset(offsetRequest - replicationStore.beginOffsetWhenCreated() - 1, WAIT_OFFSET_TIME_MILLI);
-			if(result){
+			if (result) {
 				logger.info("[waitForoffset][wait succeed]{}", redisSlave);
 				redisSlave.getRedisKeeperServer().getKeeperMonitor().getKeeperStats().increaseWaitOffsetSucceed();
 				doPartialSync(redisSlave, replId, offsetRequest);
@@ -123,7 +123,7 @@ public class PsyncHandler extends AbstractCommandHandler{
 			}
 		} catch (InterruptedException e) {
 			logger.error("[waitForoffset]" + redisSlave, e);
-		}catch(Exception e){
+		} catch (Exception e) {
 			logger.error("[waitForoffset][failed]", e);
 			try {
 				redisSlave.close();
@@ -139,18 +139,18 @@ public class PsyncHandler extends AbstractCommandHandler{
 	}
 
 	protected void doPartialSync(RedisSlave redisSlave, String replId, Long offset) {
-		
-		if(logger.isInfoEnabled()){
+
+		if (logger.isInfoEnabled()) {
 			logger.info("[doPartialSync]" + redisSlave);
 		}
 		SimpleStringParser simpleStringParser = null;
-		
-		if(!redisSlave.capaOf(CAPA.PSYNC2)){
+
+		if (!redisSlave.capaOf(CAPA.PSYNC2)) {
 			simpleStringParser = new SimpleStringParser(DefaultPsync.PARTIAL_SYNC);
-		}else{
+		} else {
 			simpleStringParser = new SimpleStringParser(String.format("%s %s", DefaultPsync.PARTIAL_SYNC, replId));
 		}
-		
+
 		redisSlave.sendMessage(simpleStringParser.format());
 		redisSlave.markPsyncProcessed();
 
@@ -163,7 +163,7 @@ public class PsyncHandler extends AbstractCommandHandler{
 	protected void doFullSync(RedisSlave redisSlave) {
 
 		try {
-			if(logger.isInfoEnabled()){
+			if (logger.isInfoEnabled()) {
 				logger.info("[doFullSync]" + redisSlave);
 			}
 
@@ -188,7 +188,7 @@ public class PsyncHandler extends AbstractCommandHandler{
 
 	@Override
 	public String[] getCommands() {
-		
+
 		return new String[]{"psync"};
 	}
 }

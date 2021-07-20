@@ -9,11 +9,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 2, 2016
  */
-public abstract class AbstractConfigCommand<T> extends AbstractRedisCommand<T>{
-	
+public abstract class AbstractConfigCommand<T> extends AbstractRedisCommand<T> {
+
 	public static String CONFIG = "config";
 
 	public AbstractConfigCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
@@ -24,8 +24,8 @@ public abstract class AbstractConfigCommand<T> extends AbstractRedisCommand<T>{
 		super(clientPool, scheduled, commandTimeoutMilli);
 	}
 
-	public static enum REDIS_CONFIG_TYPE{
-		
+	public enum REDIS_CONFIG_TYPE {
+
 		MIN_SLAVES_TO_WRITE("min-slaves-to-write"),
 		REWRITE("rewrite"),
 		DISKLESS_SYNC("repl-diskless-sync"),
@@ -34,17 +34,17 @@ public abstract class AbstractConfigCommand<T> extends AbstractRedisCommand<T>{
 
 		SLAVE_REPL_ALL("slave-repl-all")//extend for xredis
 		;
-		
+
 		private String configName;
-		
-		REDIS_CONFIG_TYPE(String configName){
+
+		REDIS_CONFIG_TYPE(String configName) {
 			this.configName = configName;
 		}
-		
+
 		public String getConfigName() {
 			return configName;
 		}
-		
+
 	}
 
 	@Override

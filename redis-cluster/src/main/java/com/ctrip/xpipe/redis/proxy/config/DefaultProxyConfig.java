@@ -31,203 +31,203 @@ import java.util.concurrent.TimeUnit;
 @Profile(AbstractProfile.PROFILE_NAME_PRODUCTION)
 public class DefaultProxyConfig implements ProxyConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultProxyConfig.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultProxyConfig.class);
 
-    private Config config;
+	private Config config;
 
-    private static final String PROXY_PROPERTIES_PATH = String.format("/opt/data/%s", FoundationService.DEFAULT.getAppId());
+	private static final String PROXY_PROPERTIES_PATH = String.format("/opt/data/%s", FoundationService.DEFAULT.getAppId());
 
-    private static final String PROXY_PROPERTIES_FILE = "xpipe.properties";
+	private static final String PROXY_PROPERTIES_FILE = "xpipe.properties";
 
-    private static final String KEY_ENDPOINT_HEALTH_CHECK_INTERVAL = "proxy.endpoint.check.interval.sec";
+	private static final String KEY_ENDPOINT_HEALTH_CHECK_INTERVAL = "proxy.endpoint.check.interval.sec";
 
-    private static final String KEY_TRAFFIC_REPORT_INTERVAL = "proxy.traffic.report.interval.milli";
+	private static final String KEY_TRAFFIC_REPORT_INTERVAL = "proxy.traffic.report.interval.milli";
 
-    private static final String KEY_FRONTEND_TCP_PORT = "proxy.frontend.tcp.port";
+	private static final String KEY_FRONTEND_TCP_PORT = "proxy.frontend.tcp.port";
 
-    private static final String KEY_FRONTEND_TLS_PORT = "proxy.frontend.tls.port";
+	private static final String KEY_FRONTEND_TLS_PORT = "proxy.frontend.tls.port";
 
-    private static final String KEY_NO_TLS_NETTY_HANDLER = "proxy.no.tls.netty.handler";
+	private static final String KEY_NO_TLS_NETTY_HANDLER = "proxy.no.tls.netty.handler";
 
-    private static final String KEY_INTERNAL_NETWORK_PREFIX = "proxy.internal.network.prefix";
+	private static final String KEY_INTERNAL_NETWORK_PREFIX = "proxy.internal.network.prefix";
 
-    private static final String KEY_RECV_BUFFER_SIZE = "proxy.recv.buffer.size";
+	private static final String KEY_RECV_BUFFER_SIZE = "proxy.recv.buffer.size";
 
-    private static final String KEY_START_PROXY_MONITOR = "proxy.monitor.start";
+	private static final String KEY_START_PROXY_MONITOR = "proxy.monitor.start";
 
-    private static final String KEY_PROXY_RESPONSE_TIMEOUT = "proxy.response.timeout";
+	private static final String KEY_PROXY_RESPONSE_TIMEOUT = "proxy.response.timeout";
 
-    private static final String KEY_PROXY_COMPRESS_ENABLED = "proxy.compress.enabled";
+	private static final String KEY_PROXY_COMPRESS_ENABLED = "proxy.compress.enabled";
 
-    private static final String KEY_PROXY_COMPRESS_ALGORITHM = "proxy.compress.algorithm";
+	private static final String KEY_PROXY_COMPRESS_ALGORITHM = "proxy.compress.algorithm";
 
-    private static final String KEY_PROXY_COMPRESS_ALGORITHM_VERSION = "proxy.compress.algorithm.version";
+	private static final String KEY_PROXY_COMPRESS_ALGORITHM_VERSION = "proxy.compress.algorithm.version";
 
-    private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1, XpipeThreadFactory.create("DefaultProxyConfig"));
+	private ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(1, XpipeThreadFactory.create("DefaultProxyConfig"));
 
-    public DefaultProxyConfig() {
-        config = initConfig();
-        scheduledFresh();
-    }
+	public DefaultProxyConfig() {
+		config = initConfig();
+		scheduledFresh();
+	}
 
-    public void scheduledFresh() {
-        scheduled.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                config = initConfig();
-            }
-        }, 1, 1, TimeUnit.MINUTES);
-    }
+	public void scheduledFresh() {
+		scheduled.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				config = initConfig();
+			}
+		}, 1, 1, TimeUnit.MINUTES);
+	}
 
-    private Config initConfig() {
-        CompositeConfig compositeConfig = new CompositeConfig();
-        try {
-            compositeConfig.addConfig(new DefaultFileConfig(PROXY_PROPERTIES_PATH, PROXY_PROPERTIES_FILE));
-        } catch (Exception e) {
-            logger.warn("", e);
-        }
+	private Config initConfig() {
+		CompositeConfig compositeConfig = new CompositeConfig();
+		try {
+			compositeConfig.addConfig(new DefaultFileConfig(PROXY_PROPERTIES_PATH, PROXY_PROPERTIES_FILE));
+		} catch (Exception e) {
+			logger.warn("", e);
+		}
 
-        try {
-            compositeConfig.addConfig(new DefaultFileConfig());
-        } catch (Exception e) {
-            logger.info("[DefaultProxyConfig]{}", e);
-        }
-        return compositeConfig;
-    }
+		try {
+			compositeConfig.addConfig(new DefaultFileConfig());
+		} catch (Exception e) {
+			logger.info("[DefaultProxyConfig]{}", e);
+		}
+		return compositeConfig;
+	}
 
-    @Override
-    public int frontendTcpPort() {
-        return getIntProperty(KEY_FRONTEND_TCP_PORT, 80);
-    }
+	@Override
+	public int frontendTcpPort() {
+		return getIntProperty(KEY_FRONTEND_TCP_PORT, 80);
+	}
 
-    @Override
-    public int frontendTlsPort() {
-        return getIntProperty(KEY_FRONTEND_TLS_PORT, 443);
-    }
+	@Override
+	public int frontendTlsPort() {
+		return getIntProperty(KEY_FRONTEND_TLS_PORT, 443);
+	}
 
-    @Override
-    public long getTrafficReportIntervalMillis() {
-        return getLongProperty(KEY_TRAFFIC_REPORT_INTERVAL, 30000L);
-    }
+	@Override
+	public long getTrafficReportIntervalMillis() {
+		return getLongProperty(KEY_TRAFFIC_REPORT_INTERVAL, 30000L);
+	}
 
-    @Override
-    public int endpointHealthCheckIntervalSec() {
-        return getIntProperty(KEY_ENDPOINT_HEALTH_CHECK_INTERVAL, 60);
-    }
+	@Override
+	public int endpointHealthCheckIntervalSec() {
+		return getIntProperty(KEY_ENDPOINT_HEALTH_CHECK_INTERVAL, 60);
+	}
 
-    @Override
-    public boolean noTlsNettyHandler() {
-        return getBooleanProperty(KEY_NO_TLS_NETTY_HANDLER, false);
-    }
+	@Override
+	public boolean noTlsNettyHandler() {
+		return getBooleanProperty(KEY_NO_TLS_NETTY_HANDLER, false);
+	}
 
-    @Override
-    public int getFixedRecvBufferSize() {
-        return getIntProperty(KEY_RECV_BUFFER_SIZE, 4096);
-    }
+	@Override
+	public int getFixedRecvBufferSize() {
+		return getIntProperty(KEY_RECV_BUFFER_SIZE, 4096);
+	}
 
-    @Override
-    public String[] getInternalNetworkPrefix() {
-        String internalNetworkPrefix = getProperty(KEY_INTERNAL_NETWORK_PREFIX, "10");
-        return IpUtils.splitIpAddr(internalNetworkPrefix);
-    }
+	@Override
+	public String[] getInternalNetworkPrefix() {
+		String internalNetworkPrefix = getProperty(KEY_INTERNAL_NETWORK_PREFIX, "10");
+		return IpUtils.splitIpAddr(internalNetworkPrefix);
+	}
 
-    @Override
-    public boolean startMonitor() {
-        return getBooleanProperty(KEY_START_PROXY_MONITOR, false);
-    }
+	@Override
+	public boolean startMonitor() {
+		return getBooleanProperty(KEY_START_PROXY_MONITOR, false);
+	}
 
-    @Override
-    public int getResponseTimeout() {
-        return getIntProperty(KEY_PROXY_RESPONSE_TIMEOUT, 1000);
-    }
+	@Override
+	public int getResponseTimeout() {
+		return getIntProperty(KEY_PROXY_RESPONSE_TIMEOUT, 1000);
+	}
 
-    @Override
-    public boolean isCompressEnabled() {
-        return getBooleanProperty(KEY_PROXY_COMPRESS_ENABLED, Boolean.FALSE);
-    }
+	@Override
+	public boolean isCompressEnabled() {
+		return getBooleanProperty(KEY_PROXY_COMPRESS_ENABLED, Boolean.FALSE);
+	}
 
-    @Override
-    public CompressAlgorithm getCompressAlgorithm() {
-        return new CompressAlgorithm() {
-            @Override
-            public String version() {
-                return getProperty(KEY_PROXY_COMPRESS_ALGORITHM_VERSION, "1.0");
-            }
+	@Override
+	public CompressAlgorithm getCompressAlgorithm() {
+		return new CompressAlgorithm() {
+			@Override
+			public String version() {
+				return getProperty(KEY_PROXY_COMPRESS_ALGORITHM_VERSION, "1.0");
+			}
 
-            @Override
-            public AlgorithmType getType() {
-                return AlgorithmType.valueOf(getProperty(KEY_PROXY_COMPRESS_ALGORITHM, AlgorithmType.ZSTD.name()));
-            }
-        };
-    }
+			@Override
+			public AlgorithmType getType() {
+				return AlgorithmType.valueOf(getProperty(KEY_PROXY_COMPRESS_ALGORITHM, AlgorithmType.ZSTD.name()));
+			}
+		};
+	}
 
-    @Override
-    public ByteToMessageDecoder getCompressDecoder() {
-        return new ZstdDecoder();
-    }
+	@Override
+	public ByteToMessageDecoder getCompressDecoder() {
+		return new ZstdDecoder();
+	}
 
-    @Override
-    public MessageToByteEncoder<ByteBuf> getCompressEncoder() {
-        return new ZstdEncoder();
-    }
+	@Override
+	public MessageToByteEncoder<ByteBuf> getCompressEncoder() {
+		return new ZstdEncoder();
+	}
 
-    @Override
-    public String getServerCertChainFilePath() {
-        return getProperty(KEY_SERVER_CERT_CHAIN_FILE_PATH, "/opt/data/100013684/openssl/server.crt");
-    }
+	@Override
+	public String getServerCertChainFilePath() {
+		return getProperty(KEY_SERVER_CERT_CHAIN_FILE_PATH, "/opt/data/100013684/openssl/server.crt");
+	}
 
-    @Override
-    public String getClientCertChainFilePath() {
-        return getProperty(KEY_CLIENT_CERT_CHAIN_FILE_PATH, "/opt/data/100013684/openssl/client.crt");
-    }
+	@Override
+	public String getClientCertChainFilePath() {
+		return getProperty(KEY_CLIENT_CERT_CHAIN_FILE_PATH, "/opt/data/100013684/openssl/client.crt");
+	}
 
-    @Override
-    public String getServerKeyFilePath() {
-        return getProperty(KEY_SERVER_KEY_FILE_PATH, "/opt/data/100013684/openssl/pkcs8_server.crt");
-    }
+	@Override
+	public String getServerKeyFilePath() {
+		return getProperty(KEY_SERVER_KEY_FILE_PATH, "/opt/data/100013684/openssl/pkcs8_server.crt");
+	}
 
-    @Override
-    public String getClientKeyFilePath() {
-        return getProperty(KEY_CLIENT_KEY_FILE_PATH, "/opt/data/100013684/openssl/pkcs8_client.key");
-    }
+	@Override
+	public String getClientKeyFilePath() {
+		return getProperty(KEY_CLIENT_KEY_FILE_PATH, "/opt/data/100013684/openssl/pkcs8_client.key");
+	}
 
-    @Override
-    public String getRootFilePath() {
-        return getProperty(KEY_ROOT_FILE_PATH, "/opt/data/100013684/openssl/ca.crt");
-    }
+	@Override
+	public String getRootFilePath() {
+		return getProperty(KEY_ROOT_FILE_PATH, "/opt/data/100013684/openssl/ca.crt");
+	}
 
-    protected String getProperty(String key, String defaultValue){
-        return config.get(key, defaultValue);
-    }
+	protected String getProperty(String key, String defaultValue) {
+		return config.get(key, defaultValue);
+	}
 
-    protected Integer getIntProperty(String key, Integer defaultValue){
+	protected Integer getIntProperty(String key, Integer defaultValue) {
 
-        String value = config.get(key);
-        if(value == null){
-            return defaultValue;
-        }
-        return Integer.parseInt(value.trim());
+		String value = config.get(key);
+		if (value == null) {
+			return defaultValue;
+		}
+		return Integer.parseInt(value.trim());
 
-    }
+	}
 
-    protected Long getLongProperty(String key, Long defaultValue){
+	protected Long getLongProperty(String key, Long defaultValue) {
 
-        String value = config.get(key);
-        if(value == null){
-            return defaultValue;
-        }
-        //TODO cache value to avoid convert each time
-        return Long.parseLong(value.trim());
+		String value = config.get(key);
+		if (value == null) {
+			return defaultValue;
+		}
+		//TODO cache value to avoid convert each time
+		return Long.parseLong(value.trim());
 
-    }
+	}
 
-    protected Boolean getBooleanProperty(String key, Boolean defaultValue){
+	protected Boolean getBooleanProperty(String key, Boolean defaultValue) {
 
-        String value = config.get(key);
-        if(value == null){
-            return defaultValue;
-        }
+		String value = config.get(key);
+		if (value == null) {
+			return defaultValue;
+		}
 
-        return Boolean.parseBoolean(value.trim());
-    }
+		return Boolean.parseBoolean(value.trim());
+	}
 }

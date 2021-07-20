@@ -4,10 +4,10 @@ import com.ctrip.xpipe.redis.core.exception.RedisRuntimeException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 5, 2016
  */
-public class BadMetaStoreException extends RedisRuntimeException{
+public class BadMetaStoreException extends RedisRuntimeException {
 
 	private static final long serialVersionUID = 1L;
 

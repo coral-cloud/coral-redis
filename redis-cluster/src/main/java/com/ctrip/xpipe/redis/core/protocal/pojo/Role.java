@@ -5,8 +5,8 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * @author wenchao.meng
- *
- *         Sep 16, 2016
+ * <p>
+ * Sep 16, 2016
  */
 public interface Role {
 

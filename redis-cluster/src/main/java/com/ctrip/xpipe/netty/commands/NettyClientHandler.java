@@ -12,44 +12,44 @@ import io.netty.util.AttributeKey;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
-public class NettyClientHandler extends AbstractNettyHandler{
-	
+public class NettyClientHandler extends AbstractNettyHandler {
+
 	public static final AttributeKey<NettyClient> KEY_CLIENT = AttributeKey.newInstance(NettyClientHandler.class.getSimpleName() + "_REDIS_CLIENTS");
-	
-	public static boolean bind(Channel channel, NettyClient nettyClient){
-		
+
+	public static boolean bind(Channel channel, NettyClient nettyClient) {
+
 		Attribute<NettyClient> attribute = channel.attr(KEY_CLIENT);
-		if(attribute != null){
+		if (attribute != null) {
 			return false;
 		}
-		
+
 		synchronized (channel) {
 			attribute = channel.attr(KEY_CLIENT);
-			if(attribute == null){
+			if (attribute == null) {
 				return false;
 			}
 			attribute.set(nettyClient);
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		
+
 		ByteBuf byteBuf = (ByteBuf) msg;
 		final NettyClient nettyClient = ctx.channel().attr(KEY_CLIENT).get();
-		
+
 		byteBufReadPolicy.read(ctx.channel(), byteBuf, new ByteBufReadAction() {
-			
+
 			@Override
 			public void read(Channel channel, ByteBuf byteBuf) throws ByteBufReadActionException {
 				nettyClient.handleResponse(channel, byteBuf);
 			}
 		});
-		
+
 		super.channelRead(ctx, msg);
 	}
 

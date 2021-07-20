@@ -13,23 +13,23 @@ import com.ctrip.xpipe.utils.StringUtil;
  */
 public interface Route {
 
-    public static String TAG_META = "meta";
-    public static String TAG_CONSOLE = "console";
+	String TAG_META = "meta";
+	String TAG_CONSOLE = "console";
 
-    default boolean tagEquals(String tag){
-        return ObjectUtils.equals(tag, getTag(), ((obj1, obj2) -> obj1.equalsIgnoreCase(obj2)));
-    }
+	default boolean tagEquals(String tag) {
+		return ObjectUtils.equals(tag, getTag(), ((obj1, obj2) -> obj1.equalsIgnoreCase(obj2)));
+	}
 
-    String getRouteInfo();
+	String getRouteInfo();
 
-    String getTag();
+	String getTag();
 
-    default String routeProtocol(){
+	default String routeProtocol() {
 
-        String routeInfo = getRouteInfo();
-        if(StringUtil.isEmpty(routeInfo)){
-            return "";
-        }
-        return String.format("%s %s %s", ProxyProtocol.KEY_WORD, PROXY_OPTION.ROUTE.name(), routeInfo.trim());
-    }
+		String routeInfo = getRouteInfo();
+		if (StringUtil.isEmpty(routeInfo)) {
+			return "";
+		}
+		return String.format("%s %s %s", ProxyProtocol.KEY_WORD, PROXY_OPTION.ROUTE.name(), routeInfo.trim());
+	}
 }

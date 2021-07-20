@@ -9,21 +9,21 @@ import com.ctrip.xpipe.utils.StringUtil;
  */
 public class PublishCommandHandler extends AbstractCommandHandler {
 
-    @Override
-    public String[] getCommands() {
-        return new String[]{"publish"};
-    }
+	@Override
+	public String[] getCommands() {
+		return new String[]{"publish"};
+	}
 
-    @Override
-    protected void doHandle(String[] args, RedisClient redisClient) {
-        logger.debug("[doHandle]{},{}", redisClient, StringUtil.join(" ", args));
-        //0 means no receiver
-        redisClient.sendMessage(new LongParser(0L).format());
-    }
+	@Override
+	protected void doHandle(String[] args, RedisClient redisClient) {
+		logger.debug("[doHandle]{},{}", redisClient, StringUtil.join(" ", args));
+		//0 means no receiver
+		redisClient.sendMessage(new LongParser(0L).format());
+	}
 
-    @Override
-    public boolean isLog(String[] args) {
-        // PUBLISH command is called by sentinel very frequently, so we need to hide the log
-        return false;
-    }
+	@Override
+	public boolean isLog(String[] args) {
+		// PUBLISH command is called by sentinel very frequently, so we need to hide the log
+		return false;
+	}
 }

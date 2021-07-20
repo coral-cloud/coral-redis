@@ -8,13 +8,13 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 6, 2016
  */
-public class UserDefinedPriorityKeeperActiveElectAlgorithm extends AbstractActiveElectAlgorithm{
-	
+public class UserDefinedPriorityKeeperActiveElectAlgorithm extends AbstractActiveElectAlgorithm {
+
 	private List<KeeperMeta> userDefinedPriority;
-	
+
 	public UserDefinedPriorityKeeperActiveElectAlgorithm(List<KeeperMeta> userDefinedPriority) {
 		this.userDefinedPriority = userDefinedPriority;
 	}
@@ -22,18 +22,18 @@ public class UserDefinedPriorityKeeperActiveElectAlgorithm extends AbstractActiv
 	@Override
 	public KeeperMeta select(String clusterId, String shardId, List<KeeperMeta> toBeSelected) {
 
-		if(toBeSelected.size() == 0){
+		if (toBeSelected.size() == 0) {
 			return null;
 		}
-		
-		for(KeeperMeta keeperMeta : userDefinedPriority){
-			for(KeeperMeta select : toBeSelected){
-				if(MetaUtils.same(keeperMeta, select)){
+
+		for (KeeperMeta keeperMeta : userDefinedPriority) {
+			for (KeeperMeta select : toBeSelected) {
+				if (MetaUtils.same(keeperMeta, select)) {
 					return select;
 				}
 			}
 		}
-		
+
 		logger.warn("[select][no keeper in given list, use first]{}, {}", userDefinedPriority, toBeSelected);
 		return toBeSelected.get(0);
 	}

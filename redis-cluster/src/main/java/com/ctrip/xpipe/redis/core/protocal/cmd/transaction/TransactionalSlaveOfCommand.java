@@ -17,16 +17,17 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * first try xslaveof, then slaveof
- * @Deprecated because redis may get inconsistent when using slaveof in transaction
- * @author wenchao.meng
  *
+ * @author wenchao.meng
+ * <p>
  * Dec 9, 2016
+ * @Deprecated because redis may get inconsistent when using slaveof in transaction
  */
 @Deprecated
-public class TransactionalSlaveOfCommand extends AbstractRedisCommand<Object[]>{
-	
+public class TransactionalSlaveOfCommand extends AbstractRedisCommand<Object[]> {
+
 	private String ip;
-	
+
 	private int port;
 
 	public TransactionalSlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, String ip, int port, ScheduledExecutorService scheduled) {
@@ -34,59 +35,59 @@ public class TransactionalSlaveOfCommand extends AbstractRedisCommand<Object[]>{
 		this.ip = ip;
 		this.port = port;
 	}
-	
+
 	@Override
 	protected void doExecute() throws CommandExecutionException {
 
 		getLogger().info("[doExecute][try xslaveof]{}", this);
-		
+
 		TransactionalCommand slaveofTransaction = new TransactionalCommand(getClientPool(), scheduled, new XSlaveofCommand(null, ip, port, scheduled), new ConfigRewrite(null, scheduled));
-		try{
+		try {
 			slaveofTransaction.execute().addListener(new CommandFutureListener<Object[]>() {
-				
+
 				@Override
 				public void operationComplete(CommandFuture<Object[]> commandFuture) throws Exception {
-					if(!commandFuture.isSuccess()){
+					if (!commandFuture.isSuccess()) {
 						failXslaveof(commandFuture.cause());
-					}else{
+					} else {
 						getLogger().info("[doExecute][xslaveof success]{}", this);
 						future().setSuccess(commandFuture.get());
 					}
 				}
 			});
-		}catch(Exception e){
+		} catch (Exception e) {
 			failXslaveof(e);
 		}
-		
+
 	}
 
 	private void failXslaveof(Throwable e) {
-		
+
 		Throwable rootCause = ExceptionUtils.getRootCause(e);
-		if((rootCause instanceof IOException)){
+		if ((rootCause instanceof IOException)) {
 			getLogger().info("[failXslaveof][do not try slaveof]");
 			fail(e);
 			return;
 		}
-		
-		getLogger().error("[doExecute][xlaveof fail, try slaveof]" + ip + ":"+ port, e);
-		
+
+		getLogger().error("[doExecute][xlaveof fail, try slaveof]" + ip + ":" + port, e);
+
 		TransactionalCommand slaveofTransaction = new TransactionalCommand(getClientPool(), scheduled, new SlaveOfCommand(null, ip, port, scheduled), new ConfigRewrite(null, scheduled));
-		try{
+		try {
 			slaveofTransaction.execute().addListener(new CommandFutureListener<Object[]>() {
-				
+
 				@Override
 				public void operationComplete(CommandFuture<Object[]> commandFuture) throws Exception {
-					
-					if(!commandFuture.isSuccess()){
+
+					if (!commandFuture.isSuccess()) {
 						fail(commandFuture.cause());
-					}else{
+					} else {
 						getLogger().info("[doExecute][slaveof success]{}", this);
 						future().setSuccess(commandFuture.get());
 					}
 				}
 			});
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			fail(ex);
 		}
 	}
@@ -100,7 +101,7 @@ public class TransactionalSlaveOfCommand extends AbstractRedisCommand<Object[]>{
 	public ByteBuf getRequest() {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("TransactionalSlaveOfCommand: %s:%d", ip, port);

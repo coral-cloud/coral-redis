@@ -14,7 +14,7 @@ public class HostPort {
 	public HostPort() {
 	}
 
-	public HostPort(InetSocketAddress address){
+	public HostPort(InetSocketAddress address) {
 		this.m_host = address.getHostString();
 		this.m_port = address.getPort();
 	}
@@ -40,7 +40,7 @@ public class HostPort {
 		m_port = port;
 	}
 
-	public static HostPort fromPair(Pair<String, Integer> pair){
+	public static HostPort fromPair(Pair<String, Integer> pair) {
 
 		return new HostPort(pair.getKey(), pair.getValue());
 	}
@@ -56,7 +56,7 @@ public class HostPort {
 		if (o == null || getClass() != o.getClass()) return false;
 		HostPort hostPort = (HostPort) o;
 		return m_port == hostPort.m_port &&
-				  Objects.equals(m_host, hostPort.m_host);
+				Objects.equals(m_host, hostPort.m_host);
 	}
 
 	@Override

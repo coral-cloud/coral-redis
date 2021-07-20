@@ -10,30 +10,30 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class CRDTSubscribeCommand extends AbstractSubscribe {
 
-    private static final Logger logger = LoggerFactory.getLogger(CRDTSubscribeCommand.class);
+	private static final Logger logger = LoggerFactory.getLogger(CRDTSubscribeCommand.class);
 
-    private static final String CRDT_SUBSCRIBE_COMMAND_NAME = "crdt.subscribe";
+	private static final String CRDT_SUBSCRIBE_COMMAND_NAME = "crdt.subscribe";
 
-    public CRDTSubscribeCommand(String host, int port, ScheduledExecutorService scheduled, String... channel) {
-        super(host, port, scheduled, MESSAGE_TYPE.CRDT_MESSAGE, channel);
-    }
+	public CRDTSubscribeCommand(String host, int port, ScheduledExecutorService scheduled, String... channel) {
+		super(host, port, scheduled, MESSAGE_TYPE.CRDT_MESSAGE, channel);
+	}
 
-    public CRDTSubscribeCommand(Endpoint endpoint, ScheduledExecutorService scheduled, String... channel) {
-        super(endpoint.getHost(), endpoint.getPort(), scheduled, MESSAGE_TYPE.CRDT_MESSAGE, channel);
-    }
+	public CRDTSubscribeCommand(Endpoint endpoint, ScheduledExecutorService scheduled, String... channel) {
+		super(endpoint.getHost(), endpoint.getPort(), scheduled, MESSAGE_TYPE.CRDT_MESSAGE, channel);
+	}
 
-    public CRDTSubscribeCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, String... channel) {
-        super(clientPool, scheduled, MESSAGE_TYPE.CRDT_MESSAGE, channel);
-    }
+	public CRDTSubscribeCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, String... channel) {
+		super(clientPool, scheduled, MESSAGE_TYPE.CRDT_MESSAGE, channel);
+	}
 
-    @Override
-    public String getName() {
-        return CRDT_SUBSCRIBE_COMMAND_NAME;
-    }
+	@Override
+	public String getName() {
+		return CRDT_SUBSCRIBE_COMMAND_NAME;
+	}
 
-    @Override
-    protected Logger getLogger() {
-        return logger;
-    }
+	@Override
+	protected Logger getLogger() {
+		return logger;
+	}
 
 }

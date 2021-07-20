@@ -19,64 +19,64 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Aug 5, 2016
+ * <p>
+ * Aug 5, 2016
  */
 public class AbstractExceptionHandler {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 
-    //处理系统内置的Exception
-    @ExceptionHandler(Throwable.class)
-    public ResponseEntity<Object> exception(HttpServletRequest request, Throwable ex) {
-        return handleError(request, INTERNAL_SERVER_ERROR, ex);
-    }
+	//处理系统内置的Exception
+	@ExceptionHandler(Throwable.class)
+	public ResponseEntity<Object> exception(HttpServletRequest request, Throwable ex) {
+		return handleError(request, INTERNAL_SERVER_ERROR, ex);
+	}
 
-    protected ResponseEntity<Object> handleError(HttpServletRequest request, HttpStatus status, Throwable ex) {
-        return handleError(request, status, ex, null);
-    }
+	protected ResponseEntity<Object> handleError(HttpServletRequest request, HttpStatus status, Throwable ex) {
+		return handleError(request, status, ex, null);
+	}
 
-    protected ResponseEntity<Object> handleError(HttpServletRequest request, HttpStatus status,
-                                                 Throwable ex, Map<String, String> extraHeaders) {
+	protected ResponseEntity<Object> handleError(HttpServletRequest request, HttpStatus status,
+												 Throwable ex, Map<String, String> extraHeaders) {
 
-        String message = ex.getMessage();
-        String requestPath = request.getRequestURI() + (request.getQueryString() == null ? "" : ("?" + request
-                .getQueryString()));
-        if (ExceptionUtils.xpipeExceptionLogMessage(ex)) {
-            logger.error("{},{}", message, requestPath);
-        } else {
-            logger.error(String.format("%s,%s", message, requestPath), ex);
-        }
+		String message = ex.getMessage();
+		String requestPath = request.getRequestURI() + (request.getQueryString() == null ? "" : ("?" + request
+				.getQueryString()));
+		if (ExceptionUtils.xpipeExceptionLogMessage(ex)) {
+			logger.error("{},{}", message, requestPath);
+		} else {
+			logger.error(String.format("%s,%s", message, requestPath), ex);
+		}
 
-        Object response = null;
+		Object response = null;
 
-        if (ex instanceof ErrorMessageAware) {
-            ErrorMessageAware errorMessageAware = (ErrorMessageAware) ex;
-            ErrorMessage<?> errorMessage = errorMessageAware.getErrorMessage();
-            if (errorMessage != null) {
-                response = errorMessage;
-            }
-        }
+		if (ex instanceof ErrorMessageAware) {
+			ErrorMessageAware errorMessageAware = (ErrorMessageAware) ex;
+			ErrorMessage<?> errorMessage = errorMessageAware.getErrorMessage();
+			if (errorMessage != null) {
+				response = errorMessage;
+			}
+		}
 
-        if (response == null) {
+		if (response == null) {
 
-            Map<String, Object> errorAttributes = new HashMap<>();
-            errorAttributes.put("message", message);
-            errorAttributes.put("exception", ex.getClass().getName());
+			Map<String, Object> errorAttributes = new HashMap<>();
+			errorAttributes.put("message", message);
+			errorAttributes.put("exception", ex.getClass().getName());
 
-            response = errorAttributes;
-        }
+			response = errorAttributes;
+		}
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(APPLICATION_JSON);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(APPLICATION_JSON);
 
-        if (extraHeaders != null && !extraHeaders.isEmpty()) {
-            for (String key : extraHeaders.keySet()) {
-                headers.set(key, extraHeaders.get(key));
-            }
-        }
+		if (extraHeaders != null && !extraHeaders.isEmpty()) {
+			for (String key : extraHeaders.keySet()) {
+				headers.set(key, extraHeaders.get(key));
+			}
+		}
 
-        return new ResponseEntity<>(response, headers, status);
-    }
+		return new ResponseEntity<>(response, headers, status);
+	}
 }

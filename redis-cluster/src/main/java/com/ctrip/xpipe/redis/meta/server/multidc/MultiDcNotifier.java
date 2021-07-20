@@ -22,8 +22,8 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * @author wenchao.meng
- *
- *         Nov 3, 2016
+ * <p>
+ * Nov 3, 2016
  */
 public class MultiDcNotifier implements MetaServerStateChangeHandler {
 
@@ -32,7 +32,7 @@ public class MultiDcNotifier implements MetaServerStateChangeHandler {
 	@Autowired
 	private MetaServerConfig metaServerConfig;
 
-	@Resource( name = AbstractSpringConfigContext.GLOBAL_EXECUTOR )
+	@Resource(name = AbstractSpringConfigContext.GLOBAL_EXECUTOR)
 	private ExecutorService executors;
 
 	@Autowired
@@ -48,8 +48,8 @@ public class MultiDcNotifier implements MetaServerStateChangeHandler {
 			logger.info("[keeperActiveElected][current dc backup, do nothing]{}, {}", clusterId, shardId, activeKeeper);
 			return;
 		}
-		
-		if(activeKeeper == null){
+
+		if (activeKeeper == null) {
 			return;
 		}
 
@@ -106,7 +106,7 @@ public class MultiDcNotifier implements MetaServerStateChangeHandler {
 		private KeeperMeta activeKeeper;
 
 		public BackupDcNotifyTask(MetaServerMultiDcService metaServerMultiDcService, String clusterId, String shardId,
-				KeeperMeta activeKeeper) {
+								  KeeperMeta activeKeeper) {
 			this.metaServerMultiDcService = metaServerMultiDcService;
 			this.clusterId = clusterId;
 			this.shardId = shardId;

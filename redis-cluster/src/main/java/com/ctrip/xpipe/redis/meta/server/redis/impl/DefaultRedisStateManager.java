@@ -23,19 +23,19 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 26, 2016
  */
-public class DefaultRedisStateManager extends AbstractLifecycle implements RedisStateManager, TopElement{
+public class DefaultRedisStateManager extends AbstractLifecycle implements RedisStateManager, TopElement {
 
-	private int redisStateManagerIntervalSeconds = Integer.parseInt(System.getProperty("REDIS_STATE_MANAGR_INTERVAL_SECONDS", "5")); 
-	
+	private int redisStateManagerIntervalSeconds = Integer.parseInt(System.getProperty("REDIS_STATE_MANAGR_INTERVAL_SECONDS", "5"));
+
 	@Autowired
 	private CurrentMetaManager currentMetaManager;
-	
+
 	@Autowired
 	private DcMetaCache dcMetaCache;
-	
+
 	@Resource(name = MetaServerContextConfig.CLIENT_POOL)
 	private XpipeNettyClientKeyedObjectPool keyedObjectPool;
 
@@ -46,7 +46,7 @@ public class DefaultRedisStateManager extends AbstractLifecycle implements Redis
 	private Executor executors;
 
 	@Resource(name = AbstractSpringConfigContext.CLUSTER_SHARD_ADJUST_EXECUTOR)
-	private KeyedOneThreadMutexableTaskExecutor<Pair<String, String> > clusterShardExecutors;
+	private KeyedOneThreadMutexableTaskExecutor<Pair<String, String>> clusterShardExecutors;
 
 	private ScheduledFuture<?> future;
 
@@ -55,33 +55,33 @@ public class DefaultRedisStateManager extends AbstractLifecycle implements Redis
 		super.doInitialize();
 
 	}
-	
+
 	@Override
 	protected void doStart() throws Exception {
 		super.doStart();
-		
+
 		future = scheduled.scheduleWithFixedDelay(new RedisesStateChangeTask(), redisStateManagerIntervalSeconds, redisStateManagerIntervalSeconds, TimeUnit.SECONDS);
 	}
 
 	@Override
 	protected void doStop() throws Exception {
 
-		if(future != null){
+		if (future != null) {
 			future.cancel(true);
 		}
 		super.doStop();
 	}
-	
+
 	@Override
 	protected void doDispose() throws Exception {
 		super.doDispose();
 	}
 
-	class RedisesStateChangeTask extends AbstractExceptionLogTask{
+	class RedisesStateChangeTask extends AbstractExceptionLogTask {
 
 		protected void doRun() throws Exception {
-			
-			for(String clusterId : currentMetaManager.allClusters()){
+
+			for (String clusterId : currentMetaManager.allClusters()) {
 
 				ClusterRedisStateAjustTask adjustTask = buildAdjustTaskForCluster(clusterId);
 				if (null != adjustTask) {

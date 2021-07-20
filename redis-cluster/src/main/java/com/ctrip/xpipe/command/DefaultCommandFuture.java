@@ -12,24 +12,24 @@ import java.util.concurrent.*;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 26, 2016
  */
-public class DefaultCommandFuture<V> implements CommandFuture<V>{
-	
+public class DefaultCommandFuture<V> implements CommandFuture<V> {
+
 	private static final Logger logger = LoggerFactory.getLogger(DefaultCommandFuture.class);
-	
+
 	private volatile Object result = null;
-	
+
 	private final static CauseHolder CANCELLED_RESULT = new CauseHolder(new CancellationException());
-	
+
 	private static final String SUCCESS_NO_RESULT = "SUCCESS_NO_RESULT";
-	
-    private short waiters = 0;
-    
-    private final List<CommandFutureListener<V>> listeners = new LinkedList<>();
-    
-    private Command<V> command; 
+
+	private short waiters = 0;
+
+	private final List<CommandFutureListener<V>> listeners = new LinkedList<>();
+
+	private Command<V> command;
 
 	public DefaultCommandFuture() {
 	}
@@ -37,24 +37,24 @@ public class DefaultCommandFuture<V> implements CommandFuture<V>{
 	public DefaultCommandFuture(Command<V> command) {
 		this.command = command;
 	}
-	
+
 
 	@Override
 	public boolean cancel(boolean mayInterruptIfRunning) {
-		
-		if(isDone()){
+
+		if (isDone()) {
 			return false;
 		}
-		
-		synchronized(this){
-			if(isDone()){
+
+		synchronized (this) {
+			if (isDone()) {
 				return false;
 			}
 			result = CANCELLED_RESULT;
-            if (hasWaiters()) {
-                notifyAll();
-            }
-            notifyListeners();
+			if (hasWaiters()) {
+				notifyAll();
+			}
+			notifyListeners();
 		}
 		return true;
 	}
@@ -76,72 +76,73 @@ public class DefaultCommandFuture<V> implements CommandFuture<V>{
 		return this;
 	}
 
-	
-    @Override
-    public V get() throws InterruptedException, ExecutionException {
-    	
-        await();
 
-        Throwable cause = cause();
-        if (cause == null) {
-            return getNow();
-        }
-        if (cause instanceof CancellationException) {
-            throw (CancellationException) cause;
-        }
-        throw new ExecutionException(cause);
-    }
+	@Override
+	public V get() throws InterruptedException, ExecutionException {
+
+		await();
+
+		Throwable cause = cause();
+		if (cause == null) {
+			return getNow();
+		}
+		if (cause instanceof CancellationException) {
+			throw (CancellationException) cause;
+		}
+		throw new ExecutionException(cause);
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public V getNow() {
-		
-		if(result instanceof CauseHolder || result == SUCCESS_NO_RESULT){
+
+		if (result instanceof CauseHolder || result == SUCCESS_NO_RESULT) {
 			return null;
 		}
-		return (V)result;
+		return (V) result;
 	}
 
 	@Override
-    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        if (await(timeout, unit)) {
-            Throwable cause = cause();
-            if (cause == null) {
-                return getNow();
-            }
-            if (cause instanceof CancellationException) {
-                throw (CancellationException) cause;
-            }
-            throw new ExecutionException(cause);
-        }
-        throw new TimeoutException();
-    }
+	public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+		if (await(timeout, unit)) {
+			Throwable cause = cause();
+			if (cause == null) {
+				return getNow();
+			}
+			if (cause instanceof CancellationException) {
+				throw (CancellationException) cause;
+			}
+			throw new ExecutionException(cause);
+		}
+		throw new TimeoutException();
+	}
 
 
-    private static final class CauseHolder {
-        final Throwable cause;
-        CauseHolder(Throwable cause) {
-            this.cause = cause;
-        }
+	private static final class CauseHolder {
+		final Throwable cause;
+
+		CauseHolder(Throwable cause) {
+			this.cause = cause;
+		}
 
 		@Override
 		public String toString() {
-			return String.format("%s", cause == null? "null" : cause.getStackTrace());
+			return String.format("%s", cause == null ? "null" : cause.getStackTrace());
 		}
 	}
 
 
 	@Override
 	public boolean isSuccess() {
-		
-		return result != null &&(result == SUCCESS_NO_RESULT || !(result instanceof CauseHolder));
+
+		return result != null && (result == SUCCESS_NO_RESULT || !(result instanceof CauseHolder));
 	}
 
 	@Override
 	public Throwable cause() {
-		
-		if(result instanceof CauseHolder){
-			return ((CauseHolder)result).cause;
+
+		if (result instanceof CauseHolder) {
+			return ((CauseHolder) result).cause;
 		}
 		return null;
 	}
@@ -153,73 +154,73 @@ public class DefaultCommandFuture<V> implements CommandFuture<V>{
 
 	@Override
 	public void setSuccess(V result) {
-		
-		if(isDone()){
+
+		if (isDone()) {
 			throw new IllegalStateException(alreadyComplete(result));
 		}
-		
+
 		synchronized (this) {
-			if(isDone()){
+			if (isDone()) {
 				throw new IllegalStateException(alreadyComplete(result));
 			}
-			
-			if(result != null){
+
+			if (result != null) {
 				this.result = result;
-			}else{
+			} else {
 				this.result = SUCCESS_NO_RESULT;
 			}
-            if (hasWaiters()) {
-                notifyAll();
-            }
-            notifyListeners();
+			if (hasWaiters()) {
+				notifyAll();
+			}
+			notifyListeners();
 		}
 	}
 
 	private String alreadyComplete(Object given) {
-		
+
 		return "already completed!" + this.result + "->" + given + "," + command;
 	}
 
 	@Override
 	public void setFailure(Throwable cause) {
-		
-		if(isDone()){
+
+		if (isDone()) {
 			throw new IllegalStateException(alreadyComplete(cause), cause);
 		}
-		
+
 		synchronized (this) {
-			if(isDone()){
+			if (isDone()) {
 				throw new IllegalStateException(alreadyComplete(cause));
 			}
 			this.result = new CauseHolder(cause);
-            if (hasWaiters()) {
-                notifyAll();
-            }
-            notifyListeners();
+			if (hasWaiters()) {
+				notifyAll();
+			}
+			notifyListeners();
 		}
 	}
 
 	@Override
 	public Future<V> await() throws InterruptedException {
-	        if (isDone()) {
-	            return this;
-	        }
+		if (isDone()) {
+			return this;
+		}
 
-	        if (Thread.interrupted()) {
-	            throw new InterruptedException(toString());
-	        }
+		if (Thread.interrupted()) {
+			throw new InterruptedException(toString());
+		}
 
-	        synchronized (this) {
-	            while (!isDone()) {
-	                incWaiters();
-	                try {
-	                    wait();
-	                } finally {
-	                    decWaiters();
-	                }
-	            }
-	        }
-	        return this;
+		synchronized (this) {
+			while (!isDone()) {
+				incWaiters();
+				try {
+					wait();
+				} finally {
+					decWaiters();
+				}
+			}
+		}
+		return this;
 	}
 
 	@Override
@@ -227,107 +228,107 @@ public class DefaultCommandFuture<V> implements CommandFuture<V>{
 		return await0(unit.toNanos(timeout), true);
 	}
 
-    private boolean await0(long timeoutNanos, boolean interruptable) throws InterruptedException {
-        if (isDone()) {
-            return true;
-        }
+	private boolean await0(long timeoutNanos, boolean interruptable) throws InterruptedException {
+		if (isDone()) {
+			return true;
+		}
 
-        if (timeoutNanos <= 0) {
-            return isDone();
-        }
+		if (timeoutNanos <= 0) {
+			return isDone();
+		}
 
-        if (interruptable && Thread.interrupted()) {
-            throw new InterruptedException(toString());
-        }
+		if (interruptable && Thread.interrupted()) {
+			throw new InterruptedException(toString());
+		}
 
-        long startTime = System.nanoTime();
-        long waitTime = timeoutNanos;
-        boolean interrupted = false;
+		long startTime = System.nanoTime();
+		long waitTime = timeoutNanos;
+		boolean interrupted = false;
 
-        try {
-            synchronized (this) {
-                if (isDone()) {
-                    return true;
-                }
+		try {
+			synchronized (this) {
+				if (isDone()) {
+					return true;
+				}
 
-                incWaiters();
-                try {
-                    for (;;) {
-                        try {
-                            wait(waitTime / 1000000, (int) (waitTime % 1000000));
-                        } catch (InterruptedException e) {
-                            if (interruptable) {
-                                throw e;
-                            } else {
-                                interrupted = true;
-                            }
-                        }
+				incWaiters();
+				try {
+					for (; ; ) {
+						try {
+							wait(waitTime / 1000000, (int) (waitTime % 1000000));
+						} catch (InterruptedException e) {
+							if (interruptable) {
+								throw e;
+							} else {
+								interrupted = true;
+							}
+						}
 
-                        if (isDone()) {
-                            return true;
-                        } else {
-                            waitTime = timeoutNanos - (System.nanoTime() - startTime);
-                            if (waitTime <= 0) {
-                                return isDone();
-                            }
-                        }
-                    }
-                } finally {
-                    decWaiters();
-                }
-            }
-        } finally {
-            if (interrupted) {
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
+						if (isDone()) {
+							return true;
+						} else {
+							waitTime = timeoutNanos - (System.nanoTime() - startTime);
+							if (waitTime <= 0) {
+								return isDone();
+							}
+						}
+					}
+				} finally {
+					decWaiters();
+				}
+			}
+		} finally {
+			if (interrupted) {
+				Thread.currentThread().interrupt();
+			}
+		}
+	}
 
-    private boolean hasWaiters() {
-        return waiters > 0;
-    }
+	private boolean hasWaiters() {
+		return waiters > 0;
+	}
 
-    private void incWaiters() {
-        if (waiters == Short.MAX_VALUE) {
-            throw new IllegalStateException("too many waiters: " + this);
-        }
-        waiters ++;
-    }
+	private void incWaiters() {
+		if (waiters == Short.MAX_VALUE) {
+			throw new IllegalStateException("too many waiters: " + this);
+		}
+		waiters++;
+	}
 
-    private void decWaiters() {
-        waiters --;
-    }
+	private void decWaiters() {
+		waiters--;
+	}
 
 	@Override
 	public void addListener(CommandFutureListener<V> commandFutureListener) {
 
-		if(isDone()){
+		if (isDone()) {
 			notifyListener(commandFutureListener);
 			return;
 		}
-		
+
 		synchronized (this) {
-			if(!isDone()){
+			if (!isDone()) {
 				listeners.add(commandFutureListener);
 				return;
 			}
 		}
-		
+
 		notifyListener(commandFutureListener);
 	}
 
 	private void notifyListener(CommandFutureListener<V> commandFutureListener) {
 
-		try{
+		try {
 			commandFutureListener.operationComplete(this);
-		}catch(Throwable th){
+		} catch (Throwable th) {
 			logger.error("[notifyListener]" + this, th);
 		}
 	}
-	
+
 	private void notifyListeners() {
-		
-		for(CommandFutureListener<V> listener : listeners){
+
+		for (CommandFutureListener<V> listener : listeners) {
 			notifyListener(listener);
 		}
 	}
@@ -342,13 +343,13 @@ public class DefaultCommandFuture<V> implements CommandFuture<V>{
 
 		String resultDesc = null;
 
-		if(isDone()){
-			if(isSuccess()){
+		if (isDone()) {
+			if (isSuccess()) {
 				resultDesc = String.format("success:%s", result);
-			}else {
+			} else {
 				resultDesc = String.format("fail:%s", cause());
 			}
-		}else {
+		} else {
 			resultDesc = "undone";
 		}
 		return String.format("cmd:%s, %s", command, resultDesc);

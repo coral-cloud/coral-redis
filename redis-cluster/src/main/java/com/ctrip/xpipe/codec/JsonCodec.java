@@ -12,33 +12,33 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 23, 2016
  */
-public class JsonCodec extends AbstractCodec{
-	
-	public static JsonCodec INSTANCE = new JsonCodec(); 
-	
+public class JsonCodec extends AbstractCodec {
+
+	public static JsonCodec INSTANCE = new JsonCodec();
+
 	private ObjectMapper objectMapper;
-	
+
 	public JsonCodec() {
 		this(false, false);
 	}
 
-	public JsonCodec(boolean indent){
+	public JsonCodec(boolean indent) {
 		this(indent, false);
 	}
 
-	public JsonCodec(boolean indent, boolean privateVisible){
+	public JsonCodec(boolean indent, boolean privateVisible) {
 
 		objectMapper = new ObjectMapper();
 		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		
-		if(indent){
+
+		if (indent) {
 			objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		}
-		if(privateVisible){
+		if (privateVisible) {
 			objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 			objectMapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
 			objectMapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
@@ -57,7 +57,7 @@ public class JsonCodec extends AbstractCodec{
 
 	@Override
 	public <T> T decode(String data, Class<T> clazz) {
-		
+
 		try {
 			return objectMapper.readValue(data, clazz);
 		} catch (IOException e) {
@@ -95,7 +95,7 @@ public class JsonCodec extends AbstractCodec{
 
 	@Override
 	public <T> T decode(byte[] data, GenericTypeReference<T> reference) {
-		
+
 		try {
 			return objectMapper.readValue(data, reference.getJacksonReference());
 		} catch (IOException e) {

@@ -11,41 +11,40 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 26, 2016
  */
-public class ServerDeadResharding extends AbstractDirectMoveSharding{
-	
+public class ServerDeadResharding extends AbstractDirectMoveSharding {
+
 	private ClusterServer deadServer;
-	
+
 	public ServerDeadResharding(SlotManager slotManager, ClusterServer deadServer, ClusterServers<? extends ClusterServer> servers, ZkClient zkClient) {
 		super(slotManager, servers, zkClient);
 		this.deadServer = deadServer;
 	}
-	
 
 
 	@Override
-	protected void doReset(){
+	protected void doReset() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	protected List<Integer> getSlotsToArrange() {
-		
-		Set<Integer> slots = slotManager.getSlotsByServerId(deadServer.getServerId()); 
+
+		Set<Integer> slots = slotManager.getSlotsByServerId(deadServer.getServerId());
 		logger.info("[doRun][serverDead, resharding]{}, {}", deadServer, slots);
-		
+
 		List<Integer> result = new LinkedList<>();
-		if(slots != null){
+		if (slots != null) {
 			result.addAll(slots);
 		}
 		return result;
 	}
-	
+
 	@Override
 	protected List<ClusterServer> allAliveServers() {
-		
+
 		List<ClusterServer> result = super.allAliveServers();
 		result.remove(deadServer);
 		return result;
@@ -55,6 +54,6 @@ public class ServerDeadResharding extends AbstractDirectMoveSharding{
 	protected ClusterServer getDeadServer() {
 		return deadServer;
 	}
-	
-	
+
+
 }

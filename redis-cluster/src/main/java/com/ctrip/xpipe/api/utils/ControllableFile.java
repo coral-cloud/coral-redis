@@ -6,14 +6,14 @@ import java.nio.channels.FileChannel;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jan 5, 2017
  */
-public interface ControllableFile extends Closeable{
-	
+public interface ControllableFile extends Closeable {
+
 	FileChannel getFileChannel() throws IOException;
-	
-	long size() ;
+
+	long size();
 
 	boolean isOpen();
 

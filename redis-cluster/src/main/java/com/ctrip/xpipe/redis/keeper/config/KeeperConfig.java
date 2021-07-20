@@ -4,14 +4,14 @@ import com.ctrip.xpipe.redis.core.config.CoreConfig;
 
 /**
  * @author marsqing
- *
- *         May 25, 2016 11:06:45 AM
+ * <p>
+ * May 25, 2016 11:06:45 AM
  */
-public interface KeeperConfig extends CoreConfig{
+public interface KeeperConfig extends CoreConfig {
 
-	public static final long DEFAULT_TRAFFIC_REPORT_INTERVAL_MILLIS = 5000L;
+	long DEFAULT_TRAFFIC_REPORT_INTERVAL_MILLIS = 5000L;
 
-	public static final String KEY_LEAKY_BUCKET_INIT_SIZE = "leaky.bucket.init.size";
+	String KEY_LEAKY_BUCKET_INIT_SIZE = "leaky.bucket.init.size";
 
 	int getMetaServerConnectTimeout();
 
@@ -29,6 +29,7 @@ public interface KeeperConfig extends CoreConfig{
 
 	/**
 	 * max commands transfered before create new rdb
+	 *
 	 * @return
 	 */
 	long getReplicationStoreMaxCommandsToTransferBeforeCreateRdb();
@@ -38,22 +39,22 @@ public interface KeeperConfig extends CoreConfig{
 	long getCommandReaderFlyingThreshold();
 
 	int getRdbDumpMinIntervalMilli();
-	
+
 	int getDelayLogLimitMicro();
 
-    long getTrafficReportIntervalMillis();
+	long getTrafficReportIntervalMillis();
 
-    long getReplicationTrafficHighWaterMark();
+	long getReplicationTrafficHighWaterMark();
 
-    long getReplicationTrafficLowWaterMark();
+	long getReplicationTrafficLowWaterMark();
 
-    int getLeakyBucketInitSize();
+	int getLeakyBucketInitSize();
 
-    int getPartialSyncTrafficMonitorIntervalTimes();
+	int getPartialSyncTrafficMonitorIntervalTimes();
 
 	int getMaxPartialSyncKeepTokenRounds();
 
-    boolean isKeeperRateLimitOpen();
+	boolean isKeeperRateLimitOpen();
 
-    long getReplDownSafeIntervalMilli();
+	long getReplDownSafeIntervalMilli();
 }

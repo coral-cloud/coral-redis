@@ -9,10 +9,10 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 9, 2016
  */
-public class ConfigRewrite extends AbstractConfigCommand<String>{
+public class ConfigRewrite extends AbstractConfigCommand<String> {
 
 	public ConfigRewrite(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 		super(clientPool, scheduled);

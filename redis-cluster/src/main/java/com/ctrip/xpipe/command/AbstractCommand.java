@@ -13,10 +13,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 26, 2016
  */
-public abstract class AbstractCommand<V> implements Command<V>{
+public abstract class AbstractCommand<V> implements Command<V> {
 
 	private Logger logger;
 
@@ -24,15 +24,15 @@ public abstract class AbstractCommand<V> implements Command<V>{
 
 	@Override
 	public CommandFuture<V> future() {
-		if(future == null){
+		if (future == null) {
 			return null;
 		}
 		return future.get();
 	}
-	
+
 	@Override
-	public CommandFuture<V> execute(){
-		
+	public CommandFuture<V> execute() {
+
 		getLogger().debug("[execute]{}", this);
 		return execute(MoreExecutors.directExecutor());
 	}
@@ -40,30 +40,30 @@ public abstract class AbstractCommand<V> implements Command<V>{
 	@Override
 	public CommandFuture<V> execute(Executor executors) {
 
-		if(future().isDone()){
+		if (future().isDone()) {
 			doExecuteWhenCommandDone();
 		}
-		
+
 		future().addListener(new CommandFutureListener<V>() {
 
 			@Override
 			public void operationComplete(CommandFuture<V> commandFuture) throws Exception {
-				if(commandFuture.isCancelled()){
+				if (commandFuture.isCancelled()) {
 					doCancel();
 				}
 			}
 		});
-		
+
 		executors.execute(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				try{
+				try {
 					doExecute();
-				}catch(Exception e){
-					if(!future().isDone()){
+				} catch (Exception e) {
+					if (!future().isDone()) {
 						future().setFailure(e);
-					}else {
+					} else {
 						getLogger().error("[execute][done, but exception]" + this, e);
 					}
 				}
@@ -76,24 +76,24 @@ public abstract class AbstractCommand<V> implements Command<V>{
 		getLogger().info("[execute][already done, reset]{}, {}", this, future().getNow());
 		reset();
 	}
-	
-	
+
+
 	protected void doCancel() {
-		
+
 	}
 
 	protected abstract void doExecute() throws Exception;
 
 	protected void fail(Throwable ex) {
-		
+
 		future().setFailure(ExceptionUtils.getRootCause(ex));
 	}
-	
-	
+
+
 	@Override
-	public void reset(){
-		
-		if(!future().isDone()){
+	public void reset() {
+
+		if (!future().isDone()) {
 			getLogger().info("[reset][not done]{}", this);
 			future().cancel(true);
 		}
@@ -102,7 +102,7 @@ public abstract class AbstractCommand<V> implements Command<V>{
 		getLogger().info("[reset]{}", this);
 		doReset();
 	}
-	
+
 	protected abstract void doReset();
 
 	@Override
@@ -111,10 +111,10 @@ public abstract class AbstractCommand<V> implements Command<V>{
 	}
 
 	protected Logger getLogger() {
-		if(logger == null) {
+		if (logger == null) {
 			logger = LoggerFactory.getLogger(getClass());
 		}
 		return logger;
 	}
-	
+
 }

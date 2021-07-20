@@ -5,10 +5,10 @@ import com.ctrip.xpipe.api.lifecycle.Stoppable;
 
 /**
  * @author wenchao.meng
- *
- *         Feb 20, 2017
+ * <p>
+ * Feb 20, 2017
  */
-public interface KeeperStats extends Startable,Stoppable {
+public interface KeeperStats extends Startable, Stoppable {
 
 	void increaseFullSync();
 

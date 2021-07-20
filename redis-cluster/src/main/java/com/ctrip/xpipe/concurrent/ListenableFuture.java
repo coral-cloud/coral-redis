@@ -6,33 +6,33 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 24, 2016
  */
-public interface ListenableFuture<V> extends Future<V>{
+public interface ListenableFuture<V> extends Future<V> {
 
 	boolean isSuccess();
-	
+
 	Throwable cause();
-		
+
 	void setSuccess(V result);
-	
+
 	/**
 	 * result null
 	 */
 	void setSuccess();
-	
+
 	void setFailure(Throwable cause);
-	
+
 	ListenableFuture<V> sync() throws InterruptedException, ExecutionException;
 
-    Future<V> await() throws InterruptedException;
+	Future<V> await() throws InterruptedException;
 
-    boolean await(long timeout, TimeUnit unit) throws InterruptedException;
-    
-    void addListener(FutureListener<? super ListenableFuture<? super V>> futureListener);
-    
-    V getNow();
+	boolean await(long timeout, TimeUnit unit) throws InterruptedException;
+
+	void addListener(FutureListener<? super ListenableFuture<? super V>> futureListener);
+
+	V getNow();
 
 
 }

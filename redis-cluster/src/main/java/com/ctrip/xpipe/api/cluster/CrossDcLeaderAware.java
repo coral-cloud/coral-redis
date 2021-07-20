@@ -2,13 +2,13 @@ package com.ctrip.xpipe.api.cluster;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Jun 14, 2017
+ * <p>
+ * Jun 14, 2017
  */
 public interface CrossDcLeaderAware {
 
-    void isCrossDcLeader();
+	void isCrossDcLeader();
 
-    void notCrossDcLeader();
+	void notCrossDcLeader();
 
 }

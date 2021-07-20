@@ -17,44 +17,44 @@ import java.net.InetSocketAddress;
  */
 public class ProxyCommandHandler extends AbstractCommandHandler {
 
-    private static final String WHITE_SPACE = " ";
+	private static final String WHITE_SPACE = " ";
 
-    @Override
-    protected void doHandle(String[] args, RedisClient redisClient) {
-        String proxyProtocol = restructCommand(args);
-        logger.info("[doHandle]receive proxy protocol: {}", proxyProtocol);
+	@Override
+	protected void doHandle(String[] args, RedisClient redisClient) {
+		String proxyProtocol = restructCommand(args);
+		logger.info("[doHandle]receive proxy protocol: {}", proxyProtocol);
 
-        ProxyConnectProtocol protocol = (ProxyConnectProtocol) new DefaultProxyConnectProtocolParser().read(proxyProtocol);
-        protocol.recordForwardFor((InetSocketAddress) redisClient.channel().remoteAddress());
-        String forwardFor = protocol.getForwardFor();
+		ProxyConnectProtocol protocol = new DefaultProxyConnectProtocolParser().read(proxyProtocol);
+		protocol.recordForwardFor((InetSocketAddress) redisClient.channel().remoteAddress());
+		String forwardFor = protocol.getForwardFor();
 
-        Endpoint srcEndpoint = getSourceEndpoint(forwardFor);
-        redisClient.setClientIpAddress(srcEndpoint.getHost());
-        redisClient.setClientEndpoint(new ProxyEnabledEndpoint(srcEndpoint.getHost(), srcEndpoint.getPort(), protocol));
-    }
+		Endpoint srcEndpoint = getSourceEndpoint(forwardFor);
+		redisClient.setClientIpAddress(srcEndpoint.getHost());
+		redisClient.setClientEndpoint(new ProxyEnabledEndpoint(srcEndpoint.getHost(), srcEndpoint.getPort(), protocol));
+	}
 
-    private String restructCommand(String[] args) {
-        StringBuilder sb = new StringBuilder("Proxy");
-        for(String arg : args) {
-            sb.append(WHITE_SPACE).append(arg);
-        }
-        return sb.toString();
-    }
+	private String restructCommand(String[] args) {
+		StringBuilder sb = new StringBuilder("Proxy");
+		for (String arg : args) {
+			sb.append(WHITE_SPACE).append(arg);
+		}
+		return sb.toString();
+	}
 
-    private Endpoint getSourceEndpoint(String forwardFor) {
-        String[] pathStrs = forwardFor.split("\\h");
-        if(pathStrs.length < 2) {
-            return new DefaultEndPoint();
-        }
-        String hostAndPort = pathStrs[1];
-        HostPort hostPort = HostPort.fromString(hostAndPort);
-        return new DefaultEndPoint(hostPort.getHost(), hostPort.getPort());
-    }
+	private Endpoint getSourceEndpoint(String forwardFor) {
+		String[] pathStrs = forwardFor.split("\\h");
+		if (pathStrs.length < 2) {
+			return new DefaultEndPoint();
+		}
+		String hostAndPort = pathStrs[1];
+		HostPort hostPort = HostPort.fromString(hostAndPort);
+		return new DefaultEndPoint(hostPort.getHost(), hostPort.getPort());
+	}
 
-    @Override
-    public String[] getCommands() {
-        return new String[]{"proxy"};
-    }
+	@Override
+	public String[] getCommands() {
+		return new String[]{"proxy"};
+	}
 
 
 }

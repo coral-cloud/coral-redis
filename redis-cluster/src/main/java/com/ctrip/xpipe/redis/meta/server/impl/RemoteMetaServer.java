@@ -22,11 +22,11 @@ import static com.ctrip.xpipe.redis.core.metaserver.META_SERVER_SERVICE.GET_CURR
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 3, 2016
  */
-public class RemoteMetaServer extends AbstractRemoteClusterServer implements MetaServer{
-	
+public class RemoteMetaServer extends AbstractRemoteClusterServer implements MetaServer {
+
 	private String changeClusterPath;
 	private String upstreamChangePath;
 	private String upstreamPeerChangePath;
@@ -40,11 +40,11 @@ public class RemoteMetaServer extends AbstractRemoteClusterServer implements Met
 	public RemoteMetaServer(int currentServerId, int serverId) {
 		super(currentServerId, serverId);
 	}
-	
+
 	public RemoteMetaServer(int currentServerId, int serverId, ClusterServerInfo clusterServerInfo) {
 		super(currentServerId, serverId, clusterServerInfo);
-				
-		if(getHttpHost() != null){
+
+		if (getHttpHost() != null) {
 			changeClusterPath = META_SERVER_SERVICE.CLUSTER_CHANGE.getRealPath(getHttpHost());
 			upstreamChangePath = META_SERVER_SERVICE.UPSTREAM_CHANGE.getRealPath(getHttpHost());
 			upstreamPeerChangePath = META_SERVER_SERVICE.UPSTREAM_PEER_CHANGE.getRealPath(getHttpHost());
@@ -58,8 +58,8 @@ public class RemoteMetaServer extends AbstractRemoteClusterServer implements Met
 	}
 
 	@Override
-	public KeeperMeta getActiveKeeper(String clusterId, String shardId, ForwardInfo forwardInfo){
-	
+	public KeeperMeta getActiveKeeper(String clusterId, String shardId, ForwardInfo forwardInfo) {
+
 		HttpHeaders headers = checkCircularAndGetHttpHeaders(forwardInfo);
 		logger.debug("[getActiveKeeper][forward]{},{},{} --> {}", clusterId, shardId, forwardInfo, this);
 
@@ -95,13 +95,13 @@ public class RemoteMetaServer extends AbstractRemoteClusterServer implements Met
 
 	@Override
 	public void clusterAdded(ClusterMeta clusterMeta, ForwardInfo forwardInfo) {
-		
+
 		HttpHeaders headers = checkCircularAndGetHttpHeaders(forwardInfo, META_SERVER_SERVICE.CLUSTER_CHANGE.getForwardType());
 		logger.info("[clusterAdded][forward]{},{}--> {}", clusterMeta.getId(), forwardInfo, this);
-		
+
 		HttpEntity<ClusterMeta> entity = new HttpEntity<>(clusterMeta, headers);
 		restTemplate.exchange(changeClusterPath, HttpMethod.POST, entity, String.class, clusterMeta.getId());
-	
+
 	}
 
 	@Override
@@ -109,10 +109,10 @@ public class RemoteMetaServer extends AbstractRemoteClusterServer implements Met
 
 		HttpHeaders headers = checkCircularAndGetHttpHeaders(forwardInfo, META_SERVER_SERVICE.CLUSTER_CHANGE.getForwardType());
 		logger.info("[clusterModified][forward]{},{} --> {}", clusterMeta.getId(), forwardInfo, this);
-		
+
 		HttpEntity<ClusterMeta> entity = new HttpEntity<>(clusterMeta, headers);
 		restTemplate.exchange(changeClusterPath, HttpMethod.PUT, entity, String.class, clusterMeta.getId());
-		
+
 	}
 
 	@Override
@@ -120,20 +120,20 @@ public class RemoteMetaServer extends AbstractRemoteClusterServer implements Met
 
 		HttpHeaders headers = checkCircularAndGetHttpHeaders(forwardInfo, META_SERVER_SERVICE.CLUSTER_CHANGE.getForwardType());
 		logger.info("[clusterDeleted][forward]{},{} --> {}", clusterId, forwardInfo, this);
-		
+
 		HttpEntity<ClusterMeta> entity = new HttpEntity<>(headers);
 		restTemplate.exchange(changeClusterPath, HttpMethod.DELETE, entity, String.class, clusterId);
 	}
 
 	@Override
 	public void updateUpstream(String clusterId, String shardId, String ip, int port, ForwardInfo forwardInfo) {
-		
+
 		HttpHeaders headers = checkCircularAndGetHttpHeaders(forwardInfo, META_SERVER_SERVICE.UPSTREAM_CHANGE.getForwardType());
 		logger.info("[updateUpstream][forward]{},{},{}:{}, {}--> {}", clusterId, shardId, ip, port, forwardInfo, this);
-		
+
 		HttpEntity<ClusterMeta> entity = new HttpEntity<>(headers);
 		restTemplate.exchange(upstreamChangePath, HttpMethod.PUT, entity, String.class, clusterId, shardId, ip, port);
-		
+
 	}
 
 	@Override
@@ -144,11 +144,11 @@ public class RemoteMetaServer extends AbstractRemoteClusterServer implements Met
 		HttpEntity<ClusterMeta> entity = new HttpEntity<>(headers);
 		restTemplate.exchange(upstreamPeerChangePath, HttpMethod.PUT, entity, String.class, upstreamDcId, clusterId, shardId);
 	}
-	
+
 	@Override
 	public PrimaryDcCheckMessage changePrimaryDcCheck(String clusterId, String shardId, String newPrimaryDc,
-			ForwardInfo forwardInfo) {
-		
+													  ForwardInfo forwardInfo) {
+
 		HttpHeaders headers = checkCircularAndGetHttpHeaders(forwardInfo, META_SERVER_SERVICE.CHANGE_PRIMARY_DC_CHECK.getForwardType());
 		logger.info("[changePrimaryDcCheck][forward]{},{},{}, {}--> {}", clusterId, shardId, newPrimaryDc, forwardInfo, this);
 		HttpEntity<ClusterMeta> entity = new HttpEntity<>(headers);
@@ -165,46 +165,46 @@ public class RemoteMetaServer extends AbstractRemoteClusterServer implements Met
 		HttpEntity<ClusterMeta> entity = new HttpEntity<>(headers);
 		ResponseEntity<MetaServerConsoleService.PreviousPrimaryDcMessage> result = restTemplate.exchange(makeMasterReadonlyPath, HttpMethod.PUT, entity, MetaServerConsoleService.PreviousPrimaryDcMessage.class, clusterId, shardId, readOnly);
 		return result.getBody();
-    }
+	}
 
 	@Override
 	public PrimaryDcChangeMessage doChangePrimaryDc(String clusterId, String shardId, String newPrimaryDc
 			, MetaServerConsoleService.PrimaryDcChangeRequest request, ForwardInfo forwardInfo) {
-		
+
 		HttpHeaders headers = checkCircularAndGetHttpHeaders(forwardInfo, META_SERVER_SERVICE.CHANGE_PRIMARY_DC.getForwardType());
 		logger.info("[doChangePrimaryDc][forward]{},{},{}, {}--> {}", clusterId, shardId, newPrimaryDc, forwardInfo, this);
 		headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
 
 		HttpEntity<MetaServerConsoleService.PrimaryDcChangeRequest> entity = new HttpEntity<>(request, headers);
-		ResponseEntity<PrimaryDcChangeMessage> resposne = restTemplate.exchange(changePrimaryDcPath, HttpMethod.PUT, 
+		ResponseEntity<PrimaryDcChangeMessage> resposne = restTemplate.exchange(changePrimaryDcPath, HttpMethod.PUT,
 				entity, PrimaryDcChangeMessage.class, clusterId, shardId, newPrimaryDc);
 		return resposne.getBody();
 	}
 
 
 	private HttpHeaders checkCircularAndGetHttpHeaders(ForwardInfo forwardInfo, ForwardType forwardType) {
-		
+
 		checkCircular(forwardInfo);
 
-		if(forwardInfo == null){
+		if (forwardInfo == null) {
 			forwardInfo = new ForwardInfo(forwardType);
-		}else{
+		} else {
 			forwardInfo.setType(forwardType);
 		}
-		forwardInfo.addForwardServers(getCurrentServerId());	
-		
+		forwardInfo.addForwardServers(getCurrentServerId());
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(MetaServerService.HTTP_HEADER_FOWRARD, Codec.DEFAULT.encode(forwardInfo));
 		return headers;
 	}
 
 	private HttpHeaders checkCircularAndGetHttpHeaders(ForwardInfo forwardInfo) {
-		
+
 		return checkCircularAndGetHttpHeaders(forwardInfo, ForwardType.FORWARD);
 	}
-	
+
 	private void checkCircular(ForwardInfo forwardInfo) {
-		if(forwardInfo != null && forwardInfo.hasServer(getCurrentServerId())){
+		if (forwardInfo != null && forwardInfo.hasServer(getCurrentServerId())) {
 			throw new CircularForwardException(forwardInfo, getCurrentServerId());
 		}
 	}

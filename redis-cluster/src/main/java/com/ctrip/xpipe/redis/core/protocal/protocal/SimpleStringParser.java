@@ -9,10 +9,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月24日 下午6:31:56
  */
-public class SimpleStringParser extends AbstractRedisClientProtocol<String>{
+public class SimpleStringParser extends AbstractRedisClientProtocol<String> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SimpleStringParser.class);
 
@@ -20,40 +20,40 @@ public class SimpleStringParser extends AbstractRedisClientProtocol<String>{
 
 	public SimpleStringParser() {
 	}
-	
+
 	public SimpleStringParser(String payload) {
 		super(payload, true, true);
 	}
-	
+
 	public SimpleStringParser(String payload, boolean logRead, boolean logWrite) {
 		super(payload, logRead, logWrite);
 	}
-	
+
 	@Override
-	public RedisClientProtocol<String> read(ByteBuf byteBuf){
-		
+	public RedisClientProtocol<String> read(ByteBuf byteBuf) {
+
 		String data = readTilCRLFAsString(byteBuf);
-		if(data == null){
+		if (data == null) {
 			return null;
 		}
-		
+
 		int beginIndex = 0;
 		int endIndex = data.length();
 		int dataLength = data.length();
-		if(data.charAt(0) == PLUS_BYTE){
+		if (data.charAt(0) == PLUS_BYTE) {
 			beginIndex = 1;
 		}
-		
-		if(data.charAt(dataLength - 2) == '\r' && data.charAt(dataLength - 1) == '\n'){
+
+		if (data.charAt(dataLength - 2) == '\r' && data.charAt(dataLength - 1) == '\n') {
 			endIndex -= 2;
 		}
 		return new SimpleStringParser(data.substring(beginIndex, endIndex));
 	}
 
-	
+
 	@Override
 	protected ByteBuf getWriteByteBuf() {
-		
+
 		return Unpooled.wrappedBuffer(getRequestBytes(PLUS_BYTE, payload));
 	}
 

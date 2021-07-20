@@ -13,28 +13,28 @@ import java.util.List;
  */
 public interface ProxyConnectProtocol extends ProxyProtocol {
 
-    List<ProxyEndpoint> nextEndpoints();
+	List<ProxyEndpoint> nextEndpoints();
 
-    void recordForwardFor(InetSocketAddress address);
+	void recordForwardFor(InetSocketAddress address);
 
-    String getForwardFor();
+	String getForwardFor();
 
-    void setContent(String content);
+	void setContent(String content);
 
-    String getContent();
+	String getContent();
 
-    String getRouteInfo();
+	String getRouteInfo();
 
-    String getFinalStation();
+	String getFinalStation();
 
-    String getSource();
+	String getSource();
 
-    boolean isCompressed();
+	boolean isCompressed();
 
-    CompressAlgorithm getCompressAlgorithm();
+	CompressAlgorithm getCompressAlgorithm();
 
-    void removeCompressOptionIfExist();
+	void removeCompressOptionIfExist();
 
-    void addCompression(CompressAlgorithm algorithm);
+	void addCompression(CompressAlgorithm algorithm);
 
 }

@@ -11,8 +11,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author marsqing
- *
- *         May 9, 2016 5:42:01 PM
+ * <p>
+ * May 9, 2016 5:42:01 PM
  */
 public class InfoCommand extends AbstractRedisCommand<String> {
 
@@ -44,7 +44,7 @@ public class InfoCommand extends AbstractRedisCommand<String> {
 
 	@Override
 	public ByteBuf getRequest() {
-		
+
 		RequestStringParser requestString = new RequestStringParser(getName(), args);
 		return requestString.format();
 	}
@@ -57,7 +57,7 @@ public class InfoCommand extends AbstractRedisCommand<String> {
 
 	@Override
 	public String toString() {
-		return getName() + " " + (args == null? "":args);
+		return getName() + " " + (args == null ? "" : args);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class InfoCommand extends AbstractRedisCommand<String> {
 		return logger;
 	}
 
-	public static enum INFO_TYPE{
+	public enum INFO_TYPE {
 
 		REPLICATION,
 		SERVER,
@@ -73,7 +73,7 @@ public class InfoCommand extends AbstractRedisCommand<String> {
 		STATS,
 		PERSISTENCE;
 
-		public String cmd(){
+		public String cmd() {
 			return toString().toLowerCase();
 		}
 	}

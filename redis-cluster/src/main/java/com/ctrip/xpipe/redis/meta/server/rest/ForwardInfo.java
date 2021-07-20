@@ -7,31 +7,31 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 3, 2016
  */
-public class ForwardInfo implements Cloneable{
-	
+public class ForwardInfo implements Cloneable {
+
 	private ForwardType type;
-	
+
 	private List<Integer> forwardServers = new LinkedList<>();
 
-	public ForwardInfo(){
-		
+	public ForwardInfo() {
+
 	}
 
-	public ForwardInfo(ForwardType type){
+	public ForwardInfo(ForwardType type) {
 		this(type, null);
 	}
 
-	public ForwardInfo(ForwardType type, Integer forwardServer){
-		
+	public ForwardInfo(ForwardType type, Integer forwardServer) {
+
 		this.type = type;
-		if(forwardServer != null){
+		if (forwardServer != null) {
 			this.forwardServers.add(forwardServer);
 		}
 	}
-	
+
 
 	public ForwardType getType() {
 		return type;
@@ -44,11 +44,11 @@ public class ForwardInfo implements Cloneable{
 	public List<Integer> getForwardServers() {
 		return forwardServers;
 	}
-	
-	public boolean hasServer(Integer serverId){
-		
-		for(Integer passServerId : forwardServers){
-			if(passServerId.equals(serverId)){
+
+	public boolean hasServer(Integer serverId) {
+
+		for (Integer passServerId : forwardServers) {
+			if (passServerId.equals(serverId)) {
 				return true;
 			}
 		}
@@ -58,19 +58,19 @@ public class ForwardInfo implements Cloneable{
 	public void setForwardServers(List<Integer> forwardServers) {
 		this.forwardServers = forwardServers;
 	}
-	
-	public void addForwardServers(Integer server){
+
+	public void addForwardServers(Integer server) {
 		forwardServers.add(server);
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("type:%s, fromServers:%s", type, forwardServers);
 	}
-	
+
 	@Override
 	public ForwardInfo clone() {
-		
+
 		ForwardInfo forwardInfo;
 		try {
 			forwardInfo = (ForwardInfo) super.clone();

@@ -9,12 +9,13 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 25, 2016
  */
-public class RedisMasterReplicationRdbDumper extends AbstractRdbDumper{
+public class RedisMasterReplicationRdbDumper extends AbstractRdbDumper {
 
 	private RedisMasterReplication redisMasterReplication;
+
 	public RedisMasterReplicationRdbDumper(RedisMasterReplication redisMasterReplication,
 										   RedisKeeperServer redisKeeperServer, KeeperResourceManager resourceManager) {
 		super(redisKeeperServer);
@@ -36,7 +37,7 @@ public class RedisMasterReplicationRdbDumper extends AbstractRdbDumper{
 	public DumpedRdbStore prepareRdbStore() throws IOException {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("%s", redisMasterReplication);

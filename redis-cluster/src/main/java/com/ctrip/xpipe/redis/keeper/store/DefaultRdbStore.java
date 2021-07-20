@@ -30,9 +30,9 @@ import java.util.function.LongSupplier;
 public class DefaultRdbStore extends AbstractStore implements RdbStore {
 
 	private final static Logger logger = LoggerFactory.getLogger(DefaultRdbStore.class);
-	
-	public static final long FAIL_RDB_LENGTH = -1; 
-	
+
+	public static final long FAIL_RDB_LENGTH = -1;
+
 	private RandomAccessFile writeFile;
 
 	protected File file;
@@ -46,25 +46,25 @@ public class DefaultRdbStore extends AbstractStore implements RdbStore {
 	protected long rdbOffset;
 
 	private AtomicInteger refCount = new AtomicInteger(0);
-	
+
 	private List<RdbStoreListener> rdbStoreListeners = new LinkedList<>();
-	
+
 	private Object truncateLock = new Object();
-	
+
 	public DefaultRdbStore(File file, long rdbOffset, EofType eofType) throws IOException {
 
 		this.file = file;
 		this.eofType = eofType;
 		this.rdbOffset = rdbOffset;
-		
-		if(file.length() > 0){
+
+		if (file.length() > 0) {
 			checkAndSetRdbState();
-		}else{
+		} else {
 			writeFile = new RandomAccessFile(file, "rw");
 			channel = writeFile.getChannel();
 		}
 	}
-	
+
 	@Override
 	public int writeRdb(ByteBuf byteBuf) throws IOException {
 		makeSureOpen();
@@ -75,9 +75,9 @@ public class DefaultRdbStore extends AbstractStore implements RdbStore {
 
 	@Override
 	public void truncateEndRdb(int reduceLen) throws IOException {
-		
+
 		logger.info("[truncateEndRdb]{}, {}", this, reduceLen);
-		
+
 		synchronized (truncateLock) {
 			channel.truncate(channel.size() - reduceLen);
 			endRdb();
@@ -86,15 +86,15 @@ public class DefaultRdbStore extends AbstractStore implements RdbStore {
 
 	@Override
 	public void endRdb() {
-		
-		if(status.get() != Status.Writing){
+
+		if (status.get() != Status.Writing) {
 			logger.info("[endRdb][already ended]{}, {}, {}", this, file, status);
 			return;
 		}
-		
-		try{
+
+		try {
 			checkAndSetRdbState();
-		}finally{
+		} finally {
 			notifyListenersEndRdb();
 			try {
 				writeFile.close();
@@ -105,11 +105,11 @@ public class DefaultRdbStore extends AbstractStore implements RdbStore {
 	}
 
 	private void notifyListenersEndRdb() {
-		
-		for(RdbStoreListener listener : rdbStoreListeners){
-			try{
+
+		for (RdbStoreListener listener : rdbStoreListeners) {
+			try {
 				listener.onEndRdb();
-			}catch(Throwable th){
+			} catch (Throwable th) {
 				logger.error("[notifyListenersEndRdb]" + this, th);
 			}
 		}
@@ -117,13 +117,13 @@ public class DefaultRdbStore extends AbstractStore implements RdbStore {
 
 	@Override
 	public void failRdb(Throwable throwable) {
-		
+
 		logger.info("[failRdb]" + this, throwable);
-		
-		if(status.get() != Status.Writing){
+
+		if (status.get() != Status.Writing) {
 			throw new IllegalStateException("already finished with final state:" + status.get());
 		}
-		
+
 		status.set(Status.Fail);
 		notifyListenersEndRdb();
 		try {
@@ -135,17 +135,17 @@ public class DefaultRdbStore extends AbstractStore implements RdbStore {
 
 	@Override
 	public long rdbFileLength() {
-		
-		if(status.get() == Status.Fail){
+
+		if (status.get() == Status.Fail) {
 			return FAIL_RDB_LENGTH;
 		}
 		return file.length();
 	}
 
 	private void checkAndSetRdbState() {
-		
+
 		//TODO check file format
-		if(eofType.fileOk(file)){
+		if (eofType.fileOk(file)) {
 			status.set(Status.Success);
 			logger.info("[checkAndSetRdbState]{}, {}", this, status);
 		} else {
@@ -157,7 +157,7 @@ public class DefaultRdbStore extends AbstractStore implements RdbStore {
 
 	@Override
 	public void readRdbFile(final RdbFileListener rdbFileListener) throws IOException {
-		
+
 		makeSureOpen();
 
 		rdbFileListener.beforeFileData();
@@ -167,47 +167,47 @@ public class DefaultRdbStore extends AbstractStore implements RdbStore {
 			doReadRdbFile(rdbFileListener, channel);
 		} catch (Exception e) {
 			logger.error("[readRdbFile]Error read rdb file" + file, e);
-		}finally{
+		} finally {
 			refCount.decrementAndGet();
 		}
 	}
 
 	private void doReadRdbFile(RdbFileListener rdbFileListener, ReferenceFileChannel referenceFileChannel) throws IOException {
-		
+
 		rdbFileListener.setRdbFileInfo(eofType, rdbOffset);
 
 		long lastLogTime = System.currentTimeMillis();
 		while (rdbFileListener.isOpen() && (isRdbWriting(status.get()) || (status.get() == Status.Success && referenceFileChannel.hasAnythingToRead()))) {
-			
-		ReferenceFileRegion referenceFileRegion = referenceFileChannel.readTilEnd();
-		
-		rdbFileListener.onFileData(referenceFileRegion);
-		if(referenceFileRegion.count() <= 0)
-			try {
-				Thread.sleep(1);
-				long currentTime = System.currentTimeMillis();
-				if(currentTime - lastLogTime > 10000){
-					logger.info("[doReadRdbFile]status:{}, referenceFileChannel:{}, count:{}, rdbFileListener:{}", 
-							status.get(), referenceFileChannel, referenceFileRegion.count(), rdbFileListener);
-					lastLogTime = currentTime;
+
+			ReferenceFileRegion referenceFileRegion = referenceFileChannel.readTilEnd();
+
+			rdbFileListener.onFileData(referenceFileRegion);
+			if (referenceFileRegion.count() <= 0)
+				try {
+					Thread.sleep(1);
+					long currentTime = System.currentTimeMillis();
+					if (currentTime - lastLogTime > 10000) {
+						logger.info("[doReadRdbFile]status:{}, referenceFileChannel:{}, count:{}, rdbFileListener:{}",
+								status.get(), referenceFileChannel, referenceFileRegion.count(), rdbFileListener);
+						lastLogTime = currentTime;
+					}
+				} catch (InterruptedException e) {
+					logger.error("[doReadRdbFile]" + rdbFileListener, e);
+					Thread.currentThread().interrupt();
 				}
-			} catch (InterruptedException e) {
-				logger.error("[doReadRdbFile]" + rdbFileListener, e);
-				Thread.currentThread().interrupt();
-			}
 		}
 
 		logger.info("[doReadRdbFile] done with status {}", status.get());
 
 		switch (status.get()) {
 			case Success:
-				if(file.exists()){//this is necessery because file may be deleted
+				if (file.exists()) {//this is necessery because file may be deleted
 					rdbFileListener.onFileData(null);
-				}else{
+				} else {
 					rdbFileListener.exception((new Exception("rdb file not exists now " + file)));
 				}
 				break;
-	
+
 			case Fail:
 				rdbFileListener.exception(new Exception("[rdb error]" + file));
 				break;
@@ -230,37 +230,37 @@ public class DefaultRdbStore extends AbstractStore implements RdbStore {
 	public long rdbOffset() {
 		return rdbOffset;
 	}
-	
+
 	public void incrementRefCount() {
 		refCount.incrementAndGet();
 	}
-	
+
 	public void decrementRefCount() {
 		refCount.decrementAndGet();
 	}
 
 	@Override
 	public boolean checkOk() {
-		return status.get() == Status.Writing 
-				|| ( status.get() == Status.Success && file.exists());
+		return status.get() == Status.Writing
+				|| (status.get() == Status.Success && file.exists());
 	}
 
 	@Override
 	public void destroy() throws Exception {
-		
+
 		logger.info("[destroy][delete file]{}", file);
 		file.delete();
 	}
 
 	@Override
 	public void close() throws IOException {
-		
-		if(cmpAndSetClosed()){
+
+		if (cmpAndSetClosed()) {
 			logger.info("[close]{}", file);
-			if(writeFile != null){
+			if (writeFile != null) {
 				writeFile.close();
 			}
-		}else{
+		} else {
 			logger.warn("[close][already closed]{}", this);
 		}
 	}
@@ -276,31 +276,31 @@ public class DefaultRdbStore extends AbstractStore implements RdbStore {
 	}
 
 	private ControllableFile createControllableFile() throws IOException {
-		
-		if(eofType instanceof LenEofType){
+
+		if (eofType instanceof LenEofType) {
 			return new DefaultControllableFile(file);
-		}else if(eofType instanceof EofMarkType){
-			
+		} else if (eofType instanceof EofMarkType) {
+
 			return new SizeControllableFile(file, new FileSize() {
-				
+
 				@Override
 				public long getSize(LongSupplier realSizeProvider) {
-					
+
 					long realSize = 0;
 					synchronized (truncateLock) {//truncate may make size wrong
 						realSize = realSizeProvider.getAsLong();
 					}
-					
-					if(status.get() == Status.Writing){
-						
-						long ret = realSize - ((EofMarkType)eofType).getTag().length(); 
+
+					if (status.get() == Status.Writing) {
+
+						long ret = realSize - eofType.getTag().length();
 						logger.debug("[getSize][writing]{}, {}", DefaultRdbStore.this, ret);
 						return ret < 0 ? 0 : ret;
 					}
 					return realSize;
 				}
 			});
-		}else{
+		} else {
 			throw new IllegalStateException("unknown eoftype:" + eofType.getClass() + "," + eofType);
 		}
 	}

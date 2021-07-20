@@ -23,120 +23,120 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultTunnelStats implements TunnelStats {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultTunnelStats.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultTunnelStats.class);
 
-    private Tunnel tunnel;
+	private Tunnel tunnel;
 
-    private SESSION_TYPE closeFrom;
+	private SESSION_TYPE closeFrom;
 
-    private long startTimestamp = System.currentTimeMillis();
+	private long startTimestamp = System.currentTimeMillis();
 
-    private long sendTimestamp;
+	private long sendTimestamp;
 
-    private long closeTimestamp;
+	private long closeTimestamp;
 
-    public DefaultTunnelStats(Tunnel tunnel) {
-        this.tunnel = tunnel;
-    }
+	public DefaultTunnelStats(Tunnel tunnel) {
+		this.tunnel = tunnel;
+	}
 
-    @Override
-    public TunnelIdentity getTunnelIdentity() {
-        return tunnel.identity();
-    }
+	@Override
+	public TunnelIdentity getTunnelIdentity() {
+		return tunnel.identity();
+	}
 
-    @Override
-    public TunnelState getTunnelState() {
-        return tunnel.getState();
-    }
+	@Override
+	public TunnelState getTunnelState() {
+		return tunnel.getState();
+	}
 
-    @Override
-    public long getProtocolRecTime() {
-        return startTimestamp;
-    }
+	@Override
+	public long getProtocolRecTime() {
+		return startTimestamp;
+	}
 
-    @Override
-    public long getProtocolSendTime() {
-        return sendTimestamp;
-    }
+	@Override
+	public long getProtocolSendTime() {
+		return sendTimestamp;
+	}
 
-    @Override
-    public long getCloseTime() {
-        return closeTimestamp;
-    }
+	@Override
+	public long getCloseTime() {
+		return closeTimestamp;
+	}
 
-    @Override
-    public SESSION_TYPE closeFrom() {
-        return closeFrom;
-    }
+	@Override
+	public SESSION_TYPE closeFrom() {
+		return closeFrom;
+	}
 
-    @Override
-    public TunnelStatsResult getTunnelStatsResult() {
-        HostPort frontend = HostPort.fromString(ChannelUtil.getSimpleIpport(tunnel.frontend().getChannel().localAddress()));
-        HostPort backend = HostPort.fromString(ChannelUtil.getSimpleIpport(tunnel.backend().getChannel().localAddress()));
-        if(closeFrom != null) {
-            return new TunnelStatsResult(tunnel.identity().toString(), tunnel.getState().name(), frontend, backend, getProtocolRecTime(),
-                    getProtocolSendTime(), getCloseTime(), closeFrom.name());
-        }
-        return new TunnelStatsResult(tunnel.identity().toString(), tunnel.getState().name(), getProtocolRecTime(), getProtocolSendTime(), frontend, backend);
-    }
+	@Override
+	public TunnelStatsResult getTunnelStatsResult() {
+		HostPort frontend = HostPort.fromString(ChannelUtil.getSimpleIpport(tunnel.frontend().getChannel().localAddress()));
+		HostPort backend = HostPort.fromString(ChannelUtil.getSimpleIpport(tunnel.backend().getChannel().localAddress()));
+		if (closeFrom != null) {
+			return new TunnelStatsResult(tunnel.identity().toString(), tunnel.getState().name(), frontend, backend, getProtocolRecTime(),
+					getProtocolSendTime(), getCloseTime(), closeFrom.name());
+		}
+		return new TunnelStatsResult(tunnel.identity().toString(), tunnel.getState().name(), getProtocolRecTime(), getProtocolSendTime(), frontend, backend);
+	}
 
-    @Override
-    public void onEstablished() {
-        sendTimestamp = System.currentTimeMillis();
-    }
+	@Override
+	public void onEstablished() {
+		sendTimestamp = System.currentTimeMillis();
+	}
 
-    @Override
-    public void onBackendClose() {
-        closeFrom = SESSION_TYPE.BACKEND;
-    }
+	@Override
+	public void onBackendClose() {
+		closeFrom = SESSION_TYPE.BACKEND;
+	}
 
-    @Override
-    public void onFrontendClose() {
-        closeFrom = SESSION_TYPE.FRONTEND;
-    }
+	@Override
+	public void onFrontendClose() {
+		closeFrom = SESSION_TYPE.FRONTEND;
+	}
 
-    @Override
-    public void onClosing() {
-        closeTimestamp = System.currentTimeMillis();
-        tunnel.getTunnelMonitor().record(tunnel);
-    }
+	@Override
+	public void onClosing() {
+		closeTimestamp = System.currentTimeMillis();
+		tunnel.getTunnelMonitor().record(tunnel);
+	}
 
-    @Override
-    public void onClosed() {
+	@Override
+	public void onClosed() {
 
-    }
+	}
 
-    // observer for tunnel change
-    @Override
-    public void update(Object args, Observable observable) {
-        if(!(observable instanceof Tunnel)) {
-            logger.error("[update] should observe tunnel only, not {}", observable.getClass().getName());
-            return;
-        }
-        DefaultTunnel tunnel = (DefaultTunnel) observable;
+	// observer for tunnel change
+	@Override
+	public void update(Object args, Observable observable) {
+		if (!(observable instanceof Tunnel)) {
+			logger.error("[update] should observe tunnel only, not {}", observable.getClass().getName());
+			return;
+		}
+		DefaultTunnel tunnel = (DefaultTunnel) observable;
 
-        // deal with TunnelStateChangeEvent Only for current
-        if(!(args instanceof TunnelStateChangeEvent)) {
-            return;
-        }
-        TunnelStateChangeEvent event = (TunnelStateChangeEvent) args;
-        TunnelState current = event.getCurrent();
+		// deal with TunnelStateChangeEvent Only for current
+		if (!(args instanceof TunnelStateChangeEvent)) {
+			return;
+		}
+		TunnelStateChangeEvent event = (TunnelStateChangeEvent) args;
+		TunnelState current = event.getCurrent();
 
-        if(current instanceof TunnelEstablished) {
-            onEstablished();
+		if (current instanceof TunnelEstablished) {
+			onEstablished();
 
-        } else if(current instanceof FrontendClosed) {
-            onFrontendClose();
+		} else if (current instanceof FrontendClosed) {
+			onFrontendClose();
 
-        } else if(current instanceof BackendClosed) {
-            onBackendClose();
+		} else if (current instanceof BackendClosed) {
+			onBackendClose();
 
-        } else if(current instanceof TunnelClosing) {
-            onClosing();
+		} else if (current instanceof TunnelClosing) {
+			onClosing();
 
-        } else if(current instanceof TunnelClosed) {
-            onClosed();
-        }
+		} else if (current instanceof TunnelClosed) {
+			onClosed();
+		}
 
-    }
+	}
 }

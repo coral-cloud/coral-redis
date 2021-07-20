@@ -4,14 +4,14 @@ import com.ctrip.xpipe.api.server.DbAction;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月24日 下午3:34:20
  */
-public abstract class AbstractDbAction implements DbAction{
+public abstract class AbstractDbAction implements DbAction {
 
 	@Override
 	public void requestFullSync() {
-		
+
 		doRequestFullSync();
 	}
 
@@ -19,9 +19,9 @@ public abstract class AbstractDbAction implements DbAction{
 
 	@Override
 	public void requestPartialSync() {
-		
+
 		doRequestPartialSync();
-		
+
 	}
 
 	protected abstract void doRequestPartialSync();

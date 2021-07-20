@@ -14,28 +14,28 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月20日 下午5:19:55
  */
 public class InOutPayloadReplicationStore extends AbstractInOutPayload implements InOutPayload {
 
 	private static final Logger logger = LoggerFactory.getLogger(InOutPayloadReplicationStore.class);
 
-	public  RdbStore rdbStore;
-	
+	public RdbStore rdbStore;
+
 	private AtomicBoolean stop = new AtomicBoolean(false);
-	
+
 	public InOutPayloadReplicationStore() {
 	}
-	
+
 	public void setRdbStore(RdbStore rdbStore) {
 		this.rdbStore = rdbStore;
 	}
 
 	@Override
 	public int doIn(ByteBuf byteBuf) throws IOException {
-		
-		if(logger.isDebugEnabled()){
+
+		if (logger.isDebugEnabled()) {
 			logger.debug("[doIn]" + byteBuf.readableBytes());
 		}
 		return rdbStore.writeRdb(byteBuf);
@@ -45,15 +45,16 @@ public class InOutPayloadReplicationStore extends AbstractInOutPayload implement
 	public void endInputTruncate(int reduceLen) throws IOException {
 		rdbStore.truncateEndRdb(reduceLen);
 	}
-	
+
 	@Override
 	protected void doEndInput() throws IOException {
 		rdbStore.endRdb();
 		super.doEndInput();
 	}
+
 	@Override
 	public void doStartOutput() throws IOException {
-		
+
 	}
 
 	@Override
@@ -68,7 +69,7 @@ public class InOutPayloadReplicationStore extends AbstractInOutPayload implement
 
 	@Override
 	protected void doTruncate(int reduceLen) throws IOException {
-		
+
 	}
 
 }

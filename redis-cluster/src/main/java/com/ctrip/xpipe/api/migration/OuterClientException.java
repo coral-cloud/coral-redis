@@ -4,16 +4,16 @@ import com.ctrip.xpipe.exception.XpipeException;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Jul 26, 2017
+ * <p>
+ * Jul 26, 2017
  */
-public class OuterClientException extends XpipeException{
+public class OuterClientException extends XpipeException {
 
-    public OuterClientException(String message) {
-        super(message);
-    }
+	public OuterClientException(String message) {
+		super(message);
+	}
 
-    public OuterClientException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public OuterClientException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

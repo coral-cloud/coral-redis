@@ -21,56 +21,56 @@ import java.net.InetSocketAddress;
 
 public class ProxyProtocolHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProxyProtocolHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProxyProtocolHandler.class);
 
-    private TunnelManager tunnelManager;
+	private TunnelManager tunnelManager;
 
-    private Tunnel tunnel;
+	private Tunnel tunnel;
 
-    private ProxyReqResProtocolHandlerManager protocolHandlerManager;
+	private ProxyReqResProtocolHandlerManager protocolHandlerManager;
 
-    public ProxyProtocolHandler(TunnelManager tunnelManager, ResourceManager resourceManager,
-                                PingStatsManager pingStatsManager) {
-        this.tunnelManager = tunnelManager;
-        this.protocolHandlerManager = new ProxyReqResProtocolHandlerManager(resourceManager,
-                tunnelManager, pingStatsManager);
-    }
+	public ProxyProtocolHandler(TunnelManager tunnelManager, ResourceManager resourceManager,
+								PingStatsManager pingStatsManager) {
+		this.tunnelManager = tunnelManager;
+		this.protocolHandlerManager = new ProxyReqResProtocolHandlerManager(resourceManager,
+				tunnelManager, pingStatsManager);
+	}
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if(!(msg instanceof ProxyProtocol)) {
-            logger.error("[channelRead] not proxy protocol, class: {}", msg.getClass());
-        }
-        handleProxyProtocol(ctx, msg);
-    }
+	@Override
+	public void channelRead(ChannelHandlerContext ctx, Object msg) {
+		if (!(msg instanceof ProxyProtocol)) {
+			logger.error("[channelRead] not proxy protocol, class: {}", msg.getClass());
+		}
+		handleProxyProtocol(ctx, msg);
+	}
 
-    private void handleProxyProtocol(ChannelHandlerContext ctx, Object msg) {
-        logger.debug("[doChannelRead][ProxyProtocol] {}", msg);
-        if(msg instanceof ProxyConnectProtocol) {
-            ProxyConnectProtocol protocol = (ProxyConnectProtocol) msg;
-            logger.info("[channelRead][ProxyProtocol-Received] {}", protocol.toString());
-            if (ctx.channel().remoteAddress() instanceof InetSocketAddress) {
-                protocol.recordForwardFor((InetSocketAddress) ctx.channel().remoteAddress());
-            }
-            tunnel = tunnelManager.create(ctx.channel(), protocol);
-            uninstallSelf(ctx);
-        } else if(msg instanceof ProxyRequestResponseProtocol) {
-            ProxyRequestResponseProtocol protocol = (ProxyRequestResponseProtocol) msg;
-            logger.debug("[ProxyRequestResponseProtocol][{}] {}", ChannelUtil.getDesc(ctx.channel()), protocol.getContent());
-            long start = System.currentTimeMillis();
-            protocolHandlerManager.handle(ctx.channel(),
-                    StringUtil.splitRemoveEmpty(AbstractProxyOptionParser.ELEMENT_SPLITTER, protocol.getContent()));
-            logger.debug("[ProxyRequestResponseProtocol][{}] {}; duration: {}", ChannelUtil.getDesc(ctx.channel()),
-                    protocol.getContent(), System.currentTimeMillis() - start);
-        }
-    }
+	private void handleProxyProtocol(ChannelHandlerContext ctx, Object msg) {
+		logger.debug("[doChannelRead][ProxyProtocol] {}", msg);
+		if (msg instanceof ProxyConnectProtocol) {
+			ProxyConnectProtocol protocol = (ProxyConnectProtocol) msg;
+			logger.info("[channelRead][ProxyProtocol-Received] {}", protocol.toString());
+			if (ctx.channel().remoteAddress() instanceof InetSocketAddress) {
+				protocol.recordForwardFor((InetSocketAddress) ctx.channel().remoteAddress());
+			}
+			tunnel = tunnelManager.create(ctx.channel(), protocol);
+			uninstallSelf(ctx);
+		} else if (msg instanceof ProxyRequestResponseProtocol) {
+			ProxyRequestResponseProtocol protocol = (ProxyRequestResponseProtocol) msg;
+			logger.debug("[ProxyRequestResponseProtocol][{}] {}", ChannelUtil.getDesc(ctx.channel()), protocol.getContent());
+			long start = System.currentTimeMillis();
+			protocolHandlerManager.handle(ctx.channel(),
+					StringUtil.splitRemoveEmpty(AbstractProxyOptionParser.ELEMENT_SPLITTER, protocol.getContent()));
+			logger.debug("[ProxyRequestResponseProtocol][{}] {}; duration: {}", ChannelUtil.getDesc(ctx.channel()),
+					protocol.getContent(), System.currentTimeMillis() - start);
+		}
+	}
 
-    private void uninstallSelf(ChannelHandlerContext ctx) {
-        if(tunnel == null) {
-            logger.error("[initChannel] tunnel should not be null");
-            return;
-        }
-        ChannelPipeline pipeline = ctx.channel().pipeline();
-        pipeline.remove(this);
-    }
+	private void uninstallSelf(ChannelHandlerContext ctx) {
+		if (tunnel == null) {
+			logger.error("[initChannel] tunnel should not be null");
+			return;
+		}
+		ChannelPipeline pipeline = ctx.channel().pipeline();
+		pipeline.remove(this);
+	}
 }

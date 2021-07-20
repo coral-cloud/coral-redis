@@ -11,16 +11,16 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Feb 24, 2017
  */
-public class SlaveOfRedisReadOnly extends AbstractRedisReadOnly{
-	
+public class SlaveOfRedisReadOnly extends AbstractRedisReadOnly {
+
 	private static final String slaveHost = "127.0.0.1";
-	private static final int    slavePort = 0;
-		
+	private static final int slavePort = 0;
+
 	public SlaveOfRedisReadOnly(String ip, int port, XpipeNettyClientKeyedObjectPool keyedObjectPool,
-			ScheduledExecutorService scheduled) {
+								ScheduledExecutorService scheduled) {
 		super(ip, port, keyedObjectPool, scheduled);
 	}
 
@@ -34,7 +34,7 @@ public class SlaveOfRedisReadOnly extends AbstractRedisReadOnly{
 
 	@Override
 	protected Command<?> createWritableCommand() {
-		
+
 		SimpleObjectPool<NettyClient> clientPool = keyedObjectPool.getKeyPool(new DefaultEndPoint(ip, port));
 		return new DefaultSlaveOfCommand(clientPool, scheduled);
 	}

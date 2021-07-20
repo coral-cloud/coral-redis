@@ -2,10 +2,10 @@ package com.ctrip.xpipe.config;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 9, 2016
  */
-public class DefaultPropertyConfig extends AbstractConfig{
+public class DefaultPropertyConfig extends AbstractConfig {
 
 	@Override
 	public String get(String key) {

@@ -2,8 +2,8 @@ package com.ctrip.xpipe.redis.core.entity;
 
 /**
  * @author wenchao.meng
- *
- *         Jul 17, 2016
+ * <p>
+ * Jul 17, 2016
  */
 public interface Keeper extends Redis {
 

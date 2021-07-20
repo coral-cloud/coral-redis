@@ -11,24 +11,24 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 8, 2016
  */
-public abstract class AbstractKeeperMasterChooserAlgorithm implements KeeperMasterChooserAlgorithm{
-	
+public abstract class AbstractKeeperMasterChooserAlgorithm implements KeeperMasterChooserAlgorithm {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	protected DcMetaCache dcMetaCache;
 
 	protected CurrentMetaManager currentMetaManager;
 
 	protected String clusterId, shardId;
-	
+
 	protected ScheduledExecutorService scheduled;
 
 
 	public AbstractKeeperMasterChooserAlgorithm(String clusterId, String shardId, DcMetaCache dcMetaCache,
-			CurrentMetaManager currentMetaManager, ScheduledExecutorService scheduled) {
+												CurrentMetaManager currentMetaManager, ScheduledExecutorService scheduled) {
 
 		this.dcMetaCache = dcMetaCache;
 		this.currentMetaManager = currentMetaManager;

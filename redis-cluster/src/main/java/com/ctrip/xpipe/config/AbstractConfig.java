@@ -10,13 +10,13 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 21, 2016
  */
-public abstract class AbstractConfig implements Config{
-	
+public abstract class AbstractConfig implements Config {
+
 	private List<ConfigChangeListener> listeners = new LinkedList<>();
-	
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
@@ -24,44 +24,44 @@ public abstract class AbstractConfig implements Config{
 		String value = get(key);
 		return value == null ? defaultValue : value;
 	}
-	
+
 	@Override
 	public void addConfigChangeListener(ConfigChangeListener configChangeListener) {
-		
-		synchronized (listeners){
+
+		synchronized (listeners) {
 			listeners.add(configChangeListener);
 		}
 	}
-	
+
 	@Override
 	public synchronized void removeConfigChangeListener(ConfigChangeListener configChangeListener) {
-		synchronized (listeners){
+		synchronized (listeners) {
 			listeners.remove(configChangeListener);
 		}
 	}
 
-	protected void notifyConfigChange(String key, String oldValue, String newValue){
-		
+	protected void notifyConfigChange(String key, String oldValue, String newValue) {
+
 		Object[] listenersCopy = null;
-		
-		synchronized (listeners){
+
+		synchronized (listeners) {
 			listenersCopy = listeners.toArray();
 		}
-		
-		for(Object listenerCopy : listenersCopy){
-			
-			try{
+
+		for (Object listenerCopy : listenersCopy) {
+
+			try {
 				ConfigChangeListener listener = (ConfigChangeListener) listenerCopy;
 				listener.onChange(key, oldValue, newValue);
-			}catch(Throwable th){
+			} catch (Throwable th) {
 				logger.error("[notifyConfigChange]{}:{}->{},{}", key, oldValue, newValue, listenerCopy, th);
 			}
 		}
 	}
-	
+
 	@Override
 	public int getOrder() {
-		
+
 		return LOWEST_PRECEDENCE;
 	}
 }

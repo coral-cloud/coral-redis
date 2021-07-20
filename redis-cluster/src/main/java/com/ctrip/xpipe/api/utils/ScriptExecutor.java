@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface ScriptExecutor<V> extends Command<V> {
 
-    String getScript();
+	String getScript();
 
-    V format(List<String> result);
+	V format(List<String> result);
 }

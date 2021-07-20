@@ -8,17 +8,17 @@ import java.net.URL;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 8, 2016
  */
 public class FileUtils {
-	
+
 	private static Logger logger = LoggerFactory.getLogger(FileUtils.class);
-	
+
 	public static int DEFAULT_SHORT_PATH_LEVEL = 4;
-	
+
 	public static void recursiveDelete(File file) {
-		
+
 		if (!file.exists() || !file.canWrite()) {
 			return;
 		}
@@ -39,43 +39,43 @@ public class FileUtils {
 	}
 
 	public static String shortPath(String absolutePath, int level) {
-		
+
 		int index = absolutePath.length();
-		for(int i=0;i<level;i++){
+		for (int i = 0; i < level; i++) {
 			int currentIndex = absolutePath.lastIndexOf(File.separator, index - 1);
-			if(currentIndex < 0){
+			if (currentIndex < 0) {
 				break;
 			}
 			index = currentIndex;
 		}
-		
-		if(index == absolutePath.length()){
+
+		if (index == absolutePath.length()) {
 			return absolutePath;
 		}
 		return absolutePath.substring(index);
 	}
 
-	public static InputStream getFileInputStream(String fileName) throws FileNotFoundException{
-		
+	public static InputStream getFileInputStream(String fileName) throws FileNotFoundException {
+
 		return getFileInputStream("./", fileName, FileUtils.class);
 	}
 
-	public static InputStream getFileInputStream(String path, String fileName) throws FileNotFoundException{
-		
+	public static InputStream getFileInputStream(String path, String fileName) throws FileNotFoundException {
+
 		return getFileInputStream(path, fileName, FileUtils.class);
 	}
 
-	public static InputStream getFileInputStream(String fileName, Class<?> clazz) throws FileNotFoundException{
-		
+	public static InputStream getFileInputStream(String fileName, Class<?> clazz) throws FileNotFoundException {
+
 		return getFileInputStream("./", fileName, clazz);
 	}
 
-	public static InputStream getFileInputStream(String path, String fileName, Class<?> clazz) throws FileNotFoundException{
-		
+	public static InputStream getFileInputStream(String path, String fileName, Class<?> clazz) throws FileNotFoundException {
+
 		File f = null;
-		if(path != null){
-			f = new File(path+ "/" + fileName);
-			if(f.exists()){
+		if (path != null) {
+			f = new File(path + "/" + fileName);
+			if (f.exists()) {
 				try {
 					logger.info("[getFileInputStream]{}", f.getAbsolutePath());
 					return new FileInputStream(f);
@@ -87,7 +87,7 @@ public class FileUtils {
 
 		//try file
 		f = new File(fileName);
-		if(f.exists()){
+		if (f.exists()) {
 			try {
 				logger.info("[getFileInputStream]{}", f.getAbsolutePath());
 				return new FileInputStream(f);
@@ -95,13 +95,13 @@ public class FileUtils {
 				throw new IllegalArgumentException("file load fail:" + f, e);
 			}
 		}
-		
+
 		//try classpath
 		URL url = clazz.getResource(fileName);
-		if(url == null){
+		if (url == null) {
 			url = clazz.getClassLoader().getResource(fileName);
 		}
-		if(url != null){
+		if (url != null) {
 			try {
 				logger.info("[load]{}", url);
 				return url.openStream();
@@ -110,12 +110,12 @@ public class FileUtils {
 			}
 		}
 
-		throw new FileNotFoundException(path + ","  + fileName);
+		throw new FileNotFoundException(path + "," + fileName);
 	}
-	
-	public static String readFileAsString(String fileName) throws IOException{
-		
-		try(InputStream ins = getFileInputStream(fileName)){ 
+
+	public static String readFileAsString(String fileName) throws IOException {
+
+		try (InputStream ins = getFileInputStream(fileName)) {
 			String fileContent = IOUtil.toString(ins);
 			return fileContent;
 		}

@@ -5,11 +5,11 @@ import com.ctrip.xpipe.api.lifecycle.Destroyable;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 9, 2016
  */
-public interface RetryTemplate<V> extends Destroyable{
-	
+public interface RetryTemplate<V> extends Destroyable {
+
 	V execute(Command<V> command) throws Exception;
 
 }

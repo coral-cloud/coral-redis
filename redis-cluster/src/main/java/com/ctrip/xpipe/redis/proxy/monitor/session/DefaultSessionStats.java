@@ -18,120 +18,120 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class DefaultSessionStats extends AbstractStats implements SessionStats {
 
-    private AtomicLong inputBytes = new AtomicLong(0L);
+	private AtomicLong inputBytes = new AtomicLong(0L);
 
-    private AtomicLong outputBytes = new AtomicLong(0L);
+	private AtomicLong outputBytes = new AtomicLong(0L);
 
-    private BaseInstantaneousMetric inputMetric = new BaseInstantaneousMetric();
+	private BaseInstantaneousMetric inputMetric = new BaseInstantaneousMetric();
 
-    private BaseInstantaneousMetric outputMetric = new BaseInstantaneousMetric();
+	private BaseInstantaneousMetric outputMetric = new BaseInstantaneousMetric();
 
-    private volatile long lastUpdateTime = System.currentTimeMillis();
+	private volatile long lastUpdateTime = System.currentTimeMillis();
 
-    private AtomicBoolean flag = new AtomicBoolean(false);
+	private AtomicBoolean flag = new AtomicBoolean(false);
 
-    private List<AutoReadEvent> autoReadEvents = Lists.newLinkedList();
+	private List<AutoReadEvent> autoReadEvents = Lists.newLinkedList();
 
-    public DefaultSessionStats(ScheduledExecutorService scheduled) {
-        super(scheduled);
-    }
+	public DefaultSessionStats(ScheduledExecutorService scheduled) {
+		super(scheduled);
+	}
 
-    @Override
-    public void increaseInputBytes(long bytes) {
-        updateLastTime();
-        inputBytes.getAndAdd(bytes);
-    }
+	@Override
+	public void increaseInputBytes(long bytes) {
+		updateLastTime();
+		inputBytes.getAndAdd(bytes);
+	}
 
-    @Override
-    public void increaseOutputBytes(long bytes) {
-        updateLastTime();
-        outputBytes.getAndAdd(bytes);
-    }
+	@Override
+	public void increaseOutputBytes(long bytes) {
+		updateLastTime();
+		outputBytes.getAndAdd(bytes);
+	}
 
-    @Override
-    public long lastUpdateTime() {
-        return lastUpdateTime;
-    }
+	@Override
+	public long lastUpdateTime() {
+		return lastUpdateTime;
+	}
 
-    private void updateLastTime() {
-        lastUpdateTime = System.currentTimeMillis();
-    }
+	private void updateLastTime() {
+		lastUpdateTime = System.currentTimeMillis();
+	}
 
-    @Override
-    public long getInputBytes() {
-        return inputBytes.get();
-    }
+	@Override
+	public long getInputBytes() {
+		return inputBytes.get();
+	}
 
-    @Override
-    public long getOutputBytes() {
-        return outputBytes.get();
-    }
+	@Override
+	public long getOutputBytes() {
+		return outputBytes.get();
+	}
 
-    @Override
-    public long getInputInstantaneousBPS() {
-        return inputMetric.getInstantaneousMetric();
-    }
+	@Override
+	public long getInputInstantaneousBPS() {
+		return inputMetric.getInstantaneousMetric();
+	}
 
-    @Override
-    public long getOutputInstantaneousBPS() {
-        return outputMetric.getInstantaneousMetric();
-    }
+	@Override
+	public long getOutputInstantaneousBPS() {
+		return outputMetric.getInstantaneousMetric();
+	}
 
-    @Override
-    public List<AutoReadEvent> getAutoReadEvents() {
-        return autoReadEvents;
-    }
+	@Override
+	public List<AutoReadEvent> getAutoReadEvents() {
+		return autoReadEvents;
+	}
 
-    @Override
-    protected void doStart() {
-        updateLastTime();
-        super.doStart();
-    }
+	@Override
+	protected void doStart() {
+		updateLastTime();
+		super.doStart();
+	}
 
-    @Override
-    protected void doTask() {
-        inputMetric.trackInstantaneousMetric(inputBytes.get());
-        outputMetric.trackInstantaneousMetric(outputBytes.get());
-    }
+	@Override
+	protected void doTask() {
+		inputMetric.trackInstantaneousMetric(inputBytes.get());
+		outputMetric.trackInstantaneousMetric(outputBytes.get());
+	}
 
-    @Override
-    protected int getCheckIntervalMilli() {
-        return 100;
-    }
+	@Override
+	protected int getCheckIntervalMilli() {
+		return 100;
+	}
 
-    @Override
-    public void onInit() {
+	@Override
+	public void onInit() {
 
-    }
+	}
 
-    @Override
-    public void onEstablished() {
+	@Override
+	public void onEstablished() {
 
-    }
+	}
 
-    @Override
-    public void onWritable() {
-        if(flag.compareAndSet(true, false)) {
-            autoReadEvents.get(autoReadEvents.size() - 1).setEndTime(System.currentTimeMillis());
-        }
-    }
+	@Override
+	public void onWritable() {
+		if (flag.compareAndSet(true, false)) {
+			autoReadEvents.get(autoReadEvents.size() - 1).setEndTime(System.currentTimeMillis());
+		}
+	}
 
-    @Override
-    public void onNotWritable() {
-        if(flag.compareAndSet(false, true)) {
-            autoReadEvents.add(new AutoReadEvent().setStartTime(System.currentTimeMillis()));
-        }
-    }
+	@Override
+	public void onNotWritable() {
+		if (flag.compareAndSet(false, true)) {
+			autoReadEvents.add(new AutoReadEvent().setStartTime(System.currentTimeMillis()));
+		}
+	}
 
-    @Override
-    public String toString() {
-        return "DefaultSessionStats{" +
-                "inputBytes=" + inputBytes.get() +
-                ", outputBytes=" + outputBytes.get() +
-                ", inputMetric=" + inputMetric.getInstantaneousMetric() +
-                ", outputMetric=" + outputMetric.getInstantaneousMetric() +
-                ", lastUpdateTime=" + DateTimeUtils.timeAsString(lastUpdateTime) +
-                ", autoReadEvents=" + Arrays.deepToString(autoReadEvents.toArray(new AutoReadEvent[0])) +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "DefaultSessionStats{" +
+				"inputBytes=" + inputBytes.get() +
+				", outputBytes=" + outputBytes.get() +
+				", inputMetric=" + inputMetric.getInstantaneousMetric() +
+				", outputMetric=" + outputMetric.getInstantaneousMetric() +
+				", lastUpdateTime=" + DateTimeUtils.timeAsString(lastUpdateTime) +
+				", autoReadEvents=" + Arrays.deepToString(autoReadEvents.toArray(new AutoReadEvent[0])) +
+				'}';
+	}
 }

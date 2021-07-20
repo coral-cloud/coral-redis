@@ -9,5 +9,5 @@ import com.ctrip.xpipe.redis.core.protocal.PsyncObserver;
  */
 public interface PsyncChecker extends PsyncObserver {
 
-    boolean canSendPsync();
+	boolean canSendPsync();
 }

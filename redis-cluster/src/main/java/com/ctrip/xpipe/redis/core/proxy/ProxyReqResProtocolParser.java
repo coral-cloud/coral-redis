@@ -10,11 +10,11 @@ import io.netty.buffer.ByteBuf;
  */
 public interface ProxyReqResProtocolParser extends ProxyProtocolParser {
 
-    @Override
-    ProxyRequestResponseProtocol read(String protocol);
+	@Override
+	ProxyRequestResponseProtocol read(String protocol);
 
-    @Override
-    ProxyRequestResponseProtocol read(ByteBuf byteBuf);
+	@Override
+	ProxyRequestResponseProtocol read(ByteBuf byteBuf);
 
-    String getContent();
+	String getContent();
 }

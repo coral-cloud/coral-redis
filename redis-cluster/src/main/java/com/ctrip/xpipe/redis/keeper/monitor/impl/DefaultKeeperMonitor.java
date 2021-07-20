@@ -17,22 +17,22 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Feb 20, 2017
  */
-public class DefaultKeeperMonitor extends AbstractStartStoppable implements KeeperMonitor{
+public class DefaultKeeperMonitor extends AbstractStartStoppable implements KeeperMonitor {
 
 	private KeeperStats keeperStats;
-	
+
 	private ReplicationStoreStats replicationStoreStats = new DefaultReplicationStoreStats();
-	
+
 	private RedisKeeperServer redisKeeperServer;
-	
+
 	public DefaultKeeperMonitor(RedisKeeperServer redisKeeperServer, ScheduledExecutorService scheduled) {
 		this.redisKeeperServer = redisKeeperServer;
 		this.keeperStats = new DefaultKeeperStats(redisKeeperServer.getShardId(), scheduled);
 	}
-	
+
 	@Override
 	public CommandStoreDelay createCommandStoreDelay(CommandStore commandStore) {
 		return new DefaultCommandStoreDelay(commandStore, () -> redisKeeperServer.getKeeperConfig().getDelayLogLimitMicro());

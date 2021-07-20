@@ -14,18 +14,18 @@ import com.ctrip.xpipe.redis.proxy.tunnel.TunnelState;
  */
 public interface TunnelStats extends TunnelEventHandler, Observer {
 
-    TunnelIdentity getTunnelIdentity();
+	TunnelIdentity getTunnelIdentity();
 
-    TunnelState getTunnelState();
+	TunnelState getTunnelState();
 
-    long getProtocolRecTime();
+	long getProtocolRecTime();
 
-    long getProtocolSendTime();
+	long getProtocolSendTime();
 
-    long getCloseTime();
+	long getCloseTime();
 
-    SESSION_TYPE closeFrom();
+	SESSION_TYPE closeFrom();
 
-    TunnelStatsResult getTunnelStatsResult();
+	TunnelStatsResult getTunnelStatsResult();
 
 }

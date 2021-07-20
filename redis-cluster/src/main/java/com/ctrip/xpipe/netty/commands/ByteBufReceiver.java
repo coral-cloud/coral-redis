@@ -5,17 +5,17 @@ import io.netty.channel.Channel;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
 public interface ByteBufReceiver {
 
 	RECEIVER_RESULT receive(Channel channel, ByteBuf byteBuf);
-	
+
 	void clientClosed(NettyClient nettyClient);
 
 
-	public static enum RECEIVER_RESULT{
+	enum RECEIVER_RESULT {
 
 		SUCCESS,
 		FAIL,

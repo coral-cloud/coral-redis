@@ -11,16 +11,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ComponentRegistryHolder {
 
-    private static AtomicBoolean isRegistrySet = new AtomicBoolean(false);
-    private static ComponentRegistry componentRegistry;
+	private static AtomicBoolean isRegistrySet = new AtomicBoolean(false);
+	private static ComponentRegistry componentRegistry;
 
-    public static void initializeRegistry(ComponentRegistry componentRegistryToSet) {
-        if (isRegistrySet.compareAndSet(false, true)) {
-            componentRegistry = componentRegistryToSet;
-        }
-    }
+	public static void initializeRegistry(ComponentRegistry componentRegistryToSet) {
+		if (isRegistrySet.compareAndSet(false, true)) {
+			componentRegistry = componentRegistryToSet;
+		}
+	}
 
-    public static ComponentRegistry getComponentRegistry() {
-        return componentRegistry;
-    }
+	public static ComponentRegistry getComponentRegistry() {
+		return componentRegistry;
+	}
 }

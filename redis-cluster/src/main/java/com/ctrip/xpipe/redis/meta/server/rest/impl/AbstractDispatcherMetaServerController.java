@@ -25,77 +25,77 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Nov 30, 2016
  */
 
-public class AbstractDispatcherMetaServerController extends AbstractController{
-	
+public class AbstractDispatcherMetaServerController extends AbstractController {
+
 	protected static final String MODEL_META_SERVER = "MODEL_META_SERVER";
-	
+
 	@Autowired
 	public MetaServer currentMetaServer;
-	
+
 	@Autowired
 	private SlotManager slotManager;
-	
+
 	@Autowired
 	public ClusterServers<MetaServer> servers;
-	
-	@ModelAttribute
-	public void populateModel(@PathVariable final String clusterId, 
-			@RequestHeader(name = MetaServerService.HTTP_HEADER_FOWRARD, required = false) ForwardInfo forwardInfo, Model model, HttpServletRequest request){
 
-		if(forwardInfo != null){
+	@ModelAttribute
+	public void populateModel(@PathVariable final String clusterId,
+							  @RequestHeader(name = MetaServerService.HTTP_HEADER_FOWRARD, required = false) ForwardInfo forwardInfo, Model model, HttpServletRequest request) {
+
+		if (forwardInfo != null) {
 			logger.info("[populateModel]{},{}", clusterId, forwardInfo);
 		}
 		MetaServer metaServer = getMetaServer(clusterId, forwardInfo, request.getRequestURI());
-		if(metaServer == null){
+		if (metaServer == null) {
 			throw new UnfoundAliveSererException(clusterId, slotManager.getServerIdByKey(clusterId), currentMetaServer.getServerId());
 		}
 		model.addAttribute(MODEL_META_SERVER, metaServer);
-		if(forwardInfo != null){
+		if (forwardInfo != null) {
 			model.addAttribute(forwardInfo);
 		}
 	}
-	
+
 	private MetaServer getMetaServer(String clusterId, ForwardInfo forwardInfo, String uri) {
-		
+
 		int slotId = slotManager.getSlotIdByKey(clusterId);
 		SlotInfo slotInfo = slotManager.getSlotInfo(slotId);
-		
-		if(forwardInfo != null && forwardInfo.getType() == ForwardType.MOVING){
 
-			if(!(slotInfo.getSlotState() == SLOT_STATE.MOVING  && slotInfo.getToServerId() == currentMetaServer.getServerId())){
+		if (forwardInfo != null && forwardInfo.getType() == ForwardType.MOVING) {
+
+			if (!(slotInfo.getSlotState() == SLOT_STATE.MOVING && slotInfo.getToServerId() == currentMetaServer.getServerId())) {
 				throw new MovingTargetException(forwardInfo, currentMetaServer.getServerId(), slotInfo, clusterId, slotId);
 			}
 			logger.info("[getMetaServer][use current server]");
 			return currentMetaServer;
 		}
 
-		if(forwardInfo != null && forwardInfo.getType() == ForwardType.MULTICASTING){
+		if (forwardInfo != null && forwardInfo.getType() == ForwardType.MULTICASTING) {
 			logger.info("[multicast message][do now]");
 			return currentMetaServer;
 		}
-		
+
 		META_SERVER_SERVICE service = META_SERVER_SERVICE.fromPath(uri);
 		Integer serverId = slotManager.getServerIdByKey(clusterId);
-		if(serverId == null){
+		if (serverId == null) {
 			throw new IllegalStateException("clusterId:" + clusterId + ", unfound server");
 		}
-		
-		if(service.getForwardType() == ForwardType.MULTICASTING){
-			
+
+		if (service.getForwardType() == ForwardType.MULTICASTING) {
+
 			logger.info("[getMetaServer][multi casting]{}, {}, {}", clusterId, forwardInfo, uri);
-			Set<MetaServer> allServers =  servers.allClusterServers();
+			Set<MetaServer> allServers = servers.allClusterServers();
 			MetaServer current = servers.getClusterServer(serverId);
 			allServers.remove(current);
-			
+
 			return MultiMetaServer.newProxy(current, new LinkedList<>(allServers));
-		}else if(service.getForwardType() == ForwardType.FORWARD){
-			
+		} else if (service.getForwardType() == ForwardType.FORWARD) {
+
 			return servers.getClusterServer(serverId);
-		}else{
+		} else {
 			throw new IllegalStateException("service type can not be:" + service.getForwardType());
 		}
 	}

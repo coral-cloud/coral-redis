@@ -7,15 +7,15 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 6, 2016
  */
-public class DefaultKeeperActiveElectAlgorithm extends AbstractActiveElectAlgorithm{
+public class DefaultKeeperActiveElectAlgorithm extends AbstractActiveElectAlgorithm {
 
 	@Override
-	public KeeperMeta select(String clusterId, String shardId, List<KeeperMeta> toBeSelected){
-		
-		if(toBeSelected.size() > 0){
+	public KeeperMeta select(String clusterId, String shardId, List<KeeperMeta> toBeSelected) {
+
+		if (toBeSelected.size() > 0) {
 			KeeperMeta result = toBeSelected.get(0);
 			//result.setActive(true);
 			return result;
@@ -23,6 +23,5 @@ public class DefaultKeeperActiveElectAlgorithm extends AbstractActiveElectAlgori
 		return null;
 	}
 
-	
 
 }

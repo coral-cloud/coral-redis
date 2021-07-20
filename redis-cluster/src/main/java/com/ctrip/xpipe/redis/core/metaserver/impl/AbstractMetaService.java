@@ -10,8 +10,8 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
- *         Sep 5, 2016
+ * <p>
+ * Sep 5, 2016
  */
 public abstract class AbstractMetaService extends AbstractService implements MetaServerService {
 
@@ -55,7 +55,7 @@ public abstract class AbstractMetaService extends AbstractService implements Met
 			@Override
 			public KeeperMeta apply(String metaServerAddress) {
 
-				
+
 				String activeKeeperPath = META_SERVER_SERVICE.GET_ACTIVE_KEEPER.getRealPath(metaServerAddress);
 				KeeperMeta keeperMeta = restTemplate.getForObject(activeKeeperPath, KeeperMeta.class, clusterId, shardId);
 				return keeperMeta;

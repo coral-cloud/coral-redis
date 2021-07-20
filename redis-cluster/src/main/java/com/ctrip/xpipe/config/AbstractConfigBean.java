@@ -13,13 +13,13 @@ import java.util.function.Function;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 22, 2016
  */
 public abstract class AbstractConfigBean implements ConfigChangeListener {
-	
+
 	private Config config;
-	
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private Map<String, Long> longCache;
@@ -28,11 +28,11 @@ public abstract class AbstractConfigBean implements ConfigChangeListener {
 
 	private AtomicLong configVersion = new AtomicLong(0L);
 
-	public AbstractConfigBean(){
+	public AbstractConfigBean() {
 		this(Config.DEFAULT);
 	}
 
-	public AbstractConfigBean(Config config){
+	public AbstractConfigBean(Config config) {
 		this.config = config;
 		config.addConfigChangeListener(this);
 	}
@@ -41,15 +41,15 @@ public abstract class AbstractConfigBean implements ConfigChangeListener {
 		this.config = config;
 	}
 
-	protected String getProperty(String key){
+	protected String getProperty(String key) {
 		return config.get(key);
 	}
 
-	protected String getProperty(String key, String defaultValue){
+	protected String getProperty(String key, String defaultValue) {
 		return config.get(key, defaultValue);
 	}
 
-	protected Integer getIntProperty(String key, Integer defaultValue){
+	protected Integer getIntProperty(String key, Integer defaultValue) {
 		if (intergerCache == null) {
 			synchronized (this) {
 				if (intergerCache == null) {
@@ -61,7 +61,7 @@ public abstract class AbstractConfigBean implements ConfigChangeListener {
 		return getValueFromCache(key, Functions.TO_INT_FUNCTION, intergerCache, defaultValue);
 	}
 
-	protected Long getLongProperty(String key, Long defaultValue){
+	protected Long getLongProperty(String key, Long defaultValue) {
 		if (longCache == null) {
 			synchronized (this) {
 				if (longCache == null) {
@@ -73,21 +73,21 @@ public abstract class AbstractConfigBean implements ConfigChangeListener {
 		return getValueFromCache(key, Functions.TO_LONG_FUNCTION, longCache, defaultValue);
 	}
 
-	protected Boolean getBooleanProperty(String key, Boolean defaultValue){
-		
+	protected Boolean getBooleanProperty(String key, Boolean defaultValue) {
+
 		String value = config.get(key);
-		if(value == null){
+		if (value == null) {
 			return defaultValue;
 		}
-		
+
 		return Boolean.parseBoolean(value.trim());
 	}
-	
+
 	@Override
 	public void onChange(String key, String oldValue, String newValue) {
 		clearCache();
 	}
-	
+
 	@Override
 	public String toString() {
 		return Codec.DEFAULT.encode(this);
@@ -108,9 +108,9 @@ public abstract class AbstractConfigBean implements ConfigChangeListener {
 
 		T val = cache.get(key);
 		String value;
-		if(val == null && (value = config.get(key, null)) != null) {
+		if (val == null && (value = config.get(key, null)) != null) {
 			synchronized (this) {
-				if(cache.get(key) == null) {
+				if (cache.get(key) == null) {
 					T result = parser.apply(value);
 
 					if (result != null) {

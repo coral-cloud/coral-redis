@@ -10,30 +10,30 @@ import java.util.Map;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 17, 2016
  */
-public class DefaultRegistry extends AbstractComponentRegistry{
-	
-	private ComponentRegistry createdRegistry; 
+public class DefaultRegistry extends AbstractComponentRegistry {
+
+	private ComponentRegistry createdRegistry;
 	private ComponentRegistry springRegistry;
-	
+
 	public DefaultRegistry(ComponentRegistry createdRegistry, ComponentRegistry springRegistry) {
-		
+
 		this.createdRegistry = createdRegistry;
 		this.springRegistry = springRegistry;
 	}
 
 	@Override
 	public Object getComponent(String name) {
-		
+
 		Object component = null;
-		
-		if(springRegistry != null){
+
+		if (springRegistry != null) {
 			component = springRegistry.getComponent(name);
 		}
-		
-		if(component == null){
+
+		if (component == null) {
 			component = createdRegistry.getComponent(name);
 		}
 		return component;
@@ -46,7 +46,7 @@ public class DefaultRegistry extends AbstractComponentRegistry{
 
 	@Override
 	protected String doAdd(Object component) throws Exception {
-		
+
 		return createdRegistry.add(component);
 	}
 
@@ -62,9 +62,9 @@ public class DefaultRegistry extends AbstractComponentRegistry{
 
 	@Override
 	protected <T> Map<String, T> doGetComponents(Class<T> clazz) {
-		
+
 		Map<String, T> result = new HashMap<>(createdRegistry.getComponents(clazz));
-		if(springRegistry != null){
+		if (springRegistry != null) {
 			result.putAll(springRegistry.getComponents(clazz));
 		}
 		return result;
@@ -72,41 +72,41 @@ public class DefaultRegistry extends AbstractComponentRegistry{
 
 	@Override
 	public Map<String, Object> allComponents() {
-		
+
 		Map<String, Object> result = new HashMap<>(createdRegistry.allComponents());
-		if(springRegistry != null){
+		if (springRegistry != null) {
 			result.putAll(springRegistry.allComponents());
 		}
 		return result;
 	}
-	
-	
+
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
-		
+
 		createdRegistry.initialize();
-		if(springRegistry != null){
+		if (springRegistry != null) {
 			springRegistry.initialize();
 		}
 	}
-	
+
 	@Override
 	protected void doStart() throws Exception {
 		super.doStart();
-		
+
 		createdRegistry.start();
-		if(springRegistry != null){
+		if (springRegistry != null) {
 			springRegistry.start();
 		}
 	}
-	
+
 	@Override
 	protected void doStop() throws Exception {
 		super.doStop();
-		
+
 		createdRegistry.stop();
-		if(springRegistry != null){
+		if (springRegistry != null) {
 			springRegistry.stop();
 		}
 	}
@@ -114,28 +114,29 @@ public class DefaultRegistry extends AbstractComponentRegistry{
 	@Override
 	protected void doDispose() throws Exception {
 		super.doDispose();
-		
+
 		createdRegistry.dispose();
-		if(springRegistry != null){
+		if (springRegistry != null) {
 			springRegistry.dispose();
 		}
 	}
+
 	@Override
 	public List<Lifecycle> lifecycleCallable() {
-		
+
 		List<Lifecycle> result = new LinkedList<>();
 		result.addAll(createdRegistry.lifecycleCallable());
-		if(springRegistry != null){
+		if (springRegistry != null) {
 			result.addAll(springRegistry.lifecycleCallable());
 		}
 		return sort(result);
 	}
-	
+
 	@Override
-	public void cleanComponents(){
-		
+	public void cleanComponents() {
+
 		createdRegistry.cleanComponents();
-		if(springRegistry != null){
+		if (springRegistry != null) {
 			springRegistry.cleanComponents();
 		}
 	}

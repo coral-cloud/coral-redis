@@ -10,11 +10,11 @@ import com.ctrip.xpipe.redis.core.config.AbstractCoreConfig;
 
 /**
  * @author marsqing
- *
- *         May 25, 2016 11:12:35 AM
+ * <p>
+ * May 25, 2016 11:12:35 AM
  */
 public class DefaultKeeperConfig extends AbstractCoreConfig implements KeeperConfig {
-	
+
 	public static final String KEY_REPLICATION_STORE_GC_INTERVAL_SECONDS = "replicationstore.gc.interval.seconds";
 	public static final String KEY_REPLICATION_STORE_COMMANDFILE_SIZE = "replicationstore.commandfile.size";
 	public static final String KEY_REPLICATION_STORE_COMMANDFILE_NUM_KEEP = "replicationstore.commandfile.num.keep";
@@ -23,7 +23,7 @@ public class DefaultKeeperConfig extends AbstractCoreConfig implements KeeperCon
 	public static final String KEY_COMMAND_READER_FLYING_THRESHOLD = "command.reader.flying.threshold";
 	public static final String KEY_RDB_DUMP_MIN_INTERVAL = "rdbdump.min.interval";
 	public static final String KEY_DELAY_LOG_LIMIT_MICRO = "monitor.delay.log.limit.micro";
-    private static final String KEY_TRAFFIC_REPORT_INTERVAL = "monitor.traffic.report.interval";
+	private static final String KEY_TRAFFIC_REPORT_INTERVAL = "monitor.traffic.report.interval";
 	private static final String KEY_KEEPER_RATE_LIMIT_OPEN = "keeper.rate.limit.open";
 
 	private static String KEEPER_CONTAINER_PROPERTIES_PATH = String.format("/opt/data/%s", FoundationService.DEFAULT.getAppId());
@@ -39,13 +39,13 @@ public class DefaultKeeperConfig extends AbstractCoreConfig implements KeeperCon
 
 	private static String KEY_META_SERVER_ADDRESS = "meta.server.address";
 
-	public DefaultKeeperConfig(){
+	public DefaultKeeperConfig() {
 
 		CompositeConfig compositeConfig = new CompositeConfig();
 		compositeConfig.addConfig(Config.DEFAULT);
-		try{
+		try {
 			compositeConfig.addConfig(new DefaultFileConfig(KEEPER_CONTAINER_PROPERTIES_PATH, KEEPER_CONTAINER_PROPERTIES_FILE));
-		}catch (Exception e){
+		} catch (Exception e) {
 //			logger.info("[DefaultKeeperConfig]", e);
 		}
 		compositeConfig.addConfig(new DefaultPropertyConfig());
@@ -99,8 +99,7 @@ public class DefaultKeeperConfig extends AbstractCoreConfig implements KeeperCon
 	}
 
 	@Override
-	public
-	int getReplicationStoreMinTimeMilliToGcAfterCreate(){
+	public int getReplicationStoreMinTimeMilliToGcAfterCreate() {
 		return getIntProperty(KEY_REPLICATION_STORE_MINITIME_GC_AFTERCREATE, 60000);
 	}
 
@@ -114,10 +113,10 @@ public class DefaultKeeperConfig extends AbstractCoreConfig implements KeeperCon
 		return getIntProperty(KEY_DELAY_LOG_LIMIT_MICRO, 10000);
 	}
 
-    @Override
-    public long getTrafficReportIntervalMillis() {
-        return getLongProperty(KEY_TRAFFIC_REPORT_INTERVAL, DEFAULT_TRAFFIC_REPORT_INTERVAL_MILLIS);
-    }
+	@Override
+	public long getTrafficReportIntervalMillis() {
+		return getLongProperty(KEY_TRAFFIC_REPORT_INTERVAL, DEFAULT_TRAFFIC_REPORT_INTERVAL_MILLIS);
+	}
 
 	@Override
 	public long getReplicationTrafficHighWaterMark() {

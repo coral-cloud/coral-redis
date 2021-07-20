@@ -12,10 +12,10 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 22, 2016
  */
-public class RedisKeeperServerStatePreActive extends AbstractRedisKeeperServerState{
+public class RedisKeeperServerStatePreActive extends AbstractRedisKeeperServerState {
 
 	//do not set master address
 	public RedisKeeperServerStatePreActive(RedisKeeperServer redisKeeperServer) {
@@ -24,14 +24,14 @@ public class RedisKeeperServerStatePreActive extends AbstractRedisKeeperServerSt
 
 	@Override
 	public void becomeActive(Endpoint masterAddress) {
-		
+
 		logger.info("[becomeActive]{}", masterAddress);
 		doBecomeActive(masterAddress);
 	}
 
 	@Override
-	public void becomeBackup(Endpoint masterAddress){
-		
+	public void becomeBackup(Endpoint masterAddress) {
+
 		logger.info("[becomeBackup]{}", masterAddress);
 		doBecomeBackup(masterAddress);
 	}

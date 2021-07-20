@@ -12,13 +12,13 @@ import java.util.List;
  */
 public interface ProxyEndpointSelector {
 
-    int selectCounts();
+	int selectCounts();
 
-    ProxyEndpoint nextHop() throws NoResourceException;
+	ProxyEndpoint nextHop() throws NoResourceException;
 
-    List<ProxyEndpoint> getCandidates();
+	List<ProxyEndpoint> getCandidates();
 
-    void setNextHopAlgorithm(NextHopAlgorithm algorithm);
+	void setNextHopAlgorithm(NextHopAlgorithm algorithm);
 
-    void setSelectStrategy(SelectStrategy strategy);
+	void setSelectStrategy(SelectStrategy strategy);
 }

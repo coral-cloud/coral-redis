@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class PeerMasterMetaServerStateChangeHandler implements MetaServerStateChangeHandler {
 
-    @Autowired
-    private PeerMasterAdjustAction peerMasterAdjustAction;
+	@Autowired
+	private PeerMasterAdjustAction peerMasterAdjustAction;
 
-    @Override
-    public void currentMasterChanged(String clusterId, String shardId) {
-        peerMasterAdjustAction.adjustPeerMaster(clusterId, shardId);
-    }
+	@Override
+	public void currentMasterChanged(String clusterId, String shardId) {
+		peerMasterAdjustAction.adjustPeerMaster(clusterId, shardId);
+	}
 
-    @Override
-    public void peerMasterChanged(String dcId, String clusterId, String shardId) {
-        peerMasterAdjustAction.adjustPeerMaster(clusterId, shardId);
-    }
+	@Override
+	public void peerMasterChanged(String dcId, String clusterId, String shardId) {
+		peerMasterAdjustAction.adjustPeerMaster(clusterId, shardId);
+	}
 
 }

@@ -2,11 +2,11 @@ package com.ctrip.xpipe.utils;
 
 /**
  * @author wenchao.meng
- *
- *         Mar 16, 2017
+ * <p>
+ * Mar 16, 2017
  */
 public class LogUtils {
-	
+
 	public static String info(String message) {
 		return format("info", message);
 	}

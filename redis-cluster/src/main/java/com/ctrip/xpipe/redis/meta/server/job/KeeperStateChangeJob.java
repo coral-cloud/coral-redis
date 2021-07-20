@@ -28,11 +28,11 @@ import static com.ctrip.xpipe.redis.core.protocal.cmd.AbstractRedisCommand.DEFAU
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 8, 2016
  */
 public class KeeperStateChangeJob extends AbstractCommand<Void> implements RequestResponseCommand<Void> {
-	
+
 	private List<KeeperMeta> keepers;
 	private Pair<String, Integer> activeKeeperMaster;
 	private RouteMeta routeForActiveKeeper;
@@ -47,15 +47,15 @@ public class KeeperStateChangeJob extends AbstractCommand<Void> implements Reque
 								Pair<String, Integer> activeKeeperMaster,
 								RouteMeta routeForActiveKeeper,
 								SimpleKeyedObjectPool<Endpoint, NettyClient> clientPool
-			, ScheduledExecutorService scheduled, Executor executors){
+			, ScheduledExecutorService scheduled, Executor executors) {
 		this(keepers, activeKeeperMaster, routeForActiveKeeper, clientPool, 1000, 5, scheduled, executors);
 	}
-	
+
 	public KeeperStateChangeJob(List<KeeperMeta> keepers,
 								Pair<String, Integer> activeKeeperMaster,
 								RouteMeta routeForActiveKeeper,
 								SimpleKeyedObjectPool<Endpoint, NettyClient> clientPool
-			, int delayBaseMilli, int retryTimes, ScheduledExecutorService scheduled, Executor executors){
+			, int delayBaseMilli, int retryTimes, ScheduledExecutorService scheduled, Executor executors) {
 		this.keepers = new LinkedList<>(keepers);
 		this.activeKeeperMaster = activeKeeperMaster;
 		this.routeForActiveKeeper = routeForActiveKeeper;
@@ -74,32 +74,32 @@ public class KeeperStateChangeJob extends AbstractCommand<Void> implements Reque
 	@Override
 	protected void doExecute() throws CommandExecutionException {
 
-		if(future().isDone()) {
+		if (future().isDone()) {
 			return;
 		}
 		KeeperMeta activeKeeper = null;
-		for(KeeperMeta keeperMeta : keepers){
+		for (KeeperMeta keeperMeta : keepers) {
 //			if(keeperMeta.isActive()){
 //				activeKeeper = keeperMeta;
 //				break;
 //			}
 		}
 
-		if(activeKeeper == null){
+		if (activeKeeper == null) {
 			future().setFailure(new Exception("can not find active keeper:" + keepers));
 			return;
 		}
 		SequenceCommandChain chain = new SequenceCommandChain(false);
 
-		if(activeKeeperMaster != null){
+		if (activeKeeperMaster != null) {
 			Command<?> setActiveCommand = createKeeperSetStateCommand(activeKeeper, activeKeeperMaster);
 			addActiveCommandHook(setActiveCommand);
 			chain.add(setActiveCommand);
 		}
 
 		ParallelCommandChain backupChain = new ParallelCommandChain(executors);
-		
-		for(KeeperMeta keeperMeta : keepers){
+
+		for (KeeperMeta keeperMeta : keepers) {
 //			if(!keeperMeta.isActive()){
 //				Command<?> backupCommand = createKeeperSetStateCommand(keeperMeta, new Pair<String, Integer>(activeKeeper.getIp(), activeKeeper.getPort()));
 //				backupChain.add(backupCommand);
@@ -108,17 +108,17 @@ public class KeeperStateChangeJob extends AbstractCommand<Void> implements Reque
 
 		chain.add(backupChain);
 
-		if(future().isDone()) {
+		if (future().isDone()) {
 			return;
 		}
 		chain.execute().addListener(new CommandFutureListener<Object>() {
-			
+
 			@Override
 			public void operationComplete(CommandFuture<Object> commandFuture) throws Exception {
-				
-				if(commandFuture.isSuccess()){
+
+				if (commandFuture.isSuccess()) {
 					future().setSuccess(null);
-				}else{
+				} else {
 					future().setFailure(commandFuture.cause());
 				}
 			}
@@ -126,7 +126,7 @@ public class KeeperStateChangeJob extends AbstractCommand<Void> implements Reque
 	}
 
 	private Command<?> createKeeperSetStateCommand(KeeperMeta keeper, Pair<String, Integer> masterAddress) {
-		
+
 		SimpleObjectPool<NettyClient> pool = new XpipeObjectPoolFromKeyed<Endpoint, NettyClient>(clientPool, new DefaultEndPoint(keeper.getIp(), keeper.getPort()));
 //
 //		KeeperSetStateCommand command =  new KeeperSetStateCommand(pool,
@@ -138,23 +138,23 @@ public class KeeperStateChangeJob extends AbstractCommand<Void> implements Reque
 	}
 
 	@Override
-	protected void doReset(){
+	protected void doReset() {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	public void setActiveSuccessCommand(Command<?> activeSuccessCommand) {
 		this.activeSuccessCommand = activeSuccessCommand;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void addActiveCommandHook(final Command<?> setActiveCommand) {
-		
+
 		setActiveCommand.future().addListener(new CommandFutureListener() {
 
 			@Override
-			public void operationComplete( CommandFuture commandFuture) throws Exception {
-				
-				if(commandFuture.isSuccess() && activeSuccessCommand != null){
+			public void operationComplete(CommandFuture commandFuture) throws Exception {
+
+				if (commandFuture.isSuccess() && activeSuccessCommand != null) {
 					getLogger().info("[addActiveCommandHook][set active success, execute hook]{}, {}", setActiveCommand, activeSuccessCommand);
 					activeSuccessCommand.execute();
 				}

@@ -12,35 +12,35 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
- *         Jul 26, 2016
+ * <p>
+ * Jul 26, 2016
  */
-public abstract class AbstractSlotMoveTask extends AbstractCommand<Void> implements SlotMoveTask{
+public abstract class AbstractSlotMoveTask extends AbstractCommand<Void> implements SlotMoveTask {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
-	protected int  taskMaxWaitMilli = 10000;
-	
+
+	protected int taskMaxWaitMilli = 10000;
+
 	protected final Integer slot;
-	
+
 	protected final ClusterServer from, to;
-	
+
 	protected ZkClient zkClient;
-	
+
 	public AbstractSlotMoveTask(Integer slot, ClusterServer from, ClusterServer to, ZkClient zkClient) {
 		this.slot = slot;
 		this.from = from;
 		this.to = to;
 		this.zkClient = zkClient;
 	}
-	
+
 	@Override
 	public ClusterServer getFrom() {
 		return from;
 	}
 
 	protected void setSlotInfo(SlotInfo slotInfo) throws ShardingException {
-		
+
 		CuratorFramework client = zkClient.get();
 
 		String path = getSlotZkPath();
@@ -52,12 +52,12 @@ public abstract class AbstractSlotMoveTask extends AbstractCommand<Void> impleme
 		}
 	}
 
-	
+
 	@Override
 	public int getSlot() {
 		return slot;
 	}
-	
+
 	@Override
 	public ClusterServer getTo() {
 		return to;
@@ -69,10 +69,10 @@ public abstract class AbstractSlotMoveTask extends AbstractCommand<Void> impleme
 
 	@Override
 	public String toString() {
-		return String.format("(%s)slot:%d, %s->%s", getClass().getSimpleName(), slot, from == null? "null" : from.getServerId(), to == null ? null: to.getServerId());
+		return String.format("(%s)slot:%d, %s->%s", getClass().getSimpleName(), slot, from == null ? "null" : from.getServerId(), to == null ? null : to.getServerId());
 	}
 
-	
+
 	@Override
 	public String getName() {
 		return getClass().getSimpleName();

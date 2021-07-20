@@ -6,17 +6,17 @@ import java.io.File;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 26, 2016
  */
-public interface DumpedRdbStore extends RdbStore{
-	
+public interface DumpedRdbStore extends RdbStore {
+
 	void setEofType(EofType eofType);
-		
+
 	EofType getEofType();
-	
+
 	void setRdbOffset(long rdbLastOffset);
-	
+
 	File getRdbFile();
 
 }

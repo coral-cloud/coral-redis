@@ -36,12 +36,12 @@ import static com.ctrip.xpipe.redis.meta.server.dcchange.impl.DefaultSentinelMan
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 13, 2016
  */
 @Component
-public class DefaultChangePrimaryDcAction implements ChangePrimaryDcAction{
-	
+public class DefaultChangePrimaryDcAction implements ChangePrimaryDcAction {
+
 	private static Logger logger = LoggerFactory.getLogger(DefaultChangePrimaryDcAction.class);
 
 	private static final int defaultTimeout = Integer.parseInt(System.getProperty("CHANGE_PRIMARY_DC_ACTION_TIMEOUT", "1000"));
@@ -56,17 +56,17 @@ public class DefaultChangePrimaryDcAction implements ChangePrimaryDcAction{
 	private ExecutorService executors;
 
 	@Resource(name = AbstractSpringConfigContext.CLUSTER_SHARD_ADJUST_EXECUTOR)
-	private KeyedOneThreadMutexableTaskExecutor<Pair<String, String> >  clusterShardExecutors;
+	private KeyedOneThreadMutexableTaskExecutor<Pair<String, String>> clusterShardExecutors;
 
 	@Autowired
-	private DcMetaCache  dcMetaCache;
-	
+	private DcMetaCache dcMetaCache;
+
 	@Autowired
 	private CurrentMetaManager currentMetaManager;
-	
+
 	@Autowired
 	private SentinelManager sentinelManager;
-	
+
 	@Autowired
 	private MultiDcService multiDcService;
 
@@ -81,16 +81,16 @@ public class DefaultChangePrimaryDcAction implements ChangePrimaryDcAction{
 
 	@Override
 	public PrimaryDcChangeMessage changePrimaryDc(String clusterId, String shardId, String newPrimaryDc, MasterInfo masterInfo) {
-		
-		if(!currentMetaManager.hasCluster(clusterId)){
+
+		if (!currentMetaManager.hasCluster(clusterId)) {
 			logger.info("[changePrimaryDc][not interested in this cluster]");
 			return new PrimaryDcChangeMessage(PRIMARY_DC_CHANGE_RESULT.SUCCESS, "not interested in this cluster:" + clusterId);
 		}
-		
+
 		ChangePrimaryDcAction changePrimaryDcAction = null;
 
 		ExecutionLog executionLog = new ExecutionLog(String.format("meta server:%s", currentClusterServer.getClusterInfo()));
-		if(newPrimaryDc.equalsIgnoreCase(dcMetaCache.getCurrentDc())){
+		if (newPrimaryDc.equalsIgnoreCase(dcMetaCache.getCurrentDc())) {
 			logger.info("[doChangePrimaryDc][become primary]{}, {}, {}", clusterId, shardId, newPrimaryDc);
 			changePrimaryDcAction = new BecomePrimaryAction(dcMetaCache, currentMetaManager, sentinelManager,
 					offsetWaiter, executionLog, keyedObjectPool, createNewMasterChooser(), scheduled, executors);
@@ -101,7 +101,7 @@ public class DefaultChangePrimaryDcAction implements ChangePrimaryDcAction{
 				clusterShardExecutors.clearAndExecute(new Pair<>(clusterId, shardId), changePrimaryDcJob);
 				waitForCommandStart(changePrimaryDcJob);
 				return changePrimaryDcJob.future().get(timeout, TimeUnit.MILLISECONDS);
-			} catch (TimeoutException|InterruptedException e) {
+			} catch (TimeoutException | InterruptedException e) {
 				logger.error("[changePrimaryDc][execute may timeout][fall to run directly]{}, {}, {}", clusterId, shardId, newPrimaryDc, e);
 				// In case task queue is blocked, we do downgrade(or a double-insurance)
 				try {
@@ -111,7 +111,7 @@ public class DefaultChangePrimaryDcAction implements ChangePrimaryDcAction{
 					logger.error("[changePrimaryDc][try direct-run failed]{}, {}, {}", clusterId, shardId, newPrimaryDc, e);
 					return new PrimaryDcChangeMessage(PRIMARY_DC_CHANGE_RESULT.FAIL, executionLog.getLog());
 				}
-			}catch (Exception e) {
+			} catch (Exception e) {
 				logger.error("[changePrimaryDc][execute by adjust executors fail]" + clusterId + "," + shardId + "," + newPrimaryDc, e);
 				return new PrimaryDcChangeMessage(PRIMARY_DC_CHANGE_RESULT.FAIL, executionLog.getLog());
 			}
@@ -127,7 +127,7 @@ public class DefaultChangePrimaryDcAction implements ChangePrimaryDcAction{
 				- metaServerConfig.getWaitforOffsetMilli() - CHECK_NEW_MASTER_TIMEOUT_SECONDS * 2 * 1000
 				- DEFAULT_CHANGE_PRIMARY_WAIT_TIMEOUT_SECONDS * 1000, defaultTimeout);
 		long endTime = System.currentTimeMillis() + timeout;
-		while(System.currentTimeMillis() < endTime) {
+		while (System.currentTimeMillis() < endTime) {
 			if (changePrimaryDcJob.isStarted()) {
 				return;
 			}

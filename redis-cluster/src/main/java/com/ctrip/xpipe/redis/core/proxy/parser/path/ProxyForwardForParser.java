@@ -11,5 +11,5 @@ import java.net.InetSocketAddress;
  */
 public interface ProxyForwardForParser extends ProxyOptionParser {
 
-    void append(InetSocketAddress address);
+	void append(InetSocketAddress address);
 }

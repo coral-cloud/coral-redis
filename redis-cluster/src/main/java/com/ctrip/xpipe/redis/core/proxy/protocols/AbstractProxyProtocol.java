@@ -11,18 +11,18 @@ import io.netty.buffer.ByteBuf;
  */
 public abstract class AbstractProxyProtocol<T extends ProxyProtocolParser> implements ProxyProtocol {
 
-    protected T parser;
+	protected T parser;
 
-    protected AbstractProxyProtocol(T parser) {
-        this.parser = parser;
-    }
+	protected AbstractProxyProtocol(T parser) {
+		this.parser = parser;
+	}
 
-    @Override
-    public ByteBuf output() {
-        return parser.format();
-    }
+	@Override
+	public ByteBuf output() {
+		return parser.format();
+	}
 
-    public T getParser() {
-        return parser;
-    }
+	public T getParser() {
+		return parser;
+	}
 }

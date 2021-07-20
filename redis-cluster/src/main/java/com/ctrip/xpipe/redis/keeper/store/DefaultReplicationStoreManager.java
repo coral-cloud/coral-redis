@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author marsqing
- *
- *         May 31, 2016 5:33:46 PM
+ * <p>
+ * May 31, 2016 5:33:46 PM
  */
 public class DefaultReplicationStoreManager extends AbstractLifecycleObservable implements ReplicationStoreManager {
 
@@ -42,7 +42,7 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 	private String clusterName;
 
 	private String shardName;
-	
+
 	private String keeperRunid;
 
 	private File baseDir;
@@ -54,15 +54,15 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 	private AtomicReference<ReplicationStore> currentStore = new AtomicReference<>();
 
 	private KeeperConfig keeperConfig;
-	
+
 	private AtomicLong gcCount = new AtomicLong();
-	
+
 	private ScheduledFuture<?> gcFuture;
-	
+
 	private ScheduledExecutorService scheduled;
 
 	private KeeperMonitor keeperMonitor;
-	
+
 	public DefaultReplicationStoreManager(KeeperConfig keeperConfig, String clusterName, String shardName, String keeperRunid, File baseDir, KeeperMonitor keeperMonitor) {
 		super(MoreExecutors.directExecutor());
 		this.clusterName = clusterName;
@@ -73,15 +73,15 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 		metaFile = new File(this.baseDir, META_FILE);
 		this.keeperMonitor = keeperMonitor;
 	}
-	
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
-		
-		scheduled =  Executors.newScheduledThreadPool(1,
+
+		scheduled = Executors.newScheduledThreadPool(1,
 				ClusterShardAwareThreadFactory.create(clusterName, shardName, "gc-" + String.format("%s-%s", clusterName, shardName)));
 		gcFuture = scheduled.scheduleWithFixedDelay(new AbstractExceptionLogTask() {
-			
+
 			@Override
 			protected void doRun() throws Exception {
 				gc();
@@ -89,7 +89,7 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 		}, keeperConfig.getReplicationStoreGcIntervalSeconds(), keeperConfig.getReplicationStoreGcIntervalSeconds(), TimeUnit.SECONDS);
 
 	}
-	
+
 	@Override
 	protected void doDispose() throws Exception {
 
@@ -100,10 +100,10 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 	}
 
 	private void closeCurrentStore() {
-		
+
 		logger.info("[closeCurrentStore]{}", this);
 		ReplicationStore replicationStore = currentStore.get();
-		if(replicationStore != null){
+		if (replicationStore != null) {
 			try {
 				replicationStore.close();
 				currentStore.set(null);
@@ -117,29 +117,28 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 	public synchronized ReplicationStore createIfNotExist() throws IOException {
 
 
-
 		ReplicationStore currentReplicationStore = null;
-		
-		try{
+
+		try {
 			currentReplicationStore = getCurrent();
-		}catch(Exception e){
+		} catch (Exception e) {
 			logger.error("[createIfNotExist]" + baseDir, e);
 		}
-		
+
 		if (currentReplicationStore == null) {
 			logger.info("[createIfNotExist]{}", baseDir);
 			currentReplicationStore = create();
 		}
 		return currentReplicationStore;
 	}
-	
+
 	@Override
 	public synchronized ReplicationStore create() throws IOException {
 
-		if(!getLifecycleState().isInitialized()){
+		if (!getLifecycleState().isInitialized()) {
 			throw new ReplicationStoreManagerStateException("can not create", toString(), getLifecycleState().getPhaseName());
 		}
-		
+
 		keeperMonitor.getReplicationStoreStats().increateReplicationStoreCreateCount();
 
 		File storeBaseDir = new File(baseDir, UUID.randomUUID().toString());
@@ -152,9 +151,9 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 		ReplicationStore replicationStore = new DefaultReplicationStore(storeBaseDir, keeperConfig, keeperRunid, keeperMonitor);
 
 		closeCurrentStore();
-		
+
 		currentStore.set(replicationStore);
-		
+
 		notifyObservers(new NodeAdded<ReplicationStore>(replicationStore));
 		return currentStore.get();
 	}
@@ -188,7 +187,7 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 	 * @throws IOException
 	 */
 	private Properties loadMeta() throws IOException {
-		
+
 		if (metaFile.isFile()) {
 			Properties meta = new Properties();
 			try (InputStream in = new NonFinalizeFileInputStream(metaFile)) {
@@ -201,13 +200,13 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 	}
 
 	private Properties currentMeta() throws IOException {
-		
+
 		return currentMeta(false);
 	}
 
 	private Properties currentMeta(boolean forceLoad) throws IOException {
-		
-		if(forceLoad || currentMeta.get() == null){
+
+		if (forceLoad || currentMeta.get() == null) {
 			currentMeta.set(loadMeta());
 		}
 		return currentMeta.get();
@@ -215,7 +214,7 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 
 	@Override
 	public synchronized ReplicationStore getCurrent() throws IOException {
-		
+
 		if (currentStore.get() == null) {
 			Properties meta = currentMeta();
 			if (meta != null) {
@@ -230,7 +229,7 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 		}
 
 		ReplicationStore replicationStore = currentStore.get();
-		if(replicationStore != null && !replicationStore.checkOk()){
+		if (replicationStore != null && !replicationStore.checkOk()) {
 			logger.info("[getCurrent][store not ok, return null]{}", replicationStore);
 			return null;
 		}
@@ -248,7 +247,7 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 	}
 
 	protected synchronized void gc() throws IOException {
-		
+
 		logger.debug("[gc]{}", this);
 
 		gcCount.incrementAndGet();
@@ -265,13 +264,13 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 			});
 
 			if (replicationStoreDirs != null && replicationStoreDirs.length > 0) {
-				
+
 				logger.info("[GC][old replicationstore]newest:{}", currentDirName);
 				for (File dir : replicationStoreDirs) {
-					if(System.currentTimeMillis() - dir.lastModified() > keeperConfig.getReplicationStoreMinTimeMilliToGcAfterCreate()){
+					if (System.currentTimeMillis() - dir.lastModified() > keeperConfig.getReplicationStoreMinTimeMilliToGcAfterCreate()) {
 						logger.info("[GC] directory {}", dir.getCanonicalPath());
 						FileUtils.recursiveDelete(dir);
-					}else{
+					} else {
 						logger.warn("[GC][directory is created too short, do not gc]{}, {}", dir, new Date(dir.lastModified()));
 					}
 				}
@@ -287,14 +286,14 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 
 	@Override
 	public void destroy() throws Exception {
-		
+
 		logger.info("[destroy]{}", this);
-		
+
 		ReplicationStore currentReplicationStore = getCurrent();
-		if(currentReplicationStore != null){
-			try{
+		if (currentReplicationStore != null) {
+			try {
 				currentReplicationStore.destroy();
-			}catch(Throwable th){
+			} catch (Throwable th) {
 				logger.error("[destroy]", th);
 			}
 		}
@@ -304,13 +303,13 @@ public class DefaultReplicationStoreManager extends AbstractLifecycleObservable 
 	public long getGcCount() {
 		return gcCount.get();
 	}
-	
+
 	@Override
 	public String toString() {
-		return String.format("cluster:%s, shard:%s, keeperRunId:%s, baseDir:%s, currentMeta:%s", clusterName, shardName, keeperRunid, baseDir, 
-				currentMeta.get() == null?"": currentMeta.get().toString());
+		return String.format("cluster:%s, shard:%s, keeperRunId:%s, baseDir:%s, currentMeta:%s", clusterName, shardName, keeperRunid, baseDir,
+				currentMeta.get() == null ? "" : currentMeta.get().toString());
 	}
-	
+
 	public File getBaseDir() {
 		return baseDir;
 	}

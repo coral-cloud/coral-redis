@@ -10,13 +10,13 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 23, 2016
  */
-public class LenEofType extends AbstractEofType{
-	
+public class LenEofType extends AbstractEofType {
+
 	private final long expectedLen;
-	
+
 	public LenEofType(long expectedLen) {
 		this.expectedLen = expectedLen;
 	}
@@ -33,9 +33,9 @@ public class LenEofType extends AbstractEofType{
 
 	@Override
 	public ByteBuf getStart() {
-		
-    	RequestStringParser parser = new RequestStringParser(String.valueOf((char)RedisClientProtocol.DOLLAR_BYTE) 
-    			+String.valueOf(expectedLen)); 
+
+		RequestStringParser parser = new RequestStringParser(String.valueOf((char) RedisClientProtocol.DOLLAR_BYTE)
+				+ expectedLen);
 		return parser.format();
 	}
 
@@ -46,13 +46,10 @@ public class LenEofType extends AbstractEofType{
 
 	@Override
 	public boolean fileOk(File file) {
-		
-		if(expectedLen == file.length()){
-			return true;
-		}
-		return false;
+
+		return expectedLen == file.length();
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("expectedLen:%d", expectedLen);

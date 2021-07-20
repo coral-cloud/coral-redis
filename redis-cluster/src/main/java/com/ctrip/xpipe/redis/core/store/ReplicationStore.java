@@ -9,16 +9,16 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
- *         2016年4月19日 下午3:43:56
+ * <p>
+ * 2016年4月19日 下午3:43:56
  */
 public interface ReplicationStore extends Closeable, Destroyable {
 
-	public static String BACKUP_REPLICATION_STORE_REDIS_MASTER_META_NAME = "BACKUP_REDIS_MASTER";
+	String BACKUP_REPLICATION_STORE_REDIS_MASTER_META_NAME = "BACKUP_REDIS_MASTER";
 
 	// rdb related
 	RdbStore beginRdb(String replId, long rdbOffset, EofType eofType) throws IOException;
-	
+
 	DumpedRdbStore prepareNewRdb() throws IOException;
 
 	void rdbUpdated(DumpedRdbStore dumpedRdbStore) throws IOException;
@@ -37,9 +37,9 @@ public interface ReplicationStore extends Closeable, Destroyable {
 	MetaStore getMetaStore();
 
 	void shiftReplicationId(String newReplId) throws IOException;
-	
+
 	long getEndOffset();
-	
+
 	long firstAvailableOffset();
 
 	long beginOffsetWhenCreated();

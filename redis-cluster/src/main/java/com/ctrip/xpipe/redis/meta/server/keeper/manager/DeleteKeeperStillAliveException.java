@@ -5,14 +5,14 @@ import com.ctrip.xpipe.redis.meta.server.exception.MetaServerException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Sep 16, 2016
  */
-public class DeleteKeeperStillAliveException extends MetaServerException{
-	
+public class DeleteKeeperStillAliveException extends MetaServerException {
+
 	private static final long serialVersionUID = 1L;
-		
-	public DeleteKeeperStillAliveException(KeeperMeta currentKeeper){
+
+	public DeleteKeeperStillAliveException(KeeperMeta currentKeeper) {
 		super(String.format("current keeper still alive:%s:%d", currentKeeper.getIp(), currentKeeper.getPort()));
 		setOnlyLogMessage(true);
 	}

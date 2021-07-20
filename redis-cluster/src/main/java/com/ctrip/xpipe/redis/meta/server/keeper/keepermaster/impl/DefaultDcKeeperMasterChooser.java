@@ -11,15 +11,15 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Nov 4, 2016
  */
 public class DefaultDcKeeperMasterChooser extends AbstractKeeperMasterChooser {
-	
+
 	private MultiDcService multiDcService;
-	
+
 	private XpipeNettyClientKeyedObjectPool keyedObjectPool;
-	
+
 	private KeeperMasterChooserAlgorithm keeperMasterChooserAlgorithm;
 
 	public DefaultDcKeeperMasterChooser(String clusterId, String shardId, MultiDcService multiDcService,
@@ -36,23 +36,23 @@ public class DefaultDcKeeperMasterChooser extends AbstractKeeperMasterChooser {
 
 	@Override
 	protected Pair<String, Integer> chooseKeeperMaster() {
-		
-		if(dcMetaCache.isCurrentDcPrimary(clusterId, shardId)){
-			
-			if(keeperMasterChooserAlgorithm == null || keeperMasterChooserAlgorithm instanceof BackupDcKeeperMasterChooserAlgorithm){
-				
+
+		if (dcMetaCache.isCurrentDcPrimary(clusterId, shardId)) {
+
+			if (keeperMasterChooserAlgorithm == null || keeperMasterChooserAlgorithm instanceof BackupDcKeeperMasterChooserAlgorithm) {
+
 				logger.info("[chooseKeeperMaster][current dc become primary, change algorithm]{}, {}", clusterId, shardId);
-				keeperMasterChooserAlgorithm = new PrimaryDcKeeperMasterChooserAlgorithm(clusterId, shardId, dcMetaCache, currentMetaManager, keyedObjectPool, checkIntervalSeconds/2, scheduled);
+				keeperMasterChooserAlgorithm = new PrimaryDcKeeperMasterChooserAlgorithm(clusterId, shardId, dcMetaCache, currentMetaManager, keyedObjectPool, checkIntervalSeconds / 2, scheduled);
 			}
-		}else{
-			if(keeperMasterChooserAlgorithm == null || keeperMasterChooserAlgorithm instanceof PrimaryDcKeeperMasterChooserAlgorithm){
+		} else {
+			if (keeperMasterChooserAlgorithm == null || keeperMasterChooserAlgorithm instanceof PrimaryDcKeeperMasterChooserAlgorithm) {
 				logger.info("[chooseKeeperMaster][current dc become backup, change algorithm]{}, {}", clusterId, shardId);
 				keeperMasterChooserAlgorithm = new BackupDcKeeperMasterChooserAlgorithm(clusterId, shardId, dcMetaCache, currentMetaManager, multiDcService, scheduled);
 			}
 		}
 		return keeperMasterChooserAlgorithm.choose();
 	}
-	
+
 	protected KeeperMasterChooserAlgorithm getKeeperMasterChooserAlgorithm() {
 		return keeperMasterChooserAlgorithm;
 	}

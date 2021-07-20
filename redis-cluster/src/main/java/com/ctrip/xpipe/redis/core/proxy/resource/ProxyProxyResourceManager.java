@@ -11,20 +11,20 @@ import com.ctrip.xpipe.redis.core.proxy.endpoint.*;
  */
 public class ProxyProxyResourceManager implements ProxyResourceManager {
 
-    private ProxyEndpointManager endpointManager;
+	private ProxyEndpointManager endpointManager;
 
-    private NextHopAlgorithm algorithm;
+	private NextHopAlgorithm algorithm;
 
-    public ProxyProxyResourceManager(ProxyEndpointManager endpointManager, NextHopAlgorithm algorithm) {
-        this.endpointManager = endpointManager;
-        this.algorithm = algorithm;
-    }
+	public ProxyProxyResourceManager(ProxyEndpointManager endpointManager, NextHopAlgorithm algorithm) {
+		this.endpointManager = endpointManager;
+		this.algorithm = algorithm;
+	}
 
-    @Override
-    public ProxyEndpointSelector createProxyEndpointSelector(ProxyConnectProtocol protocol) {
-        ProxyEndpointSelector selector = new DefaultProxyEndpointSelector(protocol.nextEndpoints(), endpointManager);
-        selector.setNextHopAlgorithm(algorithm);
-        selector.setSelectStrategy(new SelectOneCycle(selector));
-        return selector;
-    }
+	@Override
+	public ProxyEndpointSelector createProxyEndpointSelector(ProxyConnectProtocol protocol) {
+		ProxyEndpointSelector selector = new DefaultProxyEndpointSelector(protocol.nextEndpoints(), endpointManager);
+		selector.setNextHopAlgorithm(algorithm);
+		selector.setSelectStrategy(new SelectOneCycle(selector));
+		return selector;
+	}
 }

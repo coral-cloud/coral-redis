@@ -18,47 +18,47 @@ import org.springframework.context.annotation.Profile;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 9, 2016
  */
 @Configuration
 @Profile(AbstractProfile.PROFILE_NAME_PRODUCTION)
-public class Production extends AbstractProfile{
-	
+public class Production extends AbstractProfile {
+
 	@Bean
-	public MetaServerConfig  getMetaServerConfig(){
+	public MetaServerConfig getMetaServerConfig() {
 		return new DefaultMetaServerConfig();
 	}
-	
+
 	@Bean
-	public SpringComponentLifecycleManager getSpringComponentLifecycleManager(){
+	public SpringComponentLifecycleManager getSpringComponentLifecycleManager() {
 		return new SpringComponentLifecycleManager();
 	}
-	
+
 	@Bean
-	public ZkClient getZkClient(MetaServerConfig metaServerConfig){
+	public ZkClient getZkClient(MetaServerConfig metaServerConfig) {
 
 		return getZkClient(metaServerConfig.getZkNameSpace(), metaServerConfig.getZkConnectionString());
 	}
-	
+
 	@Bean
-	public ConsoleNotifycationTask getConsoleNotifycationTask(){
+	public ConsoleNotifycationTask getConsoleNotifycationTask() {
 		return new ConsoleNotifycationTask();
 	}
-	
+
 	@Bean
-	public KeeperStateController getKeeperStateController(){
-		
+	public KeeperStateController getKeeperStateController() {
+
 		return new DefaultKeeperStateController();
 	}
-	
+
 	@Bean
-	public MultiDcNotifier getMultiDcNotifier(){
+	public MultiDcNotifier getMultiDcNotifier() {
 		return new MultiDcNotifier();
 	}
-	
+
 	@Bean
-	public RedisStateManager getRedisStateManager(){
+	public RedisStateManager getRedisStateManager() {
 		return new DefaultRedisStateManager();
 	}
 }

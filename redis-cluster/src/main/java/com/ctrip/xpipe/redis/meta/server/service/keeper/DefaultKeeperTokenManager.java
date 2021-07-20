@@ -15,27 +15,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 //@Component
 public class DefaultKeeperTokenManager implements KeeperTokenManager, LeaderAware {
 
-    private AtomicBoolean isKeeperRateLimitOpen = new AtomicBoolean(true);
+	private AtomicBoolean isKeeperRateLimitOpen = new AtomicBoolean(true);
 
-    private MetaServerConfig metaServerConfig;
+	private MetaServerConfig metaServerConfig;
 
-    @Override
-    public MetaServerKeeperService.KeeperContainerTokenStatusResponse refreshKeeperTokenStatus(MetaServerKeeperService.KeeperContainerTokenStatusRequest request) {
-        return new MetaServerKeeperService.KeeperContainerTokenStatusResponse(3);
-    }
+	@Override
+	public MetaServerKeeperService.KeeperContainerTokenStatusResponse refreshKeeperTokenStatus(MetaServerKeeperService.KeeperContainerTokenStatusRequest request) {
+		return new MetaServerKeeperService.KeeperContainerTokenStatusResponse(3);
+	}
 
-    @Override
-    public boolean closeKeeperRateLimit() {
-        return isKeeperRateLimitOpen.compareAndSet(true, false);
-    }
+	@Override
+	public boolean closeKeeperRateLimit() {
+		return isKeeperRateLimitOpen.compareAndSet(true, false);
+	}
 
-    @Override
-    public void isleader() {
+	@Override
+	public void isleader() {
 
-    }
+	}
 
-    @Override
-    public void notLeader() {
+	@Override
+	public void notLeader() {
 
-    }
+	}
 }

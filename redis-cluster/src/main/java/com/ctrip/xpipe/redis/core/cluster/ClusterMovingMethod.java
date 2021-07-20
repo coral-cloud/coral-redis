@@ -5,7 +5,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 4, 2016
  */
 @Retention(RetentionPolicy.RUNTIME)

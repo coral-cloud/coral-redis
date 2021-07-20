@@ -26,11 +26,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 8, 2016
  */
-public abstract class AbstractRedisesSlaveofJob extends AbstractCommand<Void>{
-	
+public abstract class AbstractRedisesSlaveofJob extends AbstractCommand<Void> {
+
 	private List<RedisMeta> redises;
 	private String masterHost;
 	private int masterPort;
@@ -40,7 +40,7 @@ public abstract class AbstractRedisesSlaveofJob extends AbstractCommand<Void>{
 	protected ScheduledExecutorService scheduled;
 	protected Executor executors;
 
-	public AbstractRedisesSlaveofJob(List<RedisMeta> slaves, String masterHost, int masterPort, SimpleKeyedObjectPool<Endpoint, NettyClient> clientPool, ScheduledExecutorService scheduled, Executor executors){
+	public AbstractRedisesSlaveofJob(List<RedisMeta> slaves, String masterHost, int masterPort, SimpleKeyedObjectPool<Endpoint, NettyClient> clientPool, ScheduledExecutorService scheduled, Executor executors) {
 		this.redises = new LinkedList<>(slaves);
 		this.masterHost = masterHost;
 		this.masterPort = masterPort;
@@ -58,19 +58,19 @@ public abstract class AbstractRedisesSlaveofJob extends AbstractCommand<Void>{
 	protected void doExecute() throws CommandExecutionException {
 
 		ParallelCommandChain commandChain = new ParallelCommandChain(executors);
-		for(RedisMeta redisMeta : redises){
+		for (RedisMeta redisMeta : redises) {
 			Command<?> backupCommand = createSlaveofCommand(redisMeta, masterHost, masterPort);
 			commandChain.add(backupCommand);
 		}
 
 		commandChain.execute().addListener(new CommandFutureListener<Object>() {
-			
+
 			@Override
 			public void operationComplete(CommandFuture<Object> commandFuture) throws Exception {
-				
-				if(commandFuture.isSuccess()){
+
+				if (commandFuture.isSuccess()) {
 					future().setSuccess(null);
-				}else{
+				} else {
 					future().setFailure(commandFuture.cause());
 				}
 			}
@@ -78,17 +78,17 @@ public abstract class AbstractRedisesSlaveofJob extends AbstractCommand<Void>{
 	}
 
 	private Command<?> createSlaveofCommand(RedisMeta redisMeta, String masterHost, int masterPort) {
-		
+
 		SimpleObjectPool<NettyClient> pool = new XpipeObjectPoolFromKeyed<Endpoint, NettyClient>(clientPool, new DefaultEndPoint(redisMeta.getIp(), redisMeta.getPort()));
-		
-		Command<?> command =  createSlaveOfCommand(pool, masterHost, masterPort);
-		return CommandRetryWrapper.buildCountRetry(retryTimes, new RetryDelay(delayBaseMilli){
-			
+
+		Command<?> command = createSlaveOfCommand(pool, masterHost, masterPort);
+		return CommandRetryWrapper.buildCountRetry(retryTimes, new RetryDelay(delayBaseMilli) {
+
 			@Override
 			public boolean retry(Throwable th) {
 
 				Throwable rootCause = ExceptionUtils.getRootCause(th);
-				if(rootCause instanceof RedisError){
+				if (rootCause instanceof RedisError) {
 					logger.info("[retry][do not retry, because redis error]{}", rootCause.getMessage());
 					return false;
 				}
@@ -100,9 +100,9 @@ public abstract class AbstractRedisesSlaveofJob extends AbstractCommand<Void>{
 	protected abstract Command<?> createSlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, String masterHost, int masterPort);
 
 	@Override
-	protected void doReset(){
+	protected void doReset() {
 		throw new UnsupportedOperationException();
 	}
 
-	
+
 }

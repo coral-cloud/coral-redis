@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月22日 上午11:47:27
  */
-public abstract class AbstractCommandHandler implements CommandHandler{
-	
+public abstract class AbstractCommandHandler implements CommandHandler {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
@@ -21,12 +21,13 @@ public abstract class AbstractCommandHandler implements CommandHandler{
 
 	/**
 	 * when implements this method, should not block or sleep
+	 *
 	 * @param args
 	 * @param redisClient
 	 * @throws Exception
 	 */
 	protected abstract void doHandle(String[] args, RedisClient redisClient) throws Exception;
-	
+
 	@Override
 	public boolean isLog(String[] args) {
 		return true;

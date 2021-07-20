@@ -4,35 +4,38 @@ import com.ctrip.xpipe.api.command.CommandFuture;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 22, 2016
  */
-public interface ClusterServer{
-	
+public interface ClusterServer {
+
 	int getServerId();
-	
+
 	ClusterServerInfo getClusterInfo();
-	
+
 	/**
 	 * reresh slotmanager
-	 * @return 
+	 *
+	 * @return
 	 */
 	CommandFuture<Void> addSlot(int slot);
-	
+
 	CommandFuture<Void> deleteSlot(int slot);
-	
+
 	/**
 	 * notify server to export slot
+	 *
 	 * @param slotId
 	 */
 	CommandFuture<Void> exportSlot(int slotId);
-	
+
 	/**
 	 * notify server to import slot
+	 *
 	 * @param slotId
 	 */
 	CommandFuture<Void> importSlot(int slotId);
 
 	void notifySlotChange(int slotId);
-	
+
 }

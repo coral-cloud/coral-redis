@@ -5,10 +5,10 @@ import com.ctrip.xpipe.api.lifecycle.Destroyable;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Mar 16, 2018
+ * <p>
+ * Mar 16, 2018
  */
 public interface RetryCommandFactory<V> extends Destroyable {
 
-    Command<V> createRetryCommand(Command<V> command);
+	Command<V> createRetryCommand(Command<V> command);
 }

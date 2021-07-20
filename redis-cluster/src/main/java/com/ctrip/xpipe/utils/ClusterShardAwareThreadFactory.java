@@ -6,8 +6,8 @@ import java.util.concurrent.ThreadFactory;
 
 /**
  * @author marsqing
- *
- *         Dec 20, 2016 1:47:35 PM
+ * <p>
+ * Dec 20, 2016 1:47:35 PM
  */
 public final class ClusterShardAwareThreadFactory extends XpipeThreadFactory {
 

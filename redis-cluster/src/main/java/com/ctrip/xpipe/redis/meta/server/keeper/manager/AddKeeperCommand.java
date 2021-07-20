@@ -22,18 +22,18 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Sep 16, 2016
  */
-public class AddKeeperCommand extends AbstractKeeperCommand<SlaveRole>{
+public class AddKeeperCommand extends AbstractKeeperCommand<SlaveRole> {
 
-	public AddKeeperCommand(KeeperContainerService keeperContainerService, KeeperTransMeta keeperTransMeta,	ScheduledExecutorService scheduled,
-			int timeoutMilli) {
+	public AddKeeperCommand(KeeperContainerService keeperContainerService, KeeperTransMeta keeperTransMeta, ScheduledExecutorService scheduled,
+							int timeoutMilli) {
 		super(keeperContainerService, keeperTransMeta, scheduled, timeoutMilli, 1000);
 	}
 
 	public AddKeeperCommand(KeeperContainerService keeperContainerService, KeeperTransMeta keeperTransMeta, ScheduledExecutorService scheduled,
-			int timeoutMilli, int checkIntervalMilli) {
+							int timeoutMilli, int checkIntervalMilli) {
 		super(keeperContainerService, keeperTransMeta, scheduled, timeoutMilli, checkIntervalMilli);
 	}
 
@@ -45,7 +45,7 @@ public class AddKeeperCommand extends AbstractKeeperCommand<SlaveRole>{
 	@Override
 	protected boolean isSuccess(ErrorMessage<KeeperContainerErrorCode> error) {
 		KeeperContainerErrorCode errorCode = error.getErrorType();
-		switch(errorCode){
+		switch (errorCode) {
 			case KEEPER_ALREADY_EXIST:
 				return true;
 			case KEEPER_ALREADY_STARTED:
@@ -70,20 +70,17 @@ public class AddKeeperCommand extends AbstractKeeperCommand<SlaveRole>{
 
 	@Override
 	protected RetryPolicy createRetryPolicy() {
-		return new RetryDelay(checkIntervalMilli){
+		return new RetryDelay(checkIntervalMilli) {
 			@Override
 			public boolean retry(Throwable th) {
-				if(ExceptionUtils.isSocketIoException(th)){
-					return false;
-				}
-				return true;
+				return !ExceptionUtils.isSocketIoException(th);
 			}
 		};
 	}
 
 	@Override
 	protected void doReset() {
-		
+
 	}
 
 
@@ -92,42 +89,43 @@ public class AddKeeperCommand extends AbstractKeeperCommand<SlaveRole>{
 		private KeeperMeta keeperMeta;
 		private ScheduledExecutorService scheduled;
 
-		public CheckStateCommand(KeeperMeta keeperMeta, ScheduledExecutorService scheduled){
+		public CheckStateCommand(KeeperMeta keeperMeta, ScheduledExecutorService scheduled) {
 			this.keeperMeta = keeperMeta;
 			this.scheduled = scheduled;
 		}
 
-			@Override
-			public String getName() {
-				return "[role check right command]";
-			}
-
-			@Override
-			protected void doExecute() throws Exception {
-
-				CommandFuture<Role> future = new RoleCommand(keeperMeta.getIp(), keeperMeta.getPort(), true, scheduled).execute();
-
-				future.addListener(new CommandFutureListener<Role>() {
-					@Override
-					public void operationComplete(CommandFuture<Role> commandFuture) throws Exception {
-
-						if(commandFuture.isSuccess()){
-							SlaveRole keeperRole = (SlaveRole)commandFuture.getNow();
-							if(keeperRole.getMasterState() == MASTER_STATE.REDIS_REPL_CONNECTED){
-								getLogger().info("[doExecute][success]{}", keeperRole);
-								future().setSuccess(keeperRole);
-							}else{
-								future().setFailure(new KeeperMasterStateNotAsExpectedException(keeperMeta, keeperRole, MASTER_STATE.REDIS_REPL_CONNECTED));
-							}
-						}else {
-							future().setFailure(commandFuture.cause());
-						}
-					}
-				});
-			}
-			@Override
-			protected void doReset() {
-
-			}
+		@Override
+		public String getName() {
+			return "[role check right command]";
 		}
+
+		@Override
+		protected void doExecute() throws Exception {
+
+			CommandFuture<Role> future = new RoleCommand(keeperMeta.getIp(), keeperMeta.getPort(), true, scheduled).execute();
+
+			future.addListener(new CommandFutureListener<Role>() {
+				@Override
+				public void operationComplete(CommandFuture<Role> commandFuture) throws Exception {
+
+					if (commandFuture.isSuccess()) {
+						SlaveRole keeperRole = (SlaveRole) commandFuture.getNow();
+						if (keeperRole.getMasterState() == MASTER_STATE.REDIS_REPL_CONNECTED) {
+							getLogger().info("[doExecute][success]{}", keeperRole);
+							future().setSuccess(keeperRole);
+						} else {
+							future().setFailure(new KeeperMasterStateNotAsExpectedException(keeperMeta, keeperRole, MASTER_STATE.REDIS_REPL_CONNECTED));
+						}
+					} else {
+						future().setFailure(commandFuture.cause());
+					}
+				}
+			});
+		}
+
+		@Override
+		protected void doReset() {
+
+		}
+	}
 }

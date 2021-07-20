@@ -7,29 +7,30 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Sep 2, 2016
  */
 public interface MetaComparator<T, C extends Enum<C>> {
-	
+
 	Set<T> getAdded();
-	
+
 	Set<T> getRemoved();
-	
+
 	@SuppressWarnings("rawtypes")
 	Set<MetaComparator> getMofified();
-	
+
 	void compare();
 
 	List<ConfigChanged<C>> getConfigChanged();
-	
+
 	/**
 	 * add or remvoed or removed
+	 *
 	 * @return
 	 */
 	int totalChangedCount();
 
 	String idDesc();
-	
+
 	void accept(MetaComparatorVisitor<T> visitor);
 }

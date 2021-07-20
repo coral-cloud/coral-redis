@@ -7,23 +7,23 @@ package com.ctrip.xpipe.redis.core.proxy.endpoint;
  */
 public class SelectNTimes implements SelectStrategy {
 
-    private int times;
+	private int times;
 
-    private ProxyEndpointSelector selector;
+	private ProxyEndpointSelector selector;
 
-    public static final int INFINITE = -1;
+	public static final int INFINITE = -1;
 
-    public SelectNTimes(ProxyEndpointSelector selector, int times) {
-        this.selector = selector;
-        this.times = times;
-    }
+	public SelectNTimes(ProxyEndpointSelector selector, int times) {
+		this.selector = selector;
+		this.times = times;
+	}
 
-    @Override
-    public boolean select() {
-        if(times == INFINITE) {
-            return true;
-        }
-        return times > selector.selectCounts();
-    }
+	@Override
+	public boolean select() {
+		if (times == INFINITE) {
+			return true;
+		}
+		return times > selector.selectCounts();
+	}
 
 }

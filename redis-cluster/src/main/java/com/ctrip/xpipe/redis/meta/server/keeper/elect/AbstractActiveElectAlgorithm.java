@@ -6,14 +6,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 6, 2016
  */
-public abstract class AbstractActiveElectAlgorithm implements KeeperActiveElectAlgorithm{
-	
+public abstract class AbstractActiveElectAlgorithm implements KeeperActiveElectAlgorithm {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	
-	
 
 }

@@ -5,14 +5,14 @@ import io.netty.channel.ChannelFuture;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月19日 下午4:59:45
  */
 public interface CommandsListener {
 
 	boolean isOpen();
-	
+
 	ChannelFuture onCommand(ReferenceFileRegion referenceFileRegion);
-	
+
 	void beforeCommand();
 }

@@ -18,21 +18,21 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 8, 2016
  */
 @SuppressWarnings("rawtypes")
-public class TransactionalCommand extends AbstractRedisCommand<Object[]>{
-	
+public class TransactionalCommand extends AbstractRedisCommand<Object[]> {
+
 	public static final String begin = "MULTI";
-	
-	public static final String end = "EXEC"; 
-	
-	private RedisCommand[]  commands;
-	
+
+	public static final String end = "EXEC";
+
+	private RedisCommand[] commands;
+
 	private SimpleObjectPool<NettyClient> parentClientPool;
 
-	public TransactionalCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, RedisCommand ... commands) {
+	public TransactionalCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, RedisCommand... commands) {
 		super(clientPool, scheduled);
 		this.commands = commands;
 		this.parentClientPool = clientPool;
@@ -40,19 +40,19 @@ public class TransactionalCommand extends AbstractRedisCommand<Object[]>{
 
 	@Override
 	protected void doExecute() throws CommandExecutionException {
-		
-		try{
+
+		try {
 			final NettyClient nettyClient = parentClientPool.borrowObject();
 			SimpleObjectPool<NettyClient> clientPool = new FixedObjectPool<NettyClient>(nettyClient);
-			
+
 			startTransaction(clientPool);
-			
+
 			future().addListener(new CommandFutureListener<Object[]>() {
-	
+
 				@Override
 				public void operationComplete(CommandFuture<Object[]> commandFuture) throws Exception {
-					
-					if(nettyClient != null){
+
+					if (nettyClient != null) {
 						try {
 							parentClientPool.returnObject(nettyClient);
 						} catch (ReturnObjectException e) {
@@ -61,7 +61,7 @@ public class TransactionalCommand extends AbstractRedisCommand<Object[]>{
 					}
 				}
 			});
-		}catch(BorrowObjectException e){
+		} catch (BorrowObjectException e) {
 			throw new CommandExecutionException("execute " + this, e);
 		}
 	}
@@ -69,14 +69,14 @@ public class TransactionalCommand extends AbstractRedisCommand<Object[]>{
 	private void startTransaction(final SimpleObjectPool<NettyClient> clientPool) {
 
 		getLogger().info("[startTransaction]{}", this);
-		
+
 		new MultiCommand(clientPool, scheduled).execute().addListener(new CommandFutureListener<String>() {
 
 			@Override
 			public void operationComplete(CommandFuture<String> commandFuture) throws Exception {
-				if(!commandFuture.isSuccess()){
+				if (!commandFuture.isSuccess()) {
 					fail(commandFuture.cause());
-				}else{
+				} else {
 					doWork(clientPool);
 				}
 			}
@@ -85,46 +85,46 @@ public class TransactionalCommand extends AbstractRedisCommand<Object[]>{
 
 	@SuppressWarnings("unchecked")
 	protected void doWork(final SimpleObjectPool<NettyClient> clientPool) {
-		
+
 		SequenceCommandChain chain = new SequenceCommandChain(false);
-		for(RedisCommand currentCommand : commands){
+		for (RedisCommand currentCommand : commands) {
 			OneTranscationCommand oneTranscationCommand = new OneTranscationCommand(clientPool, currentCommand, scheduled);
 			chain.add(oneTranscationCommand);
 		}
-		
+
 		chain.execute().addListener(new CommandFutureListener() {
 
 			@Override
 			public void operationComplete(CommandFuture commandFuture) throws Exception {
-				
-				if(!commandFuture.isSuccess()){
+
+				if (!commandFuture.isSuccess()) {
 					getLogger().error("[doWork][fail]", commandFuture.cause());
 				}
-				
+
 				endTranscation(clientPool);
 			}
 		});
 	}
 
 	protected void endTranscation(SimpleObjectPool<NettyClient> clientPool) {
-		
+
 		getLogger().info("[endTranscation]{}", this);
-		
+
 		new ExecCommand(clientPool, scheduled).execute().addListener(new CommandFutureListener<Object[]>() {
-			
+
 			@Override
 			public void operationComplete(CommandFuture<Object[]> commandFuture) throws Exception {
-				
-				if(commandFuture.isSuccess()){
+
+				if (commandFuture.isSuccess()) {
 					future().setSuccess(commandFuture.get());
-				}else{
+				} else {
 					fail(commandFuture.cause());
 				}
 			}
 		});
 	}
 
-	public static class MultiCommand extends AbstractRedisCommand<String>{
+	public static class MultiCommand extends AbstractRedisCommand<String> {
 
 		public MultiCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 			super(clientPool, scheduled);
@@ -141,7 +141,7 @@ public class TransactionalCommand extends AbstractRedisCommand<Object[]>{
 		}
 	}
 
-	public static class ExecCommand extends AbstractRedisCommand<Object[]>{
+	public static class ExecCommand extends AbstractRedisCommand<Object[]> {
 
 		public ExecCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 			super(clientPool, scheduled);
@@ -149,8 +149,8 @@ public class TransactionalCommand extends AbstractRedisCommand<Object[]>{
 
 		@Override
 		protected Object[] format(Object payload) {
-			if(payload instanceof Object[]){
-				return (Object[])payload;
+			if (payload instanceof Object[]) {
+				return (Object[]) payload;
 			}
 			throw new IllegalStateException("expected array, but:" + payload.getClass() + "," + payload);
 		}

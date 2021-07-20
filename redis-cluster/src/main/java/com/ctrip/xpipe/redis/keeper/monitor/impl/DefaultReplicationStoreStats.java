@@ -6,11 +6,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Mar 10, 2017
  */
-public class DefaultReplicationStoreStats implements ReplicationStoreStats{
-	
+public class DefaultReplicationStoreStats implements ReplicationStoreStats {
+
 	private AtomicLong replicationStoreCreateCount = new AtomicLong();
 
 	private AtomicLong repl_down_since = new AtomicLong(0);
@@ -18,7 +18,7 @@ public class DefaultReplicationStoreStats implements ReplicationStoreStats{
 	@Override
 	public void increateReplicationStoreCreateCount() {
 		replicationStoreCreateCount.incrementAndGet();
-		
+
 	}
 
 	@Override

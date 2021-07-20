@@ -11,12 +11,13 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 23, 2016
  */
-public class EofMarkType extends AbstractEofType{
-	
+public class EofMarkType extends AbstractEofType {
+
 	private String eofMark;
+
 	public EofMarkType(String eofMark) {
 		this.eofMark = eofMark;
 	}
@@ -33,11 +34,11 @@ public class EofMarkType extends AbstractEofType{
 
 	@Override
 	public ByteBuf getStart() {
-		
-    	RequestStringParser parser = new RequestStringParser(
-    			String.valueOf((char)RedisClientProtocol.DOLLAR_BYTE) 
-    			+ new String(RedisClientProtocol.EOF)  
-    			+ eofMark); 
+
+		RequestStringParser parser = new RequestStringParser(
+				(char) RedisClientProtocol.DOLLAR_BYTE
+						+ new String(RedisClientProtocol.EOF)
+						+ eofMark);
 		return parser.format();
 	}
 
@@ -50,10 +51,10 @@ public class EofMarkType extends AbstractEofType{
 	public boolean fileOk(File file) {
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
-		
+
 		return String.format("eofmark:%s", eofMark);
 	}
 

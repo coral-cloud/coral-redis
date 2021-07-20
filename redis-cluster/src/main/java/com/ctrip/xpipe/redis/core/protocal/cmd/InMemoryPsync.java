@@ -14,24 +14,24 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 26, 2016
  */
-public class InMemoryPsync extends AbstractPsync{
-	
+public class InMemoryPsync extends AbstractPsync {
+
 	private String requestMasterId;
-	private Long   requestMasterOffset;
+	private Long requestMasterOffset;
 	private ByteArrayOutputStream commands = new ByteArrayOutputStream();
 	private ByteArrayOutputStreamPayload rdb = new ByteArrayOutputStreamPayload();
 
-	public InMemoryPsync(String masterHost, int masterPort, String requestMasterId, long   requestMasterOffset, ScheduledExecutorService scheduled) {
+	public InMemoryPsync(String masterHost, int masterPort, String requestMasterId, long requestMasterOffset, ScheduledExecutorService scheduled) {
 		super(masterHost, masterPort, true, scheduled);
 		this.requestMasterId = requestMasterId;
 		this.requestMasterOffset = requestMasterOffset;
-		
+
 	}
 
-	public InMemoryPsync(SimpleObjectPool<NettyClient> clientPool, String requestMasterId, long   requestMasterOffset, ScheduledExecutorService scheduled) {
+	public InMemoryPsync(SimpleObjectPool<NettyClient> clientPool, String requestMasterId, long requestMasterOffset, ScheduledExecutorService scheduled) {
 		super(clientPool, true, scheduled);
 		this.requestMasterId = requestMasterId;
 		this.requestMasterOffset = requestMasterOffset;
@@ -44,7 +44,7 @@ public class InMemoryPsync extends AbstractPsync{
 
 	@Override
 	protected void appendCommands(ByteBuf byteBuf) throws IOException {
-		
+
 		commands.write(ByteBufUtils.readToBytes(byteBuf));
 	}
 
@@ -52,7 +52,7 @@ public class InMemoryPsync extends AbstractPsync{
 	protected BulkStringParser createRdbReader() {
 		return new BulkStringParser(rdb);
 	}
-	
+
 	@Override
 	protected void failReadRdb(Throwable throwable) {
 		getLogger().error("[failReadRdb]", throwable);
@@ -61,7 +61,7 @@ public class InMemoryPsync extends AbstractPsync{
 	public byte[] getCommands() {
 		return commands.toByteArray();
 	}
-	
+
 	public byte[] getRdb() {
 		return rdb.getBytes();
 	}

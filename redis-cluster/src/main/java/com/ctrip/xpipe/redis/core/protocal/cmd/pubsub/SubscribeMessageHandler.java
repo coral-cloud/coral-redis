@@ -8,5 +8,5 @@ import com.ctrip.xpipe.tuple.Pair;
  * Apr 04, 2018
  */
 public interface SubscribeMessageHandler {
-    Pair<String, String> handle(String[] channelResponse);
+	Pair<String, String> handle(String[] channelResponse);
 }

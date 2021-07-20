@@ -9,34 +9,34 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月30日 上午11:03:38
  */
-public class RequestStringParser extends AbstractRedisClientProtocol<String[]>{
+public class RequestStringParser extends AbstractRedisClientProtocol<String[]> {
 
 	private static final Logger logger = LoggerFactory.getLogger(RequestStringParser.class);
-	
-	public RequestStringParser(String ...payload) {
+
+	public RequestStringParser(String... payload) {
 		super(payload, true, true);
 	}
 
-	public RequestStringParser(boolean logRead, boolean logWrite, String ...payload) {
+	public RequestStringParser(boolean logRead, boolean logWrite, String... payload) {
 		super(payload, logRead, logWrite);
 	}
 
 	@Override
-	public RedisClientProtocol<String[]> read(ByteBuf byteBuf){
+	public RedisClientProtocol<String[]> read(ByteBuf byteBuf) {
 		String data = readTilCRLFAsString(byteBuf);
-		if(data == null){
+		if (data == null) {
 			return null;
 		}
-		
+
 		return new RequestStringParser(data.split("\\s+"));
 	}
 
 	@Override
 	protected ByteBuf getWriteByteBuf() {
-		
+
 		return Unpooled.wrappedBuffer(getRequestBytes(payload));
 	}
 

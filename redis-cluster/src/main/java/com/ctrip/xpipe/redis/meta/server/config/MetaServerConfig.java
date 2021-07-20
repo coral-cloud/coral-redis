@@ -8,8 +8,8 @@ import java.util.Set;
 
 /**
  * @author marsqing
- *
- *         Jun 16, 2016 11:48:44 AM
+ * <p>
+ * Jun 16, 2016 11:48:44 AM
  */
 public interface MetaServerConfig extends CoreConfig {
 

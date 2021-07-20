@@ -5,11 +5,11 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 8, 2016
  */
-public interface RedisCommand<T> extends Command<T>{
-	
+public interface RedisCommand<T> extends Command<T> {
+
 	ByteBuf getRequest();
 
 }

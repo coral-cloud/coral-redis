@@ -16,13 +16,13 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public interface ResourceManager extends ProxyResourceManager {
 
-    NettySslHandlerFactory getClientSslHandlerFactory();
+	NettySslHandlerFactory getClientSslHandlerFactory();
 
-    NettySslHandlerFactory getServerSslHandlerFactory();
+	NettySslHandlerFactory getServerSslHandlerFactory();
 
-    ScheduledExecutorService getGlobalSharedScheduled();
+	ScheduledExecutorService getGlobalSharedScheduled();
 
-    ProxyConfig getProxyConfig();
+	ProxyConfig getProxyConfig();
 
-    SimpleKeyedObjectPool<Endpoint, NettyClient> getKeyedObjectPool();
+	SimpleKeyedObjectPool<Endpoint, NettyClient> getKeyedObjectPool();
 }

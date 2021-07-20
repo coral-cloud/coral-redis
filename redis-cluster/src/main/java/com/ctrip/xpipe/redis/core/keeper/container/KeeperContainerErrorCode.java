@@ -2,11 +2,11 @@ package com.ctrip.xpipe.redis.core.keeper.container;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 11, 2016
  */
 public enum KeeperContainerErrorCode {
-	
+
 	INTERNAL_EXCEPTION,
 	KEEPER_ALREADY_EXIST,
 	KEEPER_NOT_EXIST,

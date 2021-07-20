@@ -10,11 +10,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author marsqing
- *
- *         May 9, 2016 3:19:37 PM
+ * <p>
+ * May 9, 2016 3:19:37 PM
  */
 public abstract class AbstractSlaveOfCommand extends AbstractRedisCommand<String> {
-	
+
 	protected String ip;
 	protected int port;
 	private String param = "";
@@ -22,8 +22,8 @@ public abstract class AbstractSlaveOfCommand extends AbstractRedisCommand<String
 	public AbstractSlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 		super(clientPool, scheduled);
 	}
-	
-	public AbstractSlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, String ip, int port, ScheduledExecutorService scheduled){
+
+	public AbstractSlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, String ip, int port, ScheduledExecutorService scheduled) {
 		this(clientPool, ip, port, "", scheduled);
 	}
 
@@ -36,11 +36,11 @@ public abstract class AbstractSlaveOfCommand extends AbstractRedisCommand<String
 
 	@Override
 	public ByteBuf getRequest() {
-		
+
 		RequestStringParser requestString = null;
-		if(ip == null){
+		if (ip == null) {
 			requestString = new RequestStringParser(getName(), "no", "one", param);
-		}else{
+		} else {
 			requestString = new RequestStringParser(getName(), ip, String.valueOf(port), param);
 		}
 		return requestString.format();
@@ -49,11 +49,11 @@ public abstract class AbstractSlaveOfCommand extends AbstractRedisCommand<String
 	@Override
 	public String toString() {
 
-		String target = getClientPool() == null? "null" : getClientPool().desc();
+		String target = getClientPool() == null ? "null" : getClientPool().desc();
 
-		if(StringUtil.isEmpty(ip)){
+		if (StringUtil.isEmpty(ip)) {
 			return String.format("%s: %s no one", target, getName());
-		}else{
+		} else {
 			return String.format("%s: %s %s %d %s", target, getName(), ip, port, param);
 		}
 	}

@@ -13,13 +13,13 @@ import java.util.Map.Entry;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 17, 2016
  */
-public class SpringComponentRegistry extends AbstractComponentRegistry{
-	
+public class SpringComponentRegistry extends AbstractComponentRegistry {
+
 	private ConfigurableApplicationContext applicationContext;
-	
+
 	public SpringComponentRegistry(ConfigurableApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
@@ -57,10 +57,10 @@ public class SpringComponentRegistry extends AbstractComponentRegistry{
 
 	@Override
 	public Map<String, Object> allComponents() {
-		
+
 		Map<String, Object> result = new HashMap<>();
-		String []names = applicationContext.getBeanDefinitionNames();
-		for(String name : names){
+		String[] names = applicationContext.getBeanDefinitionNames();
+		for (String name : names) {
 			result.put(name, applicationContext.getBean(name));
 		}
 		return result;
@@ -68,20 +68,20 @@ public class SpringComponentRegistry extends AbstractComponentRegistry{
 
 	@Override
 	public List<Lifecycle> lifecycleCallable() {
-		
+
 		List<Lifecycle> result = new LinkedList<>();
-		
+
 		Map<String, Lifecycle> beans = applicationContext.getBeansOfType(Lifecycle.class);
-		for(Entry<String, Lifecycle> entry : beans.entrySet()){
-			
+		for (Entry<String, Lifecycle> entry : beans.entrySet()) {
+
 			@SuppressWarnings("unused")
 			String name = entry.getKey();
 			Lifecycle bean = entry.getValue();
-			if(bean instanceof TopElement){
-				result.add((Lifecycle)bean);
+			if (bean instanceof TopElement) {
+				result.add(bean);
 			}
 		}
-		
+
 		return sort(result);
 	}
 

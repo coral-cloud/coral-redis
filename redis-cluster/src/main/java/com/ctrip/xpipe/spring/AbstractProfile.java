@@ -8,26 +8,26 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 22, 2016
  */
 public abstract class AbstractProfile {
-	
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	public final static String PROFILE_KEY = "spring.profiles.active";
-	
+
 	public final static String PROFILE_NAME_PRODUCTION = "production";
 	public final static String PROFILE_NAME_TEST = "test";
 
-	
-	protected ZkClient getZkClient(String zkNameSpace, String zkAddress){
+
+	protected ZkClient getZkClient(String zkNameSpace, String zkAddress) {
 
 		DefaultZkClient zkClient = new DefaultZkClient();
-		
+
 		DefaultZkConfig zkConfig = new DefaultZkConfig();
 		zkConfig.setZkNameSpace(zkNameSpace);
-		
+
 		zkClient.setZkConfig(zkConfig);
 		zkClient.setZkAddress(zkAddress);
 		return zkClient;

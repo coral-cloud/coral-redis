@@ -20,167 +20,167 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public abstract class AbstractProxyMonitorCommand<T> extends AbstractProxyCommand<T[]> {
 
-    private static final String MONITOR_PREFIX = String.format("%s %s", ProxyProtocol.KEY_WORD, PROXY_OPTION.MONITOR.name());
+	private static final String MONITOR_PREFIX = String.format("%s %s", ProxyProtocol.KEY_WORD, PROXY_OPTION.MONITOR.name());
 
-    private static final int PROXY_CONNECTION_TIMEOUT_MILLI = Integer.parseInt(System.getProperty("proxy.connection.timeout.milli", "5000"));
+	private static final int PROXY_CONNECTION_TIMEOUT_MILLI = Integer.parseInt(System.getProperty("proxy.connection.timeout.milli", "5000"));
 
-    public AbstractProxyMonitorCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
-        super(clientPool, scheduled);
-        setInOutPayloadFactory(new InOutPayloadFactory.DirectByteBufInOutPayloadFactory());
-    }
+	public AbstractProxyMonitorCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
+		super(clientPool, scheduled);
+		setInOutPayloadFactory(new InOutPayloadFactory.DirectByteBufInOutPayloadFactory());
+	}
 
-    public AbstractProxyMonitorCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled,
-                                       int commandTimeoutMilli) {
-        super(clientPool, scheduled, commandTimeoutMilli);
-        setInOutPayloadFactory(new InOutPayloadFactory.DirectByteBufInOutPayloadFactory());
-    }
+	public AbstractProxyMonitorCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled,
+									   int commandTimeoutMilli) {
+		super(clientPool, scheduled, commandTimeoutMilli);
+		setInOutPayloadFactory(new InOutPayloadFactory.DirectByteBufInOutPayloadFactory());
+	}
 
-    @Override
-    public ByteBuf getRequest() {
-        return new SimpleStringParser(String.format("%s %s", MONITOR_PREFIX, getType().name())).format();
-    }
+	@Override
+	public ByteBuf getRequest() {
+		return new SimpleStringParser(String.format("%s %s", MONITOR_PREFIX, getType().name())).format();
+	}
 
-    @Override
-    protected T[] format(Object payload) {
-        if(!payload.getClass().isArray()) {
-            throw new XPipeProxyResultException(getClass().getSimpleName() + ": result should be an array");
-        }
-        Object[] objects = (Object[]) payload;
-        T[] result = initArray(objects);
-        int index = 0;
-        for(Object object : objects) {
-            result[index ++] = parseObject(object);
-        }
-        return result;
-    }
+	@Override
+	protected T[] format(Object payload) {
+		if (!payload.getClass().isArray()) {
+			throw new XPipeProxyResultException(getClass().getSimpleName() + ": result should be an array");
+		}
+		Object[] objects = (Object[]) payload;
+		T[] result = initArray(objects);
+		int index = 0;
+		for (Object object : objects) {
+			result[index++] = parseObject(object);
+		}
+		return result;
+	}
 
-    @Override
-    public int getCommandTimeoutMilli() {
-        return PROXY_CONNECTION_TIMEOUT_MILLI;
-    }
+	@Override
+	public int getCommandTimeoutMilli() {
+		return PROXY_CONNECTION_TIMEOUT_MILLI;
+	}
 
-    @Override
-    protected boolean logRequest() {
-        return false;
-    }
+	@Override
+	protected boolean logRequest() {
+		return false;
+	}
 
-    @Override
-    protected boolean logResponse() {
-        return false;
-    }
+	@Override
+	protected boolean logResponse() {
+		return false;
+	}
 
-    protected abstract T[] initArray(Object[] objects);
+	protected abstract T[] initArray(Object[] objects);
 
-    protected abstract T parseObject(Object object);
+	protected abstract T parseObject(Object object);
 
-    protected abstract ProxyMonitorParser.Type getType();
+	protected abstract ProxyMonitorParser.Type getType();
 
 
-    public static class ProxyMonitorSocketStatsCommand extends AbstractProxyMonitorCommand<TunnelSocketStatsResult> {
+	public static class ProxyMonitorSocketStatsCommand extends AbstractProxyMonitorCommand<TunnelSocketStatsResult> {
 
-        public ProxyMonitorSocketStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
-            super(clientPool, scheduled);
-        }
+		public ProxyMonitorSocketStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
+			super(clientPool, scheduled);
+		}
 
-        public ProxyMonitorSocketStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
-            super(clientPool, scheduled, commandTimeoutMilli);
-        }
+		public ProxyMonitorSocketStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
+			super(clientPool, scheduled, commandTimeoutMilli);
+		}
 
-        @Override
-        protected TunnelSocketStatsResult[] initArray(Object[] objects) {
-            return new TunnelSocketStatsResult[objects.length];
-        }
+		@Override
+		protected TunnelSocketStatsResult[] initArray(Object[] objects) {
+			return new TunnelSocketStatsResult[objects.length];
+		}
 
-        @Override
-        protected TunnelSocketStatsResult parseObject(Object object) {
-            return TunnelSocketStatsResult.parse(object);
-        }
+		@Override
+		protected TunnelSocketStatsResult parseObject(Object object) {
+			return TunnelSocketStatsResult.parse(object);
+		}
 
-        @Override
-        protected ProxyMonitorParser.Type getType() {
-            return ProxyMonitorParser.Type.SocketStats;
-        }
+		@Override
+		protected ProxyMonitorParser.Type getType() {
+			return ProxyMonitorParser.Type.SocketStats;
+		}
 
-    }
+	}
 
-    public static class ProxyMonitorTunnelStatsCommand extends AbstractProxyMonitorCommand<TunnelStatsResult> {
+	public static class ProxyMonitorTunnelStatsCommand extends AbstractProxyMonitorCommand<TunnelStatsResult> {
 
-        public ProxyMonitorTunnelStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
-            super(clientPool, scheduled);
-        }
+		public ProxyMonitorTunnelStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
+			super(clientPool, scheduled);
+		}
 
-        public ProxyMonitorTunnelStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
-            super(clientPool, scheduled, commandTimeoutMilli);
-        }
+		public ProxyMonitorTunnelStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
+			super(clientPool, scheduled, commandTimeoutMilli);
+		}
 
-        @Override
-        protected TunnelStatsResult[] initArray(Object[] objects) {
-            return new TunnelStatsResult[objects.length];
-        }
+		@Override
+		protected TunnelStatsResult[] initArray(Object[] objects) {
+			return new TunnelStatsResult[objects.length];
+		}
 
-        @Override
-        protected TunnelStatsResult parseObject(Object object) {
-            return TunnelStatsResult.parse(object);
-        }
+		@Override
+		protected TunnelStatsResult parseObject(Object object) {
+			return TunnelStatsResult.parse(object);
+		}
 
-        @Override
-        protected ProxyMonitorParser.Type getType() {
-            return ProxyMonitorParser.Type.TunnelStats;
-        }
+		@Override
+		protected ProxyMonitorParser.Type getType() {
+			return ProxyMonitorParser.Type.TunnelStats;
+		}
 
-    }
+	}
 
-    public static class ProxyMonitorPingStatsCommand extends AbstractProxyMonitorCommand<PingStatsResult> {
+	public static class ProxyMonitorPingStatsCommand extends AbstractProxyMonitorCommand<PingStatsResult> {
 
-        public ProxyMonitorPingStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
-            super(clientPool, scheduled);
-        }
+		public ProxyMonitorPingStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
+			super(clientPool, scheduled);
+		}
 
-        public ProxyMonitorPingStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
-            super(clientPool, scheduled, commandTimeoutMilli);
-        }
+		public ProxyMonitorPingStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
+			super(clientPool, scheduled, commandTimeoutMilli);
+		}
 
-        @Override
-        protected PingStatsResult[] initArray(Object[] objects) {
-            return new PingStatsResult[objects.length];
-        }
+		@Override
+		protected PingStatsResult[] initArray(Object[] objects) {
+			return new PingStatsResult[objects.length];
+		}
 
-        @Override
-        protected PingStatsResult parseObject(Object object) {
-            return PingStatsResult.parse(object);
-        }
+		@Override
+		protected PingStatsResult parseObject(Object object) {
+			return PingStatsResult.parse(object);
+		}
 
-        @Override
-        protected ProxyMonitorParser.Type getType() {
-            return ProxyMonitorParser.Type.PingStats;
-        }
+		@Override
+		protected ProxyMonitorParser.Type getType() {
+			return ProxyMonitorParser.Type.PingStats;
+		}
 
-    }
+	}
 
-    public static class ProxyMonitorTrafficStatsCommand extends AbstractProxyMonitorCommand<TunnelTrafficResult> {
+	public static class ProxyMonitorTrafficStatsCommand extends AbstractProxyMonitorCommand<TunnelTrafficResult> {
 
-        public ProxyMonitorTrafficStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
-            super(clientPool, scheduled);
-        }
+		public ProxyMonitorTrafficStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
+			super(clientPool, scheduled);
+		}
 
-        public ProxyMonitorTrafficStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
-            super(clientPool, scheduled, commandTimeoutMilli);
-        }
+		public ProxyMonitorTrafficStatsCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
+			super(clientPool, scheduled, commandTimeoutMilli);
+		}
 
-        @Override
-        protected TunnelTrafficResult[] initArray(Object[] objects) {
-            return new TunnelTrafficResult[objects.length];
-        }
+		@Override
+		protected TunnelTrafficResult[] initArray(Object[] objects) {
+			return new TunnelTrafficResult[objects.length];
+		}
 
-        @Override
-        protected TunnelTrafficResult parseObject(Object object) {
-            return TunnelTrafficResult.parse(object);
-        }
+		@Override
+		protected TunnelTrafficResult parseObject(Object object) {
+			return TunnelTrafficResult.parse(object);
+		}
 
-        @Override
-        protected ProxyMonitorParser.Type getType() {
-            return ProxyMonitorParser.Type.TrafficStats;
-        }
+		@Override
+		protected ProxyMonitorParser.Type getType() {
+			return ProxyMonitorParser.Type.TrafficStats;
+		}
 
-    }
+	}
 }

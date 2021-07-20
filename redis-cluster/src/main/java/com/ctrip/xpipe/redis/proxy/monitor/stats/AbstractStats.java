@@ -14,44 +14,44 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractStats extends AbstractStartStoppable {
 
-    private ScheduledFuture future;
+	private ScheduledFuture future;
 
-    private ScheduledExecutorService scheduled;
+	private ScheduledExecutorService scheduled;
 
-    private static final int ONE_SEC = 1000;
+	private static final int ONE_SEC = 1000;
 
-    public AbstractStats(ScheduledExecutorService scheduled) {
-        this.scheduled = scheduled;
-    }
+	public AbstractStats(ScheduledExecutorService scheduled) {
+		this.scheduled = scheduled;
+	}
 
-    @Override
-    protected void doStart() {
-        future = scheduled.scheduleWithFixedDelay(new AbstractExceptionLogTask() {
-            @Override
-            protected void doRun() {
-                doTask();
-            }
-        }, getCheckIntervalMilli(), getCheckIntervalMilli(), TimeUnit.MILLISECONDS);
-    }
+	@Override
+	protected void doStart() {
+		future = scheduled.scheduleWithFixedDelay(new AbstractExceptionLogTask() {
+			@Override
+			protected void doRun() {
+				doTask();
+			}
+		}, getCheckIntervalMilli(), getCheckIntervalMilli(), TimeUnit.MILLISECONDS);
+	}
 
-    @Override
-    protected void doStop() {
-        if(future != null) {
-            future.cancel(true);
-        }
-    }
+	@Override
+	protected void doStop() {
+		if (future != null) {
+			future.cancel(true);
+		}
+	}
 
-    protected ScheduledFuture getFuture() {
-        return future;
-    }
+	protected ScheduledFuture getFuture() {
+		return future;
+	}
 
-    protected ScheduledExecutorService getScheduled() {
-        return scheduled;
-    }
+	protected ScheduledExecutorService getScheduled() {
+		return scheduled;
+	}
 
-    protected int getCheckIntervalMilli() {
-        return ONE_SEC;
-    }
+	protected int getCheckIntervalMilli() {
+		return ONE_SEC;
+	}
 
-    protected abstract void doTask();
+	protected abstract void doTask();
 }

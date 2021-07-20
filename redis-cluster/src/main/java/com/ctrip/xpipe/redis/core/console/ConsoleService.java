@@ -7,12 +7,13 @@ import java.util.Set;
 
 /**
  * all api for console
- * @author wenchao.meng
  *
+ * @author wenchao.meng
+ * <p>
  * Aug 2, 2016
  */
 public interface ConsoleService {
-	
+
 	/***********************GET***********************/
 	Set<String> getAllDcIds();
 
@@ -28,7 +29,7 @@ public interface ConsoleService {
 
 	/***********************POST***********************/
 	void keeperActiveChanged(String dc, String clusterId, String shardId, KeeperMeta newActiveKeeper);
-	
+
 	void redisMasterChanged(String dc, String clusterId, String shardId, RedisMeta newRedisMaster);
-	
+
 }

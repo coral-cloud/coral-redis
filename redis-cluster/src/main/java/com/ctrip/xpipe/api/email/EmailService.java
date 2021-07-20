@@ -8,45 +8,45 @@ import java.util.concurrent.Executor;
 
 /**
  * @author chen.zhu
- *
+ * <p>
  * Oct 09, 2017
  */
 
 public interface EmailService extends Ordered {
 
-    EmailService DEFAULT = ServicesUtil.getEmailService();
+	EmailService DEFAULT = ServicesUtil.getEmailService();
 
-    void sendEmail(Email email);
+	void sendEmail(Email email);
 
-    CheckEmailResponse checkEmailAddress(String address);
+	CheckEmailResponse checkEmailAddress(String address);
 
-    CommandFuture<EmailResponse> sendEmailAsync(Email email);
+	CommandFuture<EmailResponse> sendEmailAsync(Email email);
 
-    CommandFuture<EmailResponse> sendEmailAsync(Email email, Executor executor);
+	CommandFuture<EmailResponse> sendEmailAsync(Email email, Executor executor);
 
-    boolean checkAsyncEmailResult(EmailResponse response);
+	boolean checkAsyncEmailResult(EmailResponse response);
 
-    public static class CheckEmailResponse {
+	class CheckEmailResponse {
 
-        private boolean ok;
+		private boolean ok;
 
-        private String message;
+		private String message;
 
-        public CheckEmailResponse(boolean ok) {
-            this.ok = ok;
-        }
+		public CheckEmailResponse(boolean ok) {
+			this.ok = ok;
+		}
 
-        public CheckEmailResponse(boolean ok, String message) {
-            this.ok = ok;
-            this.message = message;
-        }
+		public CheckEmailResponse(boolean ok, String message) {
+			this.ok = ok;
+			this.message = message;
+		}
 
-        public boolean isOk() {
-            return ok;
-        }
+		public boolean isOk() {
+			return ok;
+		}
 
-        public String getMessage() {
-            return message;
-        }
-    }
+		public String getMessage() {
+			return message;
+		}
+	}
 }

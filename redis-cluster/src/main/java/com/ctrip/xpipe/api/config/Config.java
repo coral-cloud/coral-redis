@@ -5,11 +5,11 @@ import com.ctrip.xpipe.utils.ServicesUtil;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 21, 2016
  */
-public interface Config extends Ordered{
-	
+public interface Config extends Ordered {
+
 	Config DEFAULT = ServicesUtil.getConfigService();
 
 	String get(String key);

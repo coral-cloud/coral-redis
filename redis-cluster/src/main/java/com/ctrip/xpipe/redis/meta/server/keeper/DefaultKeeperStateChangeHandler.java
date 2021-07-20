@@ -32,8 +32,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
- *         Jul 8, 2016
+ * <p>
+ * Jul 8, 2016
  */
 @Component
 public class DefaultKeeperStateChangeHandler extends AbstractLifecycle implements MetaServerStateChangeHandler, TopElement {
@@ -55,14 +55,14 @@ public class DefaultKeeperStateChangeHandler extends AbstractLifecycle implement
 
 	@Autowired
 	private CurrentMetaManager currentMetaManager;
-	
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 		executors = DefaultExecutorFactory.createAllowCoreTimeout("KeeperStateChangeHandler", OsUtils.defaultMaxCoreThreadCount()).createExecutorService();
 		keyedOneThreadTaskExecutor = new KeyedOneThreadTaskExecutor<>(executors);
 	}
-	
+
 	@Override
 	public void keeperMasterChanged(String clusterId, String shardId, Pair<String, Integer> newMaster) {
 
@@ -81,7 +81,7 @@ public class DefaultKeeperStateChangeHandler extends AbstractLifecycle implement
 
 		List<KeeperMeta> keepers = new LinkedList<>();
 		keepers.add(activeKeeper);
-		
+
 		keyedOneThreadTaskExecutor.execute(
 				new Pair<String, String>(clusterId, shardId),
 				createKeeperStateChangeJob(clusterId, keepers, newMaster));
@@ -113,30 +113,30 @@ public class DefaultKeeperStateChangeHandler extends AbstractLifecycle implement
 					slaves);
 			keeperStateChangeJob.setActiveSuccessCommand(new DefaultSlaveOfJob(slaves, activeKeeper.getIp(), activeKeeper.getPort(), clientPool, scheduled, executors));
 		}
-		
+
 		keyedOneThreadTaskExecutor.execute(new Pair<String, String>(clusterId, shardId), keeperStateChangeJob);
 	}
 
 	@Override
 	protected void doDispose() throws Exception {
-		
+
 		keyedOneThreadTaskExecutor.destroy();
 		executors.shutdown();
 		super.doDispose();
 	}
-	
+
 	public void setcurrentMetaManager(CurrentMetaManager currentMetaManager) {
 		this.currentMetaManager = currentMetaManager;
 	}
-	
+
 	public void setDcMetaCache(DcMetaCache dcMetaCache) {
 		this.dcMetaCache = dcMetaCache;
 	}
-	
+
 	public void setClientPool(SimpleKeyedObjectPool<Endpoint, NettyClient> clientPool) {
 		this.clientPool = clientPool;
 	}
-	
+
 	public void setScheduled(ScheduledExecutorService scheduled) {
 		this.scheduled = scheduled;
 	}

@@ -20,54 +20,54 @@ import java.util.concurrent.Executors;
  */
 public class ProxyReqResProtocolHandlerManager implements ProxyProtocolOptionHandler {
 
-    private ResourceManager resourceManager;
+	private ResourceManager resourceManager;
 
-    private TunnelManager tunnelManager;
+	private TunnelManager tunnelManager;
 
-    private PingStatsManager pingStatsManager;
+	private PingStatsManager pingStatsManager;
 
-    private Map<PROXY_OPTION, ProxyProtocolOptionHandler> handlers = Maps.newConcurrentMap();
+	private Map<PROXY_OPTION, ProxyProtocolOptionHandler> handlers = Maps.newConcurrentMap();
 
-    private final static ExecutorService sequentialExecutor = Executors.newSingleThreadExecutor(
-            XpipeThreadFactory.create("ProxyReqResProtocolHandler"));
+	private final static ExecutorService sequentialExecutor = Executors.newSingleThreadExecutor(
+			XpipeThreadFactory.create("ProxyReqResProtocolHandler"));
 
-    public ProxyReqResProtocolHandlerManager(ResourceManager resourceManager, TunnelManager tunnelManager,
-                                             PingStatsManager pingStatsManager) {
-        this.resourceManager = resourceManager;
-        this.tunnelManager = tunnelManager;
-        this.pingStatsManager = pingStatsManager;
-        init();
-    }
+	public ProxyReqResProtocolHandlerManager(ResourceManager resourceManager, TunnelManager tunnelManager,
+											 PingStatsManager pingStatsManager) {
+		this.resourceManager = resourceManager;
+		this.tunnelManager = tunnelManager;
+		this.pingStatsManager = pingStatsManager;
+		init();
+	}
 
-    private void init() {
-        putHandler(new ProxyPingHandler(resourceManager));
-        putHandler(new ProxyMonitorHandler(tunnelManager, pingStatsManager, resourceManager.getProxyConfig()));
-    }
+	private void init() {
+		putHandler(new ProxyPingHandler(resourceManager));
+		putHandler(new ProxyMonitorHandler(tunnelManager, pingStatsManager, resourceManager.getProxyConfig()));
+	}
 
-    @Override
-    public PROXY_OPTION getOption() {
-        return null;
-    }
+	@Override
+	public PROXY_OPTION getOption() {
+		return null;
+	}
 
-    @Override
-    public void handle(Channel channel, String[] content) {
-        sequentiallyExecute(new AbstractExceptionLogTask() {
-            @Override
-            protected void doRun() {
-                getHandler(content[0]).handle(channel, content);
-            }
-        });
-    }
+	@Override
+	public void handle(Channel channel, String[] content) {
+		sequentiallyExecute(new AbstractExceptionLogTask() {
+			@Override
+			protected void doRun() {
+				getHandler(content[0]).handle(channel, content);
+			}
+		});
+	}
 
-    private void sequentiallyExecute(Runnable run) {
-        sequentialExecutor.execute(run);
-    }
+	private void sequentiallyExecute(Runnable run) {
+		sequentialExecutor.execute(run);
+	}
 
-    private void putHandler(ProxyProtocolOptionHandler handler) {
-        handlers.put(handler.getOption(), handler);
-    }
+	private void putHandler(ProxyProtocolOptionHandler handler) {
+		handlers.put(handler.getOption(), handler);
+	}
 
-    private ProxyProtocolOptionHandler getHandler(String content) {
-        return handlers.get(PROXY_OPTION.valueOf(content));
-    }
+	private ProxyProtocolOptionHandler getHandler(String content) {
+		return handlers.get(PROXY_OPTION.valueOf(content));
+	}
 }

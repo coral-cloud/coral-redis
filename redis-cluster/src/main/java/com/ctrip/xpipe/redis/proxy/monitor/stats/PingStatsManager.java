@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface PingStatsManager {
 
-    List<PingStats> getAllPingStats();
+	List<PingStats> getAllPingStats();
 
-    PingStats create(ProxyEndpoint endpoint);
+	PingStats create(ProxyEndpoint endpoint);
 }

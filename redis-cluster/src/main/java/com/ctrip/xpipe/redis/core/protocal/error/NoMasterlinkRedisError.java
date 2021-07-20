@@ -2,10 +2,10 @@ package com.ctrip.xpipe.redis.core.protocal.error;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月24日 下午5:25:46
  */
-public class NoMasterlinkRedisError extends RedisError{
+public class NoMasterlinkRedisError extends RedisError {
 
 	private static final long serialVersionUID = 1L;
 
@@ -13,7 +13,7 @@ public class NoMasterlinkRedisError extends RedisError{
 		super("NOMASTERLINK " + message);
 	}
 
-	public String errorMessage(){
+	public String errorMessage() {
 		return super.getMessage();
 	}
 }

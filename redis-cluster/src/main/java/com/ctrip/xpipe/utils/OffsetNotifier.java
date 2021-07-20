@@ -2,8 +2,8 @@ package com.ctrip.xpipe.utils;
 
 /**
  * @author marsqing
- *
- *         May 20, 2016 2:06:20 PM
+ * <p>
+ * May 20, 2016 2:06:20 PM
  */
 public class OffsetNotifier {
 	private static final class Sync extends AbstractQueuedSynchronizer {
@@ -34,10 +34,10 @@ public class OffsetNotifier {
 	public void await(long startOffset) throws InterruptedException {
 		sync.acquireSharedInterruptibly(startOffset);
 	}
-	
-	public boolean await(long startOffset, long miliSeconds) throws InterruptedException{
-		return sync.tryAcquireSharedNanos(startOffset, miliSeconds * (1000*1000));
-		
+
+	public boolean await(long startOffset, long miliSeconds) throws InterruptedException {
+		return sync.tryAcquireSharedNanos(startOffset, miliSeconds * (1000 * 1000));
+
 	}
 
 	public void offsetIncreased(long newOffset) {

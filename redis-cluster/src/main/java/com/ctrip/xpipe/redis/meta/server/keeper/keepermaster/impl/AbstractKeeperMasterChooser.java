@@ -9,8 +9,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
- *         Nov 4, 2016
+ * <p>
+ * Nov 4, 2016
  */
 public abstract class AbstractKeeperMasterChooser extends AbstractClusterShardPeriodicTask implements MasterChooser {
 

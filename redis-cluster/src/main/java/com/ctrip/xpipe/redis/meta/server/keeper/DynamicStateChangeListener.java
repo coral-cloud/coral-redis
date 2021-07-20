@@ -5,12 +5,12 @@ import com.ctrip.xpipe.redis.core.entity.RedisMeta;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 5, 2016
  */
-public interface DynamicStateChangeListener{
-	
+public interface DynamicStateChangeListener {
+
 	void onMasterChanged(String clusterId, String shardId, RedisMeta newRedisMaster);
-	
+
 	void onKeeperStateChanged(String clusterId, String shardId, KeeperMeta keeperMeta);
 }

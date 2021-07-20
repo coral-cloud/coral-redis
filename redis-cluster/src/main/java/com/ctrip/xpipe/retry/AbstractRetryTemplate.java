@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 9, 2016
  */
-public abstract class AbstractRetryTemplate<V> implements RetryTemplate<V>{
-	
+public abstract class AbstractRetryTemplate<V> implements RetryTemplate<V> {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 }

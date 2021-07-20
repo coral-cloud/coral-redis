@@ -10,11 +10,11 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 26, 2016
  */
-public class MoveSlotFromLiving extends AbstractSlotMoveTask{
-	
+public class MoveSlotFromLiving extends AbstractSlotMoveTask {
+
 	public MoveSlotFromLiving(Integer slot, ClusterServer from, ClusterServer to, ZkClient zkClient) {
 		super(slot, from, to, zkClient);
 	}
@@ -22,48 +22,48 @@ public class MoveSlotFromLiving extends AbstractSlotMoveTask{
 	@Override
 	protected void doExecute() throws Exception {
 
-		try{
+		try {
 			logger.info("[doExecute]{},{}->{}", slot, from, to);
 			//change slot info to moving
 			SlotInfo slotInfo = new SlotInfo(from.getServerId());
 			slotInfo.moveingSlot(to.getServerId());
 			setSlotInfo(slotInfo);
-			
+
 			CommandFuture<Void> importFuture = to.importSlot(slot);
-			
-			if(importFuture.await(taskMaxWaitMilli, TimeUnit.MILLISECONDS)){
-				if(!importFuture.isSuccess()){
+
+			if (importFuture.await(taskMaxWaitMilli, TimeUnit.MILLISECONDS)) {
+				if (!importFuture.isSuccess()) {
 					logger.info("[doExecute][import fail]", importFuture.cause());
 					setFailAndlRollback(new Exception("import fail", importFuture.cause()));
 					return;
 				}
-			}else{//timeout
-				setFailAndlRollback(new TimeoutException("import time out " + to +"," + taskMaxWaitMilli));
+			} else {//timeout
+				setFailAndlRollback(new TimeoutException("import time out " + to + "," + taskMaxWaitMilli));
 				return;
 			}
-			
+
 			CommandFuture<Void> exportFuture = from.exportSlot(slot);
-			if(exportFuture.await(taskMaxWaitMilli, TimeUnit.MILLISECONDS)){
-				if(!exportFuture.isSuccess()){
+			if (exportFuture.await(taskMaxWaitMilli, TimeUnit.MILLISECONDS)) {
+				if (!exportFuture.isSuccess()) {
 					logger.info("[doExecute][export fail]", exportFuture.cause());
 					setFailAndlRollback(new Exception("export fail", exportFuture.cause()));
 					return;
 				}
-			}else{
+			} else {
 				setFailAndlRollback(new TimeoutException("export time out " + from + "," + taskMaxWaitMilli));
 				return;
 			}
-			
+
 			setSuccess();
-		}catch(Throwable th){
+		} catch (Throwable th) {
 			setFailAndlRollback(th);
 		}
 	}
 
 	private void setSuccess() throws ShardingException {
-		
+
 		logger.info("[setSuccess]{},{},{}", getSlot(), getFrom(), getTo());
-		
+
 		setSlotInfo(new SlotInfo(to.getServerId()));
 		getTo().addSlot(slot);
 		getFrom().deleteSlot(slot);
@@ -72,7 +72,7 @@ public class MoveSlotFromLiving extends AbstractSlotMoveTask{
 
 
 	private void setFailAndlRollback(Throwable th) throws ShardingException {
-		
+
 		setSlotInfo(new SlotInfo(from.getServerId()));
 		getFrom().addSlot(slot);
 		getTo().deleteSlot(slot);
@@ -81,7 +81,7 @@ public class MoveSlotFromLiving extends AbstractSlotMoveTask{
 
 
 	@Override
-	protected void doReset(){
-		
+	protected void doReset() {
+
 	}
 }

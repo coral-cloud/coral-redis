@@ -42,9 +42,10 @@ public class CommonMeta {
 		return this;
 	}
 
-	public CommonMeta parent(){
+	public CommonMeta parent() {
 		return parenti;
 	}
+
 	public CommonMeta getParent() {
 		return parenti;
 	}

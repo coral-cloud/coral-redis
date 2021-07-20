@@ -14,17 +14,17 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * May 21, 2016 10:14:33 PM
  */
-public class DefaultDelayMonitor extends AbstractStartStoppable implements DelayMonitor, Runnable{
+public class DefaultDelayMonitor extends AbstractStartStoppable implements DelayMonitor, Runnable {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private ScheduledExecutorService scheduled;
 	private AtomicLong totalDelay = new AtomicLong();
 	private AtomicLong totalNum = new AtomicLong();
-	
+
 	private long previousDelay = 0, previousNum = 0;
 	private String delayType, delayInfo;
 
@@ -50,7 +50,7 @@ public class DefaultDelayMonitor extends AbstractStartStoppable implements Delay
 
 	@Override
 	protected void doStart() throws Exception {
-		
+
 		scheduled = Executors.newScheduledThreadPool(4);
 		ScheduledFuture<?> future = scheduled.scheduleAtFixedRate(this, 0, 5, TimeUnit.SECONDS);
 		new Thread(new Runnable() {
@@ -64,8 +64,8 @@ public class DefaultDelayMonitor extends AbstractStartStoppable implements Delay
 			}
 		}).start();
 	}
-	
-	
+
+
 	@Override
 	protected void doStop() throws Exception {
 		scheduled.shutdown();
@@ -73,42 +73,42 @@ public class DefaultDelayMonitor extends AbstractStartStoppable implements Delay
 
 	@Override
 	public void addData(long lastTime) {
-		
-		if(lastTime < 0 ){
+
+		if (lastTime < 0) {
 			return;
 		}
-		
-		long current = System.currentTimeMillis(); 
-		long delta =  current - lastTime;
-		if(delta > infoDelta){
+
+		long current = System.currentTimeMillis();
+		long delta = current - lastTime;
+		if (delta > infoDelta) {
 			logger.info("{} - {} = {}", current, lastTime, delta);
 		}
-		if(delta >= 0){
+		if (delta >= 0) {
 			totalDelay.addAndGet(delta);
 			totalNum.incrementAndGet();
 		}
 
-		if(delta > max){
+		if (delta > max) {
 			max = delta;
 			maxTime = System.currentTimeMillis();
 		}
 	}
-		
+
 	@Override
 	public void run() {
-		
-		try{
+
+		try {
 			long currentDelay = totalDelay.get();
 			long currentNum = totalNum.get();
-			
-			long deltaNum = currentNum - previousNum;
-			
-			if(deltaNum  > 0 ){
-				double avgDelay =  (double)(currentDelay - previousDelay)/deltaNum;
 
-				logger.info(String.format("%d - %d = %d, %d - %d = %d", currentDelay,previousDelay, currentDelay - previousDelay, currentNum, previousNum, currentNum - previousNum));
-				String info = String.format("[delay]%s, %s, %s", getDelayType(), delayInfo == null ? "" :delayInfo, String.format("%.2f", avgDelay));
-				if(consolePrint){
+			long deltaNum = currentNum - previousNum;
+
+			if (deltaNum > 0) {
+				double avgDelay = (double) (currentDelay - previousDelay) / deltaNum;
+
+				logger.info(String.format("%d - %d = %d, %d - %d = %d", currentDelay, previousDelay, currentDelay - previousDelay, currentNum, previousNum, currentNum - previousNum));
+				String info = String.format("[delay]%s, %s, %s", getDelayType(), delayInfo == null ? "" : delayInfo, String.format("%.2f", avgDelay));
+				if (consolePrint) {
 					System.out.println(info);
 				}
 				logger.info(info);
@@ -116,14 +116,14 @@ public class DefaultDelayMonitor extends AbstractStartStoppable implements Delay
 
 			String maxInfo = String.format("[max]%d, %s", max, DateTimeUtils.timeAsString(maxTime));
 			logger.info(maxInfo);
-			if(consolePrint){
+			if (consolePrint) {
 				System.out.println(maxInfo);
 			}
 
 			previousDelay = currentDelay;
 			previousNum = currentNum;
 			max = 0;
-		}catch(Throwable th){
+		} catch (Throwable th) {
 			logger.error("[run]", th);
 		}
 	}

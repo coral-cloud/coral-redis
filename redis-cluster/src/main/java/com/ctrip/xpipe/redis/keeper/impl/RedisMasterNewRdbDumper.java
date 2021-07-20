@@ -18,28 +18,28 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 25, 2016
  */
-public class RedisMasterNewRdbDumper extends AbstractRdbDumper{
+public class RedisMasterNewRdbDumper extends AbstractRdbDumper {
 
 	private Logger logger = LoggerFactory.getLogger(RedisMasterNewRdbDumper.class);
 
 	private DumpedRdbStore dumpedRdbStore;
-	
+
 	private RedisMaster redisMaster;
-	
+
 	private RdbonlyRedisMasterReplication rdbonlyRedisMasterReplication;
 
 	private NioEventLoopGroup nioEventLoopGroup;
-	
+
 	private ScheduledExecutorService scheduled;
 
 	private KeeperResourceManager resourceManager;
 
 	public RedisMasterNewRdbDumper(RedisMaster redisMaster, RedisKeeperServer redisKeeperServer,
-                                   NioEventLoopGroup nioEventLoopGroup, ScheduledExecutorService scheduled,
-                                   KeeperResourceManager resourceManager) {
+								   NioEventLoopGroup nioEventLoopGroup, ScheduledExecutorService scheduled,
+								   KeeperResourceManager resourceManager) {
 		super(redisKeeperServer);
 		this.redisMaster = redisMaster;
 		this.nioEventLoopGroup = nioEventLoopGroup;
@@ -49,53 +49,53 @@ public class RedisMasterNewRdbDumper extends AbstractRdbDumper{
 
 	@Override
 	protected void doExecute() throws Exception {
-		
+
 		rdbonlyRedisMasterReplication = new RdbonlyRedisMasterReplication(redisKeeperServer, redisMaster, nioEventLoopGroup, scheduled, this, resourceManager);
-		
+
 		rdbonlyRedisMasterReplication.initialize();
 		rdbonlyRedisMasterReplication.start();
-		
+
 		future().addListener(new CommandFutureListener<Void>() {
-			
+
 			@Override
 			public void operationComplete(CommandFuture<Void> commandFuture) throws Exception {
 				releaseResource();
 			}
 		});
-		
+
 	}
 
 	protected void releaseResource() {
-		
-		try{
+
+		try {
 			LifecycleHelper.stopIfPossible(rdbonlyRedisMasterReplication);
 			LifecycleHelper.disposeIfPossible(rdbonlyRedisMasterReplication);
-		}catch(Exception e){
+		} catch (Exception e) {
 			logger.error("[releaseResource]" + rdbonlyRedisMasterReplication, e);
 		}
-		
+
 	}
 
-	
+
 	@Override
 	protected void doCancel() {
 		super.doCancel();
-		
+
 		logger.info("[doCancel][release resource]");
 		releaseResource();
 	}
 
 	@Override
 	public DumpedRdbStore prepareRdbStore() throws IOException {
-		
+
 		dumpedRdbStore = redisMaster.getCurrentReplicationStore().prepareNewRdb();
 		logger.info("[prepareRdbStore]{}", dumpedRdbStore);
 		return dumpedRdbStore;
 	}
-	
+
 	@Override
 	public void beginReceiveRdbData(long masterOffset) {
-		
+
 		try {
 			logger.info("[beginReceiveRdbData][update rdb]{}", dumpedRdbStore);
 			redisMaster.getCurrentReplicationStore().rdbUpdated(dumpedRdbStore);
@@ -104,7 +104,7 @@ public class RedisMasterNewRdbDumper extends AbstractRdbDumper{
 			logger.error("[beginReceiveRdbData]", e);
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("%s(%s)", getClass().getSimpleName(), rdbonlyRedisMasterReplication);

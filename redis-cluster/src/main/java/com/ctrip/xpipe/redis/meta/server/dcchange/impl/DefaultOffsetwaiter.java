@@ -24,130 +24,130 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Sep 13, 2017
+ * <p>
+ * Sep 13, 2017
  */
 @Component
 public class DefaultOffsetwaiter implements OffsetWaiter {
 
-    @Resource(name = MetaServerContextConfig.CLIENT_POOL)
-    private XpipeNettyClientKeyedObjectPool keyedObjectPool;
+	@Resource(name = MetaServerContextConfig.CLIENT_POOL)
+	private XpipeNettyClientKeyedObjectPool keyedObjectPool;
 
-    @Resource(name = AbstractSpringConfigContext.SCHEDULED_EXECUTOR)
-    private ScheduledExecutorService scheduled;
+	@Resource(name = AbstractSpringConfigContext.SCHEDULED_EXECUTOR)
+	private ScheduledExecutorService scheduled;
 
-    @Autowired
-    private MetaServerConfig metaServerConfig;
+	@Autowired
+	private MetaServerConfig metaServerConfig;
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Override
-    public boolean tryWaitfor(HostPort hostPort, MasterInfo masterInfo, ExecutionLog executionLog) {
+	@Override
+	public boolean tryWaitfor(HostPort hostPort, MasterInfo masterInfo, ExecutionLog executionLog) {
 
-        if(hostPort == null){
-            executionLog.info("target instance null");
-            return false;
-        }
+		if (hostPort == null) {
+			executionLog.info("target instance null");
+			return false;
+		}
 
-        if (masterInfo == null) {
-            executionLog.info("master info null, no wait");
-            return false;
-        }
+		if (masterInfo == null) {
+			executionLog.info("master info null, no wait");
+			return false;
+		}
 
-        String masterReplId = masterInfo.getReplId();
-        Long masterOffset = masterInfo.getMasterReplOffset();
-        if (masterOffset == null || masterOffset <= 0) {
-            executionLog.info("master offset wrong, no wait" + masterOffset);
-            return false;
-        }
+		String masterReplId = masterInfo.getReplId();
+		Long masterOffset = masterInfo.getMasterReplOffset();
+		if (masterOffset == null || masterOffset <= 0) {
+			executionLog.info("master offset wrong, no wait" + masterOffset);
+			return false;
+		}
 
-        executionLog.info(String.format("wait for %s %s", hostPort, masterInfo));
+		executionLog.info(String.format("wait for %s %s", hostPort, masterInfo));
 
-        try {
-            return doWait(masterReplId, masterOffset, hostPort, executionLog);
-        } catch (Exception e) {
-            logger.error("[tryWaitfor]" + hostPort + "," + masterInfo, e);
-            executionLog.error(e.getMessage());
-        }
-        return  false;
-    }
+		try {
+			return doWait(masterReplId, masterOffset, hostPort, executionLog);
+		} catch (Exception e) {
+			logger.error("[tryWaitfor]" + hostPort + "," + masterInfo, e);
+			executionLog.error(e.getMessage());
+		}
+		return false;
+	}
 
-    private boolean doWait(String masterReplId, Long masterOffset, HostPort hostPort, ExecutionLog executionLog) {
+	private boolean doWait(String masterReplId, Long masterOffset, HostPort hostPort, ExecutionLog executionLog) {
 
-        int waitMilli = metaServerConfig.getWaitforOffsetMilli();
-        long endTime = System.currentTimeMillis() + waitMilli;
+		int waitMilli = metaServerConfig.getWaitforOffsetMilli();
+		long endTime = System.currentTimeMillis() + waitMilli;
 
-        String slaveReplId = null;
-        Long slaveOffset = null;
+		String slaveReplId = null;
+		Long slaveOffset = null;
 
-        executionLog.info(String.format("wait timeout config:%d ms", waitMilli));
-
-
-        while (true) {
-
-            InfoReplicationComplementCommand command = new InfoReplicationComplementCommand(
-                    keyedObjectPool.getKeyPool(new DefaultEndPoint(hostPort.getHost(), hostPort.getPort())),
-                    scheduled
-            );
-
-            try {
-
-                RedisInfo redisInfo = command.execute().get(waitMilli, TimeUnit.MILLISECONDS);
-                if ((redisInfo instanceof MasterInfo) || !(redisInfo instanceof SlaveInfo)) {
-                    executionLog.info("target role:" + (redisInfo == null ? "null" : redisInfo.getClass().getSimpleName()));
-                    break;
-                }
-
-                SlaveInfo slaveInfo = (SlaveInfo) redisInfo;
-                slaveReplId = slaveInfo.getMasterReplId();
-                slaveOffset = slaveInfo.getSlaveReplOffset();
-
-                if (!StringUtil.isEmpty(slaveReplId) && !StringUtil.isEmpty(masterReplId)) {
-                    if (!slaveReplId.equalsIgnoreCase(masterReplId)) {
-                        executionLog.info(String.format("master replid not equal with slave replid, break. %s %s", masterReplId, slaveReplId));
-                        break;
-                    }
-                }
-                if (slaveOffset >= masterOffset) {
-                    executionLog.info(String.format("wait succeed:%d >= %d", slaveOffset, masterOffset));
-                    return true;
-                }
-            } catch (Exception e) {
-                executionLog.error(e.getMessage());
-                logger.error("[waitfor]" + hostPort, e);
-            }
-            long current = System.currentTimeMillis();
-            if (current >= endTime) {
-                executionLog.error("wait time out, exit");
-                break;
-            }
-            sleep(1);
-        }
-
-        if(slaveOffset != null){
-            executionLog.info(String.format("master offset:%s, slave offset:%d, sub:%d", masterOffset, slaveOffset, masterOffset - slaveOffset));
-        }
-        return false;
-    }
-
-    private void sleep(int time) {
-        try {
-            TimeUnit.MILLISECONDS.sleep(time);
-        } catch (InterruptedException e) {
-            logger.error("[sleep]", e);
-        }
-    }
+		executionLog.info(String.format("wait timeout config:%d ms", waitMilli));
 
 
-    public void setKeyedObjectPool(XpipeNettyClientKeyedObjectPool keyedObjectPool) {
-        this.keyedObjectPool = keyedObjectPool;
-    }
+		while (true) {
 
-    public void setMetaServerConfig(MetaServerConfig metaServerConfig) {
-        this.metaServerConfig = metaServerConfig;
-    }
+			InfoReplicationComplementCommand command = new InfoReplicationComplementCommand(
+					keyedObjectPool.getKeyPool(new DefaultEndPoint(hostPort.getHost(), hostPort.getPort())),
+					scheduled
+			);
 
-    public void setScheduled(ScheduledExecutorService scheduled) {
-        this.scheduled = scheduled;
-    }
+			try {
+
+				RedisInfo redisInfo = command.execute().get(waitMilli, TimeUnit.MILLISECONDS);
+				if ((redisInfo instanceof MasterInfo) || !(redisInfo instanceof SlaveInfo)) {
+					executionLog.info("target role:" + (redisInfo == null ? "null" : redisInfo.getClass().getSimpleName()));
+					break;
+				}
+
+				SlaveInfo slaveInfo = (SlaveInfo) redisInfo;
+				slaveReplId = slaveInfo.getMasterReplId();
+				slaveOffset = slaveInfo.getSlaveReplOffset();
+
+				if (!StringUtil.isEmpty(slaveReplId) && !StringUtil.isEmpty(masterReplId)) {
+					if (!slaveReplId.equalsIgnoreCase(masterReplId)) {
+						executionLog.info(String.format("master replid not equal with slave replid, break. %s %s", masterReplId, slaveReplId));
+						break;
+					}
+				}
+				if (slaveOffset >= masterOffset) {
+					executionLog.info(String.format("wait succeed:%d >= %d", slaveOffset, masterOffset));
+					return true;
+				}
+			} catch (Exception e) {
+				executionLog.error(e.getMessage());
+				logger.error("[waitfor]" + hostPort, e);
+			}
+			long current = System.currentTimeMillis();
+			if (current >= endTime) {
+				executionLog.error("wait time out, exit");
+				break;
+			}
+			sleep(1);
+		}
+
+		if (slaveOffset != null) {
+			executionLog.info(String.format("master offset:%s, slave offset:%d, sub:%d", masterOffset, slaveOffset, masterOffset - slaveOffset));
+		}
+		return false;
+	}
+
+	private void sleep(int time) {
+		try {
+			TimeUnit.MILLISECONDS.sleep(time);
+		} catch (InterruptedException e) {
+			logger.error("[sleep]", e);
+		}
+	}
+
+
+	public void setKeyedObjectPool(XpipeNettyClientKeyedObjectPool keyedObjectPool) {
+		this.keyedObjectPool = keyedObjectPool;
+	}
+
+	public void setMetaServerConfig(MetaServerConfig metaServerConfig) {
+		this.metaServerConfig = metaServerConfig;
+	}
+
+	public void setScheduled(ScheduledExecutorService scheduled) {
+		this.scheduled = scheduled;
+	}
 }

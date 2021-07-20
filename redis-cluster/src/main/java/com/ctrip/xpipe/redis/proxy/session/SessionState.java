@@ -10,6 +10,6 @@ import io.netty.buffer.ByteBuf;
  */
 public interface SessionState extends State<SessionState> {
 
-    void tryWrite(ByteBuf byteBuf);
+	void tryWrite(ByteBuf byteBuf);
 
 }

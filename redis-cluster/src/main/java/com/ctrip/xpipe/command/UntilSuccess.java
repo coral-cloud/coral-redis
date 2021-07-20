@@ -8,10 +8,10 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Mar 6, 2017
  */
-public class UntilSuccess extends AbstractCommandChain{
+public class UntilSuccess extends AbstractCommandChain {
 
 	public UntilSuccess() {
 	}
@@ -20,20 +20,20 @@ public class UntilSuccess extends AbstractCommandChain{
 		super(commandsList);
 	}
 
-	public UntilSuccess(Command<?> ... commands) {
+	public UntilSuccess(Command<?>... commands) {
 		super(commands);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
 	protected void doExecute() throws Exception {
-		
-		if(future().isCancelled()){
+
+		if (future().isCancelled()) {
 			return;
 		}
 
 		CommandFuture<?> future = executeNext();
-		if(future == null){
+		if (future == null) {
 			future().setFailure(new CommandChainException("until success fail", getResult()));
 			return;
 		}
@@ -42,24 +42,24 @@ public class UntilSuccess extends AbstractCommandChain{
 			@Override
 			public void operationComplete(CommandFuture commandFuture) throws Exception {
 
-				if(commandFuture.isSuccess()){
+				if (commandFuture.isSuccess()) {
 					future().setSuccess(commandFuture.get());
-				}else{
+				} else {
 					getLogger().error("[doExecute]" + currentCommand(), commandFuture.cause());
 					doExecute();
 				}
 			}
 		});
 	}
-	
+
 	@Override
 	protected void doCancel() {
 		super.doCancel();
-		
+
 		Command<?> currentCommand = currentCommand();
-		if(currentCommand != null){
+		if (currentCommand != null) {
 			currentCommand.future().cancel(true);
 		}
-		
+
 	}
 }

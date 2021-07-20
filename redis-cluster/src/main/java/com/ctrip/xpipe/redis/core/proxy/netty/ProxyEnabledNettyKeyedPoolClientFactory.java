@@ -24,38 +24,38 @@ import org.slf4j.LoggerFactory;
  */
 public class ProxyEnabledNettyKeyedPoolClientFactory extends NettyKeyedPoolClientFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProxyEnabledNettyKeyedPoolClientFactory.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProxyEnabledNettyKeyedPoolClientFactory.class);
 
-    private ProxyedConnectionFactory proxyedConnectionFactory;
+	private ProxyedConnectionFactory proxyedConnectionFactory;
 
-    public ProxyEnabledNettyKeyedPoolClientFactory(int eventLoopThreads, ProxyResourceManager resourceManager) {
-        super(eventLoopThreads);
-        this.proxyedConnectionFactory = new DefaultProxyedConnectionFactory(resourceManager);
-    }
+	public ProxyEnabledNettyKeyedPoolClientFactory(int eventLoopThreads, ProxyResourceManager resourceManager) {
+		super(eventLoopThreads);
+		this.proxyedConnectionFactory = new DefaultProxyedConnectionFactory(resourceManager);
+	}
 
-    public ProxyEnabledNettyKeyedPoolClientFactory(ProxyResourceManager resourceManager) {
-        this.proxyedConnectionFactory = new DefaultProxyedConnectionFactory(resourceManager);
-    }
+	public ProxyEnabledNettyKeyedPoolClientFactory(ProxyResourceManager resourceManager) {
+		this.proxyedConnectionFactory = new DefaultProxyedConnectionFactory(resourceManager);
+	}
 
-    @Override
-    public PooledObject<NettyClient> makeObject(Endpoint key) throws Exception {
-        if(!isProxyEnabled(key)) {
-            return super.makeObject(key);
-        }
-        ProxyConnectProtocol protocol = ((ProxyEnabled) key).getProxyProtocol();
-        ChannelFuture f = proxyedConnectionFactory.getProxyedConnectionChannelFuture(protocol, b);
-        f.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                future.channel().writeAndFlush(protocol.output());
-            }
-        });
-        NettyClient nettyClient = new AsyncNettyClient(f, key);
-        f.channel().attr(NettyClientHandler.KEY_CLIENT).set(nettyClient);
-        return new DefaultPooledObject<>(nettyClient);
-    }
+	@Override
+	public PooledObject<NettyClient> makeObject(Endpoint key) throws Exception {
+		if (!isProxyEnabled(key)) {
+			return super.makeObject(key);
+		}
+		ProxyConnectProtocol protocol = ((ProxyEnabled) key).getProxyProtocol();
+		ChannelFuture f = proxyedConnectionFactory.getProxyedConnectionChannelFuture(protocol, b);
+		f.addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				future.channel().writeAndFlush(protocol.output());
+			}
+		});
+		NettyClient nettyClient = new AsyncNettyClient(f, key);
+		f.channel().attr(NettyClientHandler.KEY_CLIENT).set(nettyClient);
+		return new DefaultPooledObject<>(nettyClient);
+	}
 
-    private boolean isProxyEnabled(Endpoint key) {
-        return key instanceof ProxyEnabled;
-    }
+	private boolean isProxyEnabled(Endpoint key) {
+		return key instanceof ProxyEnabled;
+	}
 }

@@ -5,15 +5,15 @@ import com.ctrip.xpipe.exception.XpipeRuntimeException;
 
 public class XPipeProxyResultException extends XpipeRuntimeException {
 
-    public XPipeProxyResultException(String message) {
-        super(message);
-    }
+	public XPipeProxyResultException(String message) {
+		super(message);
+	}
 
-    public XPipeProxyResultException(String message, Throwable th) {
-        super(message, th);
-    }
+	public XPipeProxyResultException(String message, Throwable th) {
+		super(message, th);
+	}
 
-    public <T extends Enum<T>> XPipeProxyResultException(ErrorMessage<T> errorMessage, Throwable th) {
-        super(errorMessage, th);
-    }
+	public <T extends Enum<T>> XPipeProxyResultException(ErrorMessage<T> errorMessage, Throwable th) {
+		super(errorMessage, th);
+	}
 }

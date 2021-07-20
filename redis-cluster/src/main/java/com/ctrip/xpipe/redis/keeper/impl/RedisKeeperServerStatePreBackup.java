@@ -12,10 +12,10 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 22, 2016
  */
-public class RedisKeeperServerStatePreBackup extends AbstractRedisKeeperServerState{
+public class RedisKeeperServerStatePreBackup extends AbstractRedisKeeperServerState {
 
 	//do not set master address
 	public RedisKeeperServerStatePreBackup(RedisKeeperServer redisKeeperServer) {
@@ -23,20 +23,20 @@ public class RedisKeeperServerStatePreBackup extends AbstractRedisKeeperServerSt
 	}
 
 	@Override
-	public void becomeActive(Endpoint masterAddress){
+	public void becomeActive(Endpoint masterAddress) {
 		doBecomeActive(masterAddress);
 	}
 
 	@Override
 	public void becomeBackup(Endpoint masterAddress) {
-		logger.info("[becomeBackup]{}",  masterAddress);
+		logger.info("[becomeBackup]{}", masterAddress);
 		doBecomeBackup(masterAddress);
 	}
 
 	@Override
 	public void setPromotionState(PROMOTION_STATE promotionState, Object promitionInfo) throws IOException {
 		throw new UnsupportedOperationException();
-		
+
 	}
 
 	@Override

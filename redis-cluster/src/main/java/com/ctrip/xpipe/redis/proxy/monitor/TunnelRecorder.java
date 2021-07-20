@@ -4,5 +4,5 @@ import com.ctrip.xpipe.redis.proxy.Tunnel;
 
 public interface TunnelRecorder {
 
-    void record(Tunnel tunnel);
+	void record(Tunnel tunnel);
 }

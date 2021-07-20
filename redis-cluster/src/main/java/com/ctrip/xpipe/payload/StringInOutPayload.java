@@ -10,27 +10,27 @@ import java.nio.charset.Charset;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月26日 下午7:02:09
  */
-public class StringInOutPayload extends AbstractInOutPayload{
-	
+public class StringInOutPayload extends AbstractInOutPayload {
+
 	private String message;
-	
+
 	private Charset charset;
-	
-	public StringInOutPayload(String message){
-		
+
+	public StringInOutPayload(String message) {
+
 		this(message, Codec.defaultCharset);
 	}
 
 	public StringInOutPayload(String message, Charset charset) {
-		
+
 		this.message = message;
 		this.charset = charset;
-		
+
 	}
-	
+
 
 	@Override
 	protected int doIn(ByteBuf byteBuf) throws IOException {
@@ -39,7 +39,7 @@ public class StringInOutPayload extends AbstractInOutPayload{
 
 	@Override
 	protected long doOut(WritableByteChannel writableByteChannel) throws IOException {
-		
+
 		return writableByteChannel.write(ByteBuffer.wrap(message.getBytes(charset)));
 	}
 

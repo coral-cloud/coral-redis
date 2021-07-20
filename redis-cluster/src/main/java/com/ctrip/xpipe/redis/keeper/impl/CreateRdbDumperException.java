@@ -5,10 +5,10 @@ import com.ctrip.xpipe.redis.keeper.RedisMaster;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 25, 2016
  */
-public class CreateRdbDumperException extends AbstractRdbDumperException{
+public class CreateRdbDumperException extends AbstractRdbDumperException {
 
 	private static final long serialVersionUID = 1L;
 

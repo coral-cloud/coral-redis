@@ -14,20 +14,20 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
-public abstract class AbstractNettyCommand<V> extends AbstractCommand<V>{
-	
+public abstract class AbstractNettyCommand<V> extends AbstractCommand<V> {
+
 	private SimpleObjectPool<NettyClient> clientPool;
-	
+
 	private volatile boolean poolCreated = false;
-	
+
 	private String host;
-	
+
 	private int port;
 
-	public AbstractNettyCommand(String host, int port){
+	public AbstractNettyCommand(String host, int port) {
 		this(NettyPoolUtil.createNettyPool(new DefaultEndPoint(host, port)));
 		poolCreated = true;
 		this.host = host;
@@ -40,7 +40,7 @@ public abstract class AbstractNettyCommand<V> extends AbstractCommand<V>{
 
 	@Override
 	protected void doExecute() throws CommandExecutionException {
-		
+
 		NettyClient nettyClient = null;
 		try {
 			getLogger().debug("[doExecute]{}", this);
@@ -49,13 +49,13 @@ public abstract class AbstractNettyCommand<V> extends AbstractCommand<V>{
 			doSendRequest(nettyClient, byteBuf);
 		} catch (BorrowObjectException e) {
 			throw new CommandExecutionException("execute " + this, e);
-		}finally{
+		} finally {
 			afterCommandExecute(nettyClient);
 		}
 	}
 
 	protected void afterCommandExecute(NettyClient nettyClient) {
-		if( nettyClient != null){
+		if (nettyClient != null) {
 			try {
 				clientPool.returnObject(nettyClient);
 			} catch (ReturnObjectException e) {
@@ -63,7 +63,7 @@ public abstract class AbstractNettyCommand<V> extends AbstractCommand<V>{
 			}
 		}
 
-		if(poolCreated){
+		if (poolCreated) {
 			future().addListener(new CommandFutureListener<V>() {
 
 				@Override
@@ -78,15 +78,15 @@ public abstract class AbstractNettyCommand<V> extends AbstractCommand<V>{
 	protected abstract void doSendRequest(NettyClient nettyClient, ByteBuf byteBuf);
 
 	public abstract ByteBuf getRequest();
-	
+
 
 	@Override
 	protected void doReset() {
-		if(poolCreated){
+		if (poolCreated) {
 			this.clientPool = NettyPoolUtil.createNettyPool(new DefaultEndPoint(host, port));
 		}
 	}
-	
+
 	protected SimpleObjectPool<NettyClient> getClientPool() {
 		return clientPool;
 	}
@@ -97,6 +97,6 @@ public abstract class AbstractNettyCommand<V> extends AbstractCommand<V>{
 
 	@Override
 	public String toString() {
-		return String.format("T:%s, CMD:%s", clientPool == null? "null": clientPool.desc(), getName());
+		return String.format("T:%s, CMD:%s", clientPool == null ? "null" : clientPool.desc(), getName());
 	}
 }

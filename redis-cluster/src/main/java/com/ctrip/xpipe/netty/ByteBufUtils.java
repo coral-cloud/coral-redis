@@ -13,20 +13,20 @@ import java.nio.channels.FileChannel;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 26, 2016
  */
 public class ByteBufUtils {
-	
-	private static Logger logger = LoggerFactory.getLogger(ByteBufferUtils.class);
-	
-	public static byte[] readToBytes(ByteBuf byteBuf){
 
-		
-		if(byteBuf instanceof CompositeByteBuf){
+	private static Logger logger = LoggerFactory.getLogger(ByteBufferUtils.class);
+
+	public static byte[] readToBytes(ByteBuf byteBuf) {
+
+
+		if (byteBuf instanceof CompositeByteBuf) {
 			CompositeByteBuf compositeByteBuf = (CompositeByteBuf) byteBuf;
 			ByteArrayOutputStream baous = new ByteArrayOutputStream();
-			for(ByteBuf single : compositeByteBuf){
+			for (ByteBuf single : compositeByteBuf) {
 				try {
 					baous.write(readToBytes(single));
 				} catch (IOException e) {
@@ -34,55 +34,55 @@ public class ByteBufUtils {
 				}
 			}
 			return baous.toByteArray();
-		}else{
-			byte []result = new byte[byteBuf.readableBytes()];
+		} else {
+			byte[] result = new byte[byteBuf.readableBytes()];
 			byteBuf.readBytes(result);
 			return result;
 		}
 	}
 
-	public static String readToString(ByteBuf byteBuf){
-		
-		byte []result = readToBytes(byteBuf);
-		return new String(result,Codec.defaultCharset);
+	public static String readToString(ByteBuf byteBuf) {
+
+		byte[] result = readToBytes(byteBuf);
+		return new String(result, Codec.defaultCharset);
 	}
 
-	public static int writeByteBufToFileChannel(ByteBuf byteBuf, FileChannel fileChannel) throws IOException{
+	public static int writeByteBufToFileChannel(ByteBuf byteBuf, FileChannel fileChannel) throws IOException {
 		return writeByteBufToFileChannel(byteBuf, fileChannel, null);
 	}
 
-	
-	public static int writeByteBufToFileChannel(ByteBuf byteBuf, FileChannel fileChannel, Logger tracelogger) throws IOException{
+
+	public static int writeByteBufToFileChannel(ByteBuf byteBuf, FileChannel fileChannel, Logger tracelogger) throws IOException {
 
 		int wrote = 0;
 		final int readerIndex = byteBuf.readerIndex();
 		final int readable = byteBuf.readableBytes();
-		try{
+		try {
 			ByteBuffer buf = byteBuf.internalNioBuffer(readerIndex, readable);
-			if(logger.isDebugEnabled()){
+			if (logger.isDebugEnabled()) {
 				logger.debug("[appendCommands]{}", ByteBufferUtils.readToString(buf.slice()));
 			}
-			
-			if(tracelogger != null){
+
+			if (tracelogger != null) {
 				tracelogger.debug("[writeByteBufToFileChannel][begin real write]");
 			}
 			wrote += fileChannel.write(buf);
-		}catch(Exception e){
-			
+		} catch (Exception e) {
+
 			logger.info("[appendCommands]", e);
 			ByteBuffer[] buffers = byteBuf.nioBuffers();
 			// TODO ensure all read
 			if (buffers != null) {
 				for (ByteBuffer buf : buffers) {
-					if(logger.isDebugEnabled()){
+					if (logger.isDebugEnabled()) {
 						logger.debug("[appendCommands]{}", ByteBufferUtils.readToString(buf.slice()));
 					}
 					wrote += fileChannel.write(buf);
 				}
 			}
 		}
-		
-		if(wrote < readable){
+
+		if (wrote < readable) {
 			logger.warn("[writeByteBufToFileChannel][wrote < readable]{} < {}", wrote, readable);
 		}
 		byteBuf.readerIndex(readerIndex + wrote);

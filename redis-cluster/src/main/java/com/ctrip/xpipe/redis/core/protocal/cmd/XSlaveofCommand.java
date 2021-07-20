@@ -7,8 +7,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
- *         Oct 28, 2016
+ * <p>
+ * Oct 28, 2016
  */
 public class XSlaveofCommand extends AbstractSlaveOfCommand {
 

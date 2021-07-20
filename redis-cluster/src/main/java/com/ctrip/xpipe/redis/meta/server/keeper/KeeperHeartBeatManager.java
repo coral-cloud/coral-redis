@@ -7,15 +7,15 @@ import com.ctrip.xpipe.redis.core.keeper.HeartBeat;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 5, 2016
  */
-public interface KeeperHeartBeatManager extends Observable, HeartBeat{
-	
+public interface KeeperHeartBeatManager extends Observable, HeartBeat {
+
 	void ping(KeeperInstanceMeta keeperInstanceMeta);
-	
+
 	boolean isKeeperAlive();
-	
+
 	void close();
-	
+
 }

@@ -12,47 +12,47 @@ import io.netty.buffer.ByteBuf;
  */
 public class SessionEstablished extends AbstractSessionState {
 
-    public SessionEstablished(Session session) {
-        super(session);
-    }
+	public SessionEstablished(Session session) {
+		super(session);
+	}
 
-    @Override
-    protected SessionState doNextAfterSuccess() {
-        return this;
-    }
+	@Override
+	protected SessionState doNextAfterSuccess() {
+		return this;
+	}
 
-    @Override
-    protected SessionState doNextAfterFail() {
-        return new SessionClosing(session);
-    }
+	@Override
+	protected SessionState doNextAfterFail() {
+		return new SessionClosing(session);
+	}
 
-    @Override
-    public void tryWrite(ByteBuf byteBuf) {
-        ((AbstractSession)session).doWrite(byteBuf);
-    }
+	@Override
+	public void tryWrite(ByteBuf byteBuf) {
+		((AbstractSession) session).doWrite(byteBuf);
+	}
 
-    @Override
-    public String name() {
-        return "Session-Established";
-    }
+	@Override
+	public String name() {
+		return "Session-Established";
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 
-    @Override
-    public boolean isValidNext(SessionState sessionState) {
-        return (sessionState instanceof SessionClosed) || super.isValidNext(sessionState);
-    }
+	@Override
+	public boolean isValidNext(SessionState sessionState) {
+		return (sessionState instanceof SessionClosed) || super.isValidNext(sessionState);
+	}
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 }

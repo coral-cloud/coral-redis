@@ -6,8 +6,8 @@ import java.nio.ByteBuffer;
 
 /**
  * @author wenchao.meng
- *
- *         Aug 26, 2016
+ * <p>
+ * Aug 26, 2016
  */
 public class ByteBufferUtils {
 

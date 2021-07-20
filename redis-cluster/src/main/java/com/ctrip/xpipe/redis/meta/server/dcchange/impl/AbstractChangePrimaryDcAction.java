@@ -21,27 +21,27 @@ import java.util.concurrent.*;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 9, 2016
  */
-public abstract class AbstractChangePrimaryDcAction implements ChangePrimaryDcAction{
-	
+public abstract class AbstractChangePrimaryDcAction implements ChangePrimaryDcAction {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	public static final int DEFAULT_CHANGE_PRIMARY_WAIT_TIMEOUT_SECONDS = Integer.parseInt(System.getProperty("DEFAULT_CHANGE_PRIMARY_WAIT_TIMEOUT_SECONDS", "2"));
-	
+
 	protected int waitTimeoutSeconds = DEFAULT_CHANGE_PRIMARY_WAIT_TIMEOUT_SECONDS;
-	
+
 	protected ExecutionLog executionLog;
-	
-	protected DcMetaCache   dcMetaCache;
-	
+
+	protected DcMetaCache dcMetaCache;
+
 	protected CurrentMetaManager currentMetaManager;
-	
+
 	protected SentinelManager sentinelManager;
-	
+
 	protected XpipeNettyClientKeyedObjectPool keyedObjectPool;
-	
+
 	protected ScheduledExecutorService scheduled;
 
 	protected Executor executors;
@@ -64,10 +64,10 @@ public abstract class AbstractChangePrimaryDcAction implements ChangePrimaryDcAc
 
 	@Override
 	public PrimaryDcChangeMessage changePrimaryDc(String clusterId, String shardId, String newPrimaryDc, MasterInfo masterInfo) {
-		
-		try{
+
+		try {
 			return doChangePrimaryDc(clusterId, shardId, newPrimaryDc, masterInfo);
-		}catch(Exception e){
+		} catch (Exception e) {
 			executionLog.error(e.getMessage());
 			logger.error("[changePrimaryDc]" + clusterId + "," + shardId + "," + newPrimaryDc, e);
 			return new PrimaryDcChangeMessage(PRIMARY_DC_CHANGE_RESULT.FAIL, executionLog.getLog());
@@ -82,13 +82,13 @@ public abstract class AbstractChangePrimaryDcAction implements ChangePrimaryDcAc
 
 		List<KeeperMeta> keepers = currentMetaManager.getSurviveKeepers(clusterId, shardId);
 		executionLog.info("[makeKeepersOk]" + keepers);
-		
+
 		KeeperStateChangeJob job = new KeeperStateChangeJob(keepers,
 				new Pair<String, Integer>(newMaster.getKey(), newMaster.getValue()),
 				currentMetaManager.randomRoute(clusterId),
 				keyedObjectPool, 1000, 1, scheduled, executors);
 		try {
-			job.execute().get(waitTimeoutSeconds/2, TimeUnit.SECONDS);
+			job.execute().get(waitTimeoutSeconds / 2, TimeUnit.SECONDS);
 			executionLog.info("[makeKeepersOk]success");
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			logger.error("[makeKeepersOk]" + e.getMessage());
@@ -103,7 +103,7 @@ public abstract class AbstractChangePrimaryDcAction implements ChangePrimaryDcAc
 	protected abstract Pair<String, Integer> chooseNewMaster(String clusterId, String shardId);
 
 	protected void doChangeMetaCache(String clusterId, String shardId, String newPrimaryDc) {
-		
+
 		executionLog.info(String.format("[doChangeMetaCache]%s %s -> %s", clusterId, shardId, newPrimaryDc));
 		dcMetaCache.primaryDcChanged(clusterId, shardId, newPrimaryDc);
 	}

@@ -7,22 +7,22 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class CRDTInfoCommand extends InfoCommand {
 
-    public CRDTInfoCommand(SimpleObjectPool<NettyClient> clientPool, String args, ScheduledExecutorService scheduled) {
-        super(clientPool, args, scheduled);
-    }
+	public CRDTInfoCommand(SimpleObjectPool<NettyClient> clientPool, String args, ScheduledExecutorService scheduled) {
+		super(clientPool, args, scheduled);
+	}
 
-    public CRDTInfoCommand(SimpleObjectPool<NettyClient> clientPool, INFO_TYPE infoType, ScheduledExecutorService scheduled) {
-        super(clientPool, infoType, scheduled);
-    }
+	public CRDTInfoCommand(SimpleObjectPool<NettyClient> clientPool, INFO_TYPE infoType, ScheduledExecutorService scheduled) {
+		super(clientPool, infoType, scheduled);
+	}
 
-    public CRDTInfoCommand(SimpleObjectPool<NettyClient> clientPool, String args, ScheduledExecutorService scheduled,
-                       int commandTimeoutMilli) {
-        super(clientPool, args, scheduled, commandTimeoutMilli);
-    }
+	public CRDTInfoCommand(SimpleObjectPool<NettyClient> clientPool, String args, ScheduledExecutorService scheduled,
+						   int commandTimeoutMilli) {
+		super(clientPool, args, scheduled, commandTimeoutMilli);
+	}
 
-    @Override
-    public String getName() {
-        return "crdt.info";
-    }
+	@Override
+	public String getName() {
+		return "crdt.info";
+	}
 
 }

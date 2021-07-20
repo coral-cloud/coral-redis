@@ -8,8 +8,8 @@ import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 
 /**
  * @author marsqing
- *
- *         May 25, 2016 11:01:39 AM
+ * <p>
+ * May 25, 2016 11:01:39 AM
  */
 public class DefaultLeaderElector extends AbstractLifecycle implements LeaderElector {
 
@@ -28,12 +28,12 @@ public class DefaultLeaderElector extends AbstractLifecycle implements LeaderEle
 	protected void doStart() throws Exception {
 		elect();
 	}
-	
+
 	@Override
 	public void elect() throws Exception {
-		
+
 		zkClient.createContainers(ctx.getLeaderElectionZKPath());
-		
+
 		latch = new LeaderLatch(zkClient, ctx.getLeaderElectionZKPath(), ctx.getLeaderElectionID());
 		latch.addListener(new LeaderLatchListener() {
 

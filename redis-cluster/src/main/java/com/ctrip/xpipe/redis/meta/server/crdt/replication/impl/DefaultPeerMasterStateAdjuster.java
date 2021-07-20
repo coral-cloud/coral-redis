@@ -16,49 +16,49 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class DefaultPeerMasterStateAdjuster extends AbstractClusterShardPeriodicTask implements PeerMasterStateAdjuster {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    public static final int DEFAULT_PEER_MASTER_ADJUST_INTERVAL_SECONDS = Integer
-            .parseInt(System.getProperty("PEER_MASTER_ADJUST_INTERVAL_SECONDS", "60"));
+	public static final int DEFAULT_PEER_MASTER_ADJUST_INTERVAL_SECONDS = Integer
+			.parseInt(System.getProperty("PEER_MASTER_ADJUST_INTERVAL_SECONDS", "60"));
 
-    protected PeerMasterAdjustJobFactory peerMasterAdjustJobFactory;
+	protected PeerMasterAdjustJobFactory peerMasterAdjustJobFactory;
 
-    protected KeyedOneThreadTaskExecutor<Pair<String, String> > peerMasterAdjustExecutor;
+	protected KeyedOneThreadTaskExecutor<Pair<String, String>> peerMasterAdjustExecutor;
 
-    private MetaServerConfig config;
+	private MetaServerConfig config;
 
-    private int adjustIntervalSeconds;
+	private int adjustIntervalSeconds;
 
-    public DefaultPeerMasterStateAdjuster(String clusterId, String shardId, DcMetaCache dcMetaCache, CurrentMetaManager currentMetaManager,
-                                          MetaServerConfig config, PeerMasterAdjustJobFactory peerMasterAdjustJobFactory,
-                                          KeyedOneThreadTaskExecutor<Pair<String, String> > peerMasterAdjustExecutor,
-                                          ScheduledExecutorService scheduled) {
-        this(clusterId, shardId, dcMetaCache, currentMetaManager, config, peerMasterAdjustJobFactory, peerMasterAdjustExecutor,
-                scheduled, DEFAULT_PEER_MASTER_ADJUST_INTERVAL_SECONDS);
-    }
+	public DefaultPeerMasterStateAdjuster(String clusterId, String shardId, DcMetaCache dcMetaCache, CurrentMetaManager currentMetaManager,
+										  MetaServerConfig config, PeerMasterAdjustJobFactory peerMasterAdjustJobFactory,
+										  KeyedOneThreadTaskExecutor<Pair<String, String>> peerMasterAdjustExecutor,
+										  ScheduledExecutorService scheduled) {
+		this(clusterId, shardId, dcMetaCache, currentMetaManager, config, peerMasterAdjustJobFactory, peerMasterAdjustExecutor,
+				scheduled, DEFAULT_PEER_MASTER_ADJUST_INTERVAL_SECONDS);
+	}
 
-    public DefaultPeerMasterStateAdjuster(String clusterId, String shardId, DcMetaCache dcMetaCache, CurrentMetaManager currentMetaManager,
-                                          MetaServerConfig config, PeerMasterAdjustJobFactory peerMasterAdjustJobFactory,
-                                          KeyedOneThreadTaskExecutor<Pair<String, String> > peerMasterAdjustExecutor,
-                                          ScheduledExecutorService scheduled, int adjustIntervalSeconds) {
-        super(clusterId, shardId, dcMetaCache, currentMetaManager, scheduled);
-        this.peerMasterAdjustJobFactory = peerMasterAdjustJobFactory;
-        this.peerMasterAdjustExecutor = peerMasterAdjustExecutor;
-        this.adjustIntervalSeconds = adjustIntervalSeconds;
-        this.config = config;
-    }
+	public DefaultPeerMasterStateAdjuster(String clusterId, String shardId, DcMetaCache dcMetaCache, CurrentMetaManager currentMetaManager,
+										  MetaServerConfig config, PeerMasterAdjustJobFactory peerMasterAdjustJobFactory,
+										  KeyedOneThreadTaskExecutor<Pair<String, String>> peerMasterAdjustExecutor,
+										  ScheduledExecutorService scheduled, int adjustIntervalSeconds) {
+		super(clusterId, shardId, dcMetaCache, currentMetaManager, scheduled);
+		this.peerMasterAdjustJobFactory = peerMasterAdjustJobFactory;
+		this.peerMasterAdjustExecutor = peerMasterAdjustExecutor;
+		this.adjustIntervalSeconds = adjustIntervalSeconds;
+		this.config = config;
+	}
 
-    @Override
-    protected void work() {
-        if (!config.shouldCorrectPeerMasterPeriodically()) return;
+	@Override
+	protected void work() {
+		if (!config.shouldCorrectPeerMasterPeriodically()) return;
 
-        PeerMasterAdjustJob adjustJob = peerMasterAdjustJobFactory.buildPeerMasterAdjustJob(clusterId, shardId);
-        if (null != adjustJob) peerMasterAdjustExecutor.execute(Pair.of(clusterId, shardId), adjustJob);
-    }
+		PeerMasterAdjustJob adjustJob = peerMasterAdjustJobFactory.buildPeerMasterAdjustJob(clusterId, shardId);
+		if (null != adjustJob) peerMasterAdjustExecutor.execute(Pair.of(clusterId, shardId), adjustJob);
+	}
 
-    @Override
-    protected int getWorkIntervalSeconds() {
-        return adjustIntervalSeconds;
-    }
+	@Override
+	protected int getWorkIntervalSeconds() {
+		return adjustIntervalSeconds;
+	}
 
 }

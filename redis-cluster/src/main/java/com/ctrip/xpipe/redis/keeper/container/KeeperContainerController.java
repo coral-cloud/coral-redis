@@ -23,81 +23,81 @@ import java.util.Map;
 @RestController
 @RequestMapping("/keepers")
 public class KeeperContainerController extends AbstractController {
-    @Autowired
-    private KeeperContainerService keeperContainerService;
+	@Autowired
+	private KeeperContainerService keeperContainerService;
 
-    @Autowired
-    private CompositeLeakyBucket leakyBucket;
+	@Autowired
+	private CompositeLeakyBucket leakyBucket;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public void add(@RequestBody KeeperTransMeta keeperTransMeta) {
+	@RequestMapping(method = RequestMethod.POST)
+	public void add(@RequestBody KeeperTransMeta keeperTransMeta) {
 
-        logger.info("[add]{}", keeperTransMeta);
-        keeperContainerService.add(keeperTransMeta);
-    }
+		logger.info("[add]{}", keeperTransMeta);
+		keeperContainerService.add(keeperTransMeta);
+	}
 
-    @RequestMapping(value = "/clusters/" + CLUSTER_NAME_PATH_VARIABLE + "/shards/" + SHARD_NAME_PATH_VARIABLE, method = RequestMethod.POST)
-    public void addOrStart(@RequestBody KeeperTransMeta keeperTransMeta) {
+	@RequestMapping(value = "/clusters/" + CLUSTER_NAME_PATH_VARIABLE + "/shards/" + SHARD_NAME_PATH_VARIABLE, method = RequestMethod.POST)
+	public void addOrStart(@RequestBody KeeperTransMeta keeperTransMeta) {
 
-        logger.info("[addOrStart]{}", keeperTransMeta);
-        keeperContainerService.addOrStart(keeperTransMeta);
-    }
+		logger.info("[addOrStart]{}", keeperTransMeta);
+		keeperContainerService.addOrStart(keeperTransMeta);
+	}
 
-    @RequestMapping(method = RequestMethod.GET)
-    public List<KeeperInstanceMeta> list() {
-        logger.info("[list]");
-        List<KeeperInstanceMeta> keepers = FluentIterable.from(keeperContainerService.list()).transform(
-                new Function<RedisKeeperServer, KeeperInstanceMeta>() {
-                    @Override
-                    public KeeperInstanceMeta apply(RedisKeeperServer server) {
-                        return server.getKeeperInstanceMeta();
-                    }
-                }).toList();
-        return keepers;
-    }
+	@RequestMapping(method = RequestMethod.GET)
+	public List<KeeperInstanceMeta> list() {
+		logger.info("[list]");
+		List<KeeperInstanceMeta> keepers = FluentIterable.from(keeperContainerService.list()).transform(
+				new Function<RedisKeeperServer, KeeperInstanceMeta>() {
+					@Override
+					public KeeperInstanceMeta apply(RedisKeeperServer server) {
+						return server.getKeeperInstanceMeta();
+					}
+				}).toList();
+		return keepers;
+	}
 
-    @RequestMapping(value = "/clusters/" + CLUSTER_NAME_PATH_VARIABLE + "/shards/" + SHARD_NAME_PATH_VARIABLE, method = RequestMethod.DELETE)
-    public void remove(@PathVariable String clusterName, @PathVariable String shardName) {
+	@RequestMapping(value = "/clusters/" + CLUSTER_NAME_PATH_VARIABLE + "/shards/" + SHARD_NAME_PATH_VARIABLE, method = RequestMethod.DELETE)
+	public void remove(@PathVariable String clusterName, @PathVariable String shardName) {
 
-        logger.info("[remove]{},{}", clusterName, shardName);
-        keeperContainerService.remove(clusterName, shardName);
-    }
+		logger.info("[remove]{},{}", clusterName, shardName);
+		keeperContainerService.remove(clusterName, shardName);
+	}
 
-    @RequestMapping(value = "/clusters/" + CLUSTER_NAME_PATH_VARIABLE + "/shards/" + SHARD_NAME_PATH_VARIABLE + "/start", method = RequestMethod.PUT)
-    public void start(@PathVariable String clusterName, @PathVariable String shardName) {
+	@RequestMapping(value = "/clusters/" + CLUSTER_NAME_PATH_VARIABLE + "/shards/" + SHARD_NAME_PATH_VARIABLE + "/start", method = RequestMethod.PUT)
+	public void start(@PathVariable String clusterName, @PathVariable String shardName) {
 
-        logger.info("[start]{},{}", clusterName, shardName);
-        keeperContainerService.start(clusterName, shardName);
-    }
+		logger.info("[start]{},{}", clusterName, shardName);
+		keeperContainerService.start(clusterName, shardName);
+	}
 
-    @RequestMapping(value = "/clusters/" + CLUSTER_NAME_PATH_VARIABLE + "/shards/" + SHARD_NAME_PATH_VARIABLE + "/stop", method = RequestMethod.PUT)
-    public void stop(@PathVariable String clusterName, @PathVariable String shardName) {
+	@RequestMapping(value = "/clusters/" + CLUSTER_NAME_PATH_VARIABLE + "/shards/" + SHARD_NAME_PATH_VARIABLE + "/stop", method = RequestMethod.PUT)
+	public void stop(@PathVariable String clusterName, @PathVariable String shardName) {
 
-        logger.info("[stop]{},{}", clusterName, shardName);
-        keeperContainerService.stop(clusterName, shardName);
-    }
+		logger.info("[stop]{},{}", clusterName, shardName);
+		keeperContainerService.stop(clusterName, shardName);
+	}
 
-    @RequestMapping(value = "/leakybucket", method = RequestMethod.GET)
-    public LeakyBucketInfo getLeakyBucketInfo() {
-        return new LeakyBucketInfo(!leakyBucket.isClosed(), leakyBucket.getTotalSize());
-    }
+	@RequestMapping(value = "/leakybucket", method = RequestMethod.GET)
+	public LeakyBucketInfo getLeakyBucketInfo() {
+		return new LeakyBucketInfo(!leakyBucket.isClosed(), leakyBucket.getTotalSize());
+	}
 
-    private class LeakyBucketInfo {
-        private boolean open;
-        private int size;
+	private class LeakyBucketInfo {
+		private boolean open;
+		private int size;
 
-        public LeakyBucketInfo(boolean open, int size) {
-            this.open = open;
-            this.size = size;
-        }
+		public LeakyBucketInfo(boolean open, int size) {
+			this.open = open;
+			this.size = size;
+		}
 
-        public boolean isOpen() {
-            return open;
-        }
+		public boolean isOpen() {
+			return open;
+		}
 
-        public int getSize() {
-            return size;
-        }
-    }
+		public int getSize() {
+			return size;
+		}
+	}
 
 }

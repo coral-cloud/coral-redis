@@ -9,21 +9,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月24日 下午8:53:30
  */
-public class ByteArrayOutputStreamPayload extends AbstractInOutPayload{
+public class ByteArrayOutputStreamPayload extends AbstractInOutPayload {
 
 	private int INIT_SIZE = 2 << 10;
-	private byte []data;
-	private AtomicInteger pos  = new AtomicInteger(0);
-	
+	private byte[] data;
+	private AtomicInteger pos = new AtomicInteger(0);
+
 	public ByteArrayOutputStreamPayload() {
-		
+
 	}
 
 	public ByteArrayOutputStreamPayload(int INIT_SIZE) {
-		if(INIT_SIZE > 0) {
+		if (INIT_SIZE > 0) {
 			this.INIT_SIZE = INIT_SIZE;
 		}
 	}
@@ -35,29 +35,29 @@ public class ByteArrayOutputStreamPayload extends AbstractInOutPayload{
 
 	@Override
 	public void doStartInput() {
-		 data = new byte[INIT_SIZE];
-		 pos.set(0);
+		data = new byte[INIT_SIZE];
+		pos.set(0);
 	}
 
 	@Override
 	public int doIn(ByteBuf byteBuf) throws IOException {
-		
+
 		int size = byteBuf.readableBytes();
-		
+
 		makeSureSize(size);
-		
+
 		byteBuf.readBytes(data, pos.get(), size);
-		
-		int read = size - byteBuf.readableBytes(); 
+
+		int read = size - byteBuf.readableBytes();
 		pos.addAndGet(read);
-		
+
 		return read;
 	}
 
 	private void makeSureSize(int size) {
-		
-		if(pos.get() + size > data.length){
-			byte []newData = new byte[ensureSize(size)];
+
+		if (pos.get() + size > data.length) {
+			byte[] newData = new byte[ensureSize(size)];
 			System.arraycopy(data, 0, newData, 0, data.length);
 			data = newData;
 		}
@@ -70,24 +70,24 @@ public class ByteArrayOutputStreamPayload extends AbstractInOutPayload{
 
 	@Override
 	public long doOut(WritableByteChannel writableByteChannel) throws IOException {
-		
+
 		return writableByteChannel.write(ByteBuffer.wrap(data, 0, pos.get()));
 	}
 
-	
-	public byte[] getBytes(){
+
+	public byte[] getBytes() {
 		int currentPos = pos.get();
-		
-		byte []dst = new byte[currentPos];
+
+		byte[] dst = new byte[currentPos];
 		System.arraycopy(data, 0, dst, 0, currentPos);
 		return dst;
 	}
-	
+
 	@Override
 	public String toString() {
-		
-		if(data != null){
-			return new String(data, 0 , pos.get());
+
+		if (data != null) {
+			return new String(data, 0, pos.get());
 		}
 		return super.toString();
 	}

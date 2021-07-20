@@ -14,21 +14,21 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public abstract class AbstractProxyCommand<T> extends AbstractRedisCommand<T> implements ProxyCommand<T> {
 
-    private static final int DEFAULT_PROXY_COMMAND_TIMEOUT = 10000;
+	private static final int DEFAULT_PROXY_COMMAND_TIMEOUT = 10000;
 
-    public AbstractProxyCommand(String host, int port, ScheduledExecutorService scheduled) {
-        super(host, port, scheduled, DEFAULT_PROXY_COMMAND_TIMEOUT);
-    }
+	public AbstractProxyCommand(String host, int port, ScheduledExecutorService scheduled) {
+		super(host, port, scheduled, DEFAULT_PROXY_COMMAND_TIMEOUT);
+	}
 
-    public AbstractProxyCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
-        super(clientPool, scheduled, DEFAULT_PROXY_COMMAND_TIMEOUT);
-    }
+	public AbstractProxyCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
+		super(clientPool, scheduled, DEFAULT_PROXY_COMMAND_TIMEOUT);
+	}
 
-    public AbstractProxyCommand(String host, int port, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
-        super(host, port, scheduled, commandTimeoutMilli);
-    }
+	public AbstractProxyCommand(String host, int port, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
+		super(host, port, scheduled, commandTimeoutMilli);
+	}
 
-    public AbstractProxyCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
-        super(clientPool, scheduled, commandTimeoutMilli);
-    }
+	public AbstractProxyCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, int commandTimeoutMilli) {
+		super(clientPool, scheduled, commandTimeoutMilli);
+	}
 }

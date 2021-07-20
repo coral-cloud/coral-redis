@@ -9,7 +9,7 @@ import com.ctrip.xpipe.redis.proxy.Tunnel;
  */
 public interface TunnelMonitorManager {
 
-    TunnelMonitor getOrCreate(Tunnel tunnel);
+	TunnelMonitor getOrCreate(Tunnel tunnel);
 
-    void remove(Tunnel tunnel);
+	void remove(Tunnel tunnel);
 }

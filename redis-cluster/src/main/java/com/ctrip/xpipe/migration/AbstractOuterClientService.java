@@ -11,11 +11,11 @@ import java.util.List;
 
 /**
  * @author shyin
- *
- *         Dec 22, 2016
+ * <p>
+ * Dec 22, 2016
  */
 public abstract class AbstractOuterClientService implements OuterClientService {
-	
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override

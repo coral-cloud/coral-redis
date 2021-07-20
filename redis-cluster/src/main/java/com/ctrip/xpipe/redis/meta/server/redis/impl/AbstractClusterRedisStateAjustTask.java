@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 26, 2016
  */
-public abstract class AbstractClusterRedisStateAjustTask extends AbstractExceptionLogTask implements ClusterRedisStateAjustTask{
-	
+public abstract class AbstractClusterRedisStateAjustTask extends AbstractExceptionLogTask implements ClusterRedisStateAjustTask {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 }

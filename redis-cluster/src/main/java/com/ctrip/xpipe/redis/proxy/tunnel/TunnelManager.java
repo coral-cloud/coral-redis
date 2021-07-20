@@ -15,11 +15,11 @@ import java.util.List;
  */
 public interface TunnelManager extends Releasable, Observer {
 
-    Tunnel create(Channel frontendChannel, ProxyConnectProtocol protocol);
+	Tunnel create(Channel frontendChannel, ProxyConnectProtocol protocol);
 
-    void remove(Channel frontendChannel);
+	void remove(Channel frontendChannel);
 
-    List<Tunnel> tunnels();
+	List<Tunnel> tunnels();
 
-    Tunnel getById(String id);
+	Tunnel getById(String id);
 }

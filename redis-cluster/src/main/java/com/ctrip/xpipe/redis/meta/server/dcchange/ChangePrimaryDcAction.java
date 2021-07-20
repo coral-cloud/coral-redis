@@ -5,11 +5,11 @@ import com.ctrip.xpipe.redis.core.protocal.pojo.MasterInfo;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 9, 2016
  */
 public interface ChangePrimaryDcAction {
-	
+
 	PrimaryDcChangeMessage changePrimaryDc(String clusterId, String shardId, String newPrimaryDc, MasterInfo masterInfo);
 
 }

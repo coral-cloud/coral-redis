@@ -11,57 +11,57 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Feb 24, 2017
+ * <p>
+ * Feb 24, 2017
  */
 public abstract class AbstractRedisReadOnly implements RedisReadonly {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected String ip;
+	protected String ip;
 
-    protected int port;
+	protected int port;
 
-    protected XpipeNettyClientKeyedObjectPool keyedObjectPool;
+	protected XpipeNettyClientKeyedObjectPool keyedObjectPool;
 
-    protected ScheduledExecutorService scheduled;
+	protected ScheduledExecutorService scheduled;
 
-    public AbstractRedisReadOnly(String ip, int port, XpipeNettyClientKeyedObjectPool keyedObjectPool, ScheduledExecutorService scheduled) {
+	public AbstractRedisReadOnly(String ip, int port, XpipeNettyClientKeyedObjectPool keyedObjectPool, ScheduledExecutorService scheduled) {
 
-        this.ip = ip;
-        this.port = port;
-        this.keyedObjectPool = keyedObjectPool;
-        this.scheduled = scheduled;
-    }
-
-
-    @Override
-    public void makeReadOnly() throws RedisReadonlyException {
-
-        try {
-            Command<?> command = createReadOnlyCommand();
-            Object result = command.execute().get();
-            logger.info("[makeReadOnly]{}:{}, {}", ip, port, result);
-        } catch (Exception e) {
-            throw new RedisReadonlyException(String.format("%s:%d make readonly", ip, port), e);
-        }
-    }
-
-    protected abstract Command<?> createReadOnlyCommand();
+		this.ip = ip;
+		this.port = port;
+		this.keyedObjectPool = keyedObjectPool;
+		this.scheduled = scheduled;
+	}
 
 
-    @Override
-    public void makeWritable() throws RedisReadonlyException {
-        try {
-            Command<?> command = createWritableCommand();
-            Object result = command.execute().get();
-            logger.info("[makeWritable]{}:{}, {}", ip, port, (Object) result);
-        } catch (Exception e) {
-            throw new RedisReadonlyException(String.format("%s:%d makeWritable", ip, port), e);
-        }
-    }
+	@Override
+	public void makeReadOnly() throws RedisReadonlyException {
+
+		try {
+			Command<?> command = createReadOnlyCommand();
+			Object result = command.execute().get();
+			logger.info("[makeReadOnly]{}:{}, {}", ip, port, result);
+		} catch (Exception e) {
+			throw new RedisReadonlyException(String.format("%s:%d make readonly", ip, port), e);
+		}
+	}
+
+	protected abstract Command<?> createReadOnlyCommand();
 
 
-    protected abstract Command<?> createWritableCommand();
+	@Override
+	public void makeWritable() throws RedisReadonlyException {
+		try {
+			Command<?> command = createWritableCommand();
+			Object result = command.execute().get();
+			logger.info("[makeWritable]{}:{}, {}", ip, port, result);
+		} catch (Exception e) {
+			throw new RedisReadonlyException(String.format("%s:%d makeWritable", ip, port), e);
+		}
+	}
+
+
+	protected abstract Command<?> createWritableCommand();
 
 }

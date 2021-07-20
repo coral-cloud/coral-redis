@@ -14,16 +14,16 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Feb 24, 2017
  */
-public class DefaultSlaveOfCommand extends AbstractSlaveOfCommand{
+public class DefaultSlaveOfCommand extends AbstractSlaveOfCommand {
 
 	public DefaultSlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 		super(clientPool, scheduled);
 	}
-	
-	public DefaultSlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, String ip, int port, ScheduledExecutorService scheduled){
+
+	public DefaultSlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, String ip, int port, ScheduledExecutorService scheduled) {
 		super(clientPool, ip, port, "", scheduled);
 	}
 
@@ -33,31 +33,31 @@ public class DefaultSlaveOfCommand extends AbstractSlaveOfCommand{
 		if (future().isDone()) {
 			return;
 		}
-		
+
 		SimpleObjectPool<NettyClient> clientPool = getClientPool();
-		
+
 		UntilSuccess slaveOf = new UntilSuccess();
 		slaveOf.add(new XSlaveofCommand(clientPool, ip, port, scheduled));
 		slaveOf.add(new SlaveOfCommand(clientPool, ip, port, scheduled));
-		
+
 		SequenceCommandChain chain = new SequenceCommandChain(false);
-		
+
 		chain.add(slaveOf);
 		chain.add(new ConfigRewrite(clientPool, scheduled));
-		
+
 		chain.execute().addListener(new CommandFutureListener<Object>() {
-			
+
 			@Override
 			public void operationComplete(CommandFuture<Object> commandFuture) throws Exception {
-				
-				if(commandFuture.isSuccess()){
+
+				if (commandFuture.isSuccess()) {
 					future().setSuccess(RedisClientProtocol.OK);
-				}else{
+				} else {
 					future().setFailure(commandFuture.cause());
 				}
 			}
 		});
-		
+
 	}
 
 	@Override

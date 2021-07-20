@@ -6,10 +6,10 @@ import com.ctrip.xpipe.zk.ZkClient;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Oct 10, 2016
  */
-public class RollbackMovingTask extends AbstractSlotMoveTask{
+public class RollbackMovingTask extends AbstractSlotMoveTask {
 
 	public RollbackMovingTask(Integer slot, ClusterServer from, ClusterServer to, ZkClient zkClient) {
 		super(slot, from, to, zkClient);
@@ -19,13 +19,13 @@ public class RollbackMovingTask extends AbstractSlotMoveTask{
 	protected void doExecute() throws Exception {
 
 		setSlotInfo(new SlotInfo(from.getServerId()));
-		
+
 		ClusterServer from = getFrom();
 		ClusterServer to = getTo();
-		if( from != null ){
+		if (from != null) {
 			from.addSlot(slot);
 		}
-		if( to != null ){
+		if (to != null) {
 			to.deleteSlot(slot);
 		}
 		future().setSuccess();
@@ -33,6 +33,6 @@ public class RollbackMovingTask extends AbstractSlotMoveTask{
 
 	@Override
 	protected void doReset() {
-		
+
 	}
 }

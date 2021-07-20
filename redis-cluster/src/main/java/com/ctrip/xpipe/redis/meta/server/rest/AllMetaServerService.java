@@ -9,13 +9,14 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 2, 2016
  */
-public interface AllMetaServerService extends MetaServerConsoleService, MetaServerKeeperService{
-	
+public interface AllMetaServerService extends MetaServerConsoleService, MetaServerKeeperService {
+
 	/**
-	 * current keepers 
+	 * current keepers
+	 *
 	 * @param keeperContainerMeta
 	 * @return
 	 */

@@ -9,19 +9,19 @@ import com.ctrip.xpipe.zk.ZkClient;
 
 /**
  * @author marsqing
- *
- *         Jun 17, 2016 4:53:49 PM
+ * <p>
+ * Jun 17, 2016 4:53:49 PM
  */
 public class DefaultLeaderElectorManager extends AbstractLifecycle implements LeaderElectorManager, TopElement {
-	
-	
+
+
 	private ZkClient zkClient;
-	
-	
+
+
 	public DefaultLeaderElectorManager(ZkClient zkClient) {
 		this.zkClient = zkClient;
 	}
-	
+
 	@Override
 	public LeaderElector createLeaderElector(ElectContext ctx) {
 		return new DefaultLeaderElector(ctx, zkClient.get());
@@ -31,5 +31,5 @@ public class DefaultLeaderElectorManager extends AbstractLifecycle implements Le
 	public int getOrder() {
 		return Ordered.HIGHEST_PRECEDENCE;
 	}
-	
+
 }

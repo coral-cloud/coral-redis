@@ -9,8 +9,8 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
- *         Aug 7, 2016
+ * <p>
+ * Aug 7, 2016
  */
 public interface DcMetaCache extends Observable {
 
@@ -43,13 +43,13 @@ public interface DcMetaCache extends Observable {
 	SentinelMeta getSentinel(String clusterId, String shardId);
 
 	String getSentinelMonitorName(String clusterId, String shardId);
-	
-	
+
+
 	void clusterAdded(ClusterMeta clusterMeta);
 
 	void clusterModified(ClusterMeta clusterMeta);
 
 	void clusterDeleted(String clusterId);
-	
+
 	void primaryDcChanged(String clusterId, String shardId, String newPrimaryDc);
 }

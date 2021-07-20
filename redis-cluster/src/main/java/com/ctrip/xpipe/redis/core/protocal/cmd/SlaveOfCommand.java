@@ -7,15 +7,15 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author marsqing
- *
- *         May 9, 2016 3:19:37 PM
+ * <p>
+ * May 9, 2016 3:19:37 PM
  */
 public class SlaveOfCommand extends AbstractSlaveOfCommand {
 
 	public SlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 		super(clientPool, scheduled);
 	}
-	
+
 	public SlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, String ip, int port, ScheduledExecutorService scheduled) {
 		super(clientPool, ip, port, scheduled);
 	}

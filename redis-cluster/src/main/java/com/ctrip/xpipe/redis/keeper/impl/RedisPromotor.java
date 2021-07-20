@@ -27,37 +27,37 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author marsqing
- *
+ * <p>
  * Jun 22, 2016
  */
 public class RedisPromotor {
-	
+
 	protected Logger logger = LoggerFactory.getLogger(RedisPromotor.class);
-	
+
 	private int waitTimeoutMilli = 60 * 1000;
-	
+
 	private final RedisKeeperServer redisKeeperServer;
 	private final String promoteServerIp;
 	private final int promoteServerPort;
 	private ScheduledExecutorService scheduled;
-	
-	public RedisPromotor(RedisKeeperServer redisKeeperServer, String promoteServerIp, int promoteServerPort, ScheduledExecutorService scheduled){
-		
+
+	public RedisPromotor(RedisKeeperServer redisKeeperServer, String promoteServerIp, int promoteServerPort, ScheduledExecutorService scheduled) {
+
 		this.redisKeeperServer = redisKeeperServer;
 		this.promoteServerIp = promoteServerIp;
 		this.promoteServerPort = promoteServerPort;
 		this.scheduled = scheduled;
 	}
-	
-	public void promote() throws RedisSlavePromotionException{
-		
+
+	public void promote() throws RedisSlavePromotionException {
+
 
 		final RedisSlave redisSlave = findSlave(this.redisKeeperServer, this.promoteServerIp, this.promoteServerPort);
-		if(redisSlave == null){
+		if (redisSlave == null) {
 			String msg = String.format("%s:%s is not a connected slave", promoteServerIp, promoteServerPort);
 			throw new RedisSlavePromotionException(msg);
 		}
-		
+
 		logger.info("[promote]{},{} ,{}:{}", redisKeeperServer, redisSlave, promoteServerIp, promoteServerPort);
 		new Thread() {
 			public void run() {
@@ -74,31 +74,31 @@ public class RedisPromotor {
 
 		SimpleObjectPool<NettyClient> fsyncPool = null;
 		SimpleObjectPool<NettyClient> clientPool = null;
-		try{
+		try {
 			fsyncPool = NettyPoolUtil.createNettyPool(new DefaultEndPoint(promoteServerIp, promoteServerPort));
 			clientPool = NettyPoolUtil.createNettyPool(new DefaultEndPoint(promoteServerIp, promoteServerPort));
 			waitUntilSlaveSync(redisSlave, this.promoteServerIp, this.promoteServerPort, waitTimeoutMilli);
-			
-			try{
+
+			try {
 				redisKeeperServer.getRedisKeeperServerState().setPromotionState(PROMOTION_STATE.BEGIN_PROMOTE_SLAVE);
 				Fsync fsyncCmd = new Fsync(fsyncPool, scheduled);
 				String fsyncResult = fsyncCmd.execute().get();
 				logger.info("[promoteSlaveToMaster][fsync done]{}, {},{}", fsyncResult, promoteServerIp, promoteServerPort);
 				redisModified(redisSlave, clientPool);
-			}catch(ExecutionException e){
+			} catch (ExecutionException e) {
 				logger.error("[promoteSlaveToMaster]" + redisSlave, e.getCause());
-				if(e.getCause() instanceof RedisError){
+				if (e.getCause() instanceof RedisError) {
 					logger.info("[promoteSlaveToMaster][fsync not supported, raw redis]{}", redisSlave);
 					redisNotModified(redisSlave, clientPool);
-				}else{
+				} else {
 					logger.error("[promoteSlaveToMaster][fail]" + redisSlave);
 				}
 			}
-		}finally{
-			if(fsyncPool != null){
+		} finally {
+			if (fsyncPool != null) {
 				fsyncPool.clear();
 			}
-			if(clientPool != null){
+			if (clientPool != null) {
 				clientPool.clear();
 			}
 		}
@@ -106,22 +106,22 @@ public class RedisPromotor {
 
 	private void redisModified(RedisSlave redisSlave, SimpleObjectPool<NettyClient> clientPool) throws Exception {
 
-		try{
+		try {
 			logger.info("[redisModified]{}", redisSlave);
 			AbstractSlaveOfCommand slaveOfCmd = new SlaveOfCommand(clientPool, scheduled);
 			slaveOfCmd.execute().sync();
-	
+
 			InfoCommand infoServerCmd = new InfoCommand(clientPool, "server", scheduled);
 			String info = infoServerCmd.execute().get();
 			String masterId = null;
-	
+
 			List<String> lines = IOUtils.readLines(new StringReader(info));
 			for (String line : lines) {
 				if (line.startsWith("run_id:")) {
 					masterId = line.substring("run_id:".length());
 				}
 			}
-			InfoCommand infoLastMasterCmd = new InfoCommand(clientPool,"lastmaster", scheduled);
+			InfoCommand infoLastMasterCmd = new InfoCommand(clientPool, "lastmaster", scheduled);
 			String infoLastMaster = infoLastMasterCmd.execute().get();
 			long keeperOffset = 0, newMasterOffset = 0;
 			try {
@@ -145,26 +145,26 @@ public class RedisPromotor {
 		logger.info("[redisNotModified]{}", redisSlave);
 		AbstractSlaveOfCommand slaveOfCmd = new SlaveOfCommand(clientPool, scheduled);
 		slaveOfCmd.execute().sync();
-		
+
 		redisKeeperServer.getRedisKeeperServerState().setPromotionState(PROMOTION_STATE.SLAVE_PROMTED, new InetSocketAddress(promoteServerIp, promoteServerPort));
 	}
 
 	private void waitUntilSlaveSync(RedisSlave redisSlave, String ip, int port, int timeoutMilli) {
 
-		logger.info("[waitUntilSlaveSync]{}, {}, {}, {}", redisSlave, ip, port,timeoutMilli);
-		
+		logger.info("[waitUntilSlaveSync]{}, {}, {}, {}", redisSlave, ip, port, timeoutMilli);
+
 		long til = System.currentTimeMillis() + timeoutMilli;
 		while (true) {
 			long current = System.currentTimeMillis();
-			if(current > til){
+			if (current > til) {
 				logger.info("[waitUntilSlaveSync][timeout]{}", redisSlave);
 				break;
 			}
-			
+
 			Long slaveCmdOffset = redisSlave.getAck();
 			long masterCmdOffset = redisSlave.getRedisKeeperServer().getKeeperRepl().getEndOffset();
-			
-			if(slaveCmdOffset == null || slaveCmdOffset < masterCmdOffset){
+
+			if (slaveCmdOffset == null || slaveCmdOffset < masterCmdOffset) {
 				if (logger.isInfoEnabled()) {
 					logger.info("[waitUntilSlaveSync]{}, {} < {}", redisSlave, slaveCmdOffset, masterCmdOffset);
 				}
@@ -172,7 +172,7 @@ public class RedisPromotor {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
 				}
-			}else{
+			} else {
 				break;
 			}
 		}
@@ -181,7 +181,7 @@ public class RedisPromotor {
 	private RedisSlave findSlave(RedisKeeperServer keeper, String actualIp, int actualPort) {
 		Set<RedisSlave> slaves = keeper.slaves();
 		for (RedisSlave redisSlave : slaves) {
-			
+
 			InetSocketAddress slaveAddr = (InetSocketAddress) redisSlave.channel().remoteAddress();
 			String expectedIp = slaveAddr.getAddress().getHostAddress();
 			int expectedPort = redisSlave.getSlaveListeningPort();
@@ -193,21 +193,21 @@ public class RedisPromotor {
 		return null;
 	}
 
-	
-	public static class SlavePromotionInfo{
-		
+
+	public static class SlavePromotionInfo {
+
 		private long keeperOffset;
 		private DefaultEndPoint newMasterEndpoint;
 		private String newMasterRunid;
 		private long newMasterReplOffset;
-		
-		public SlavePromotionInfo(long keeperOffset, DefaultEndPoint newMasterEndpoint, String newMasterRunid, long newMasterReplOffset){
+
+		public SlavePromotionInfo(long keeperOffset, DefaultEndPoint newMasterEndpoint, String newMasterRunid, long newMasterReplOffset) {
 			this.keeperOffset = keeperOffset;
 			this.newMasterEndpoint = newMasterEndpoint;
 			this.newMasterRunid = newMasterRunid;
 			this.newMasterReplOffset = newMasterReplOffset;
 		}
-		
+
 
 		public long getKeeperOffset() {
 			return keeperOffset;
@@ -224,13 +224,13 @@ public class RedisPromotor {
 		public long getNewMasterReplOffset() {
 			return newMasterReplOffset;
 		}
-		
+
 		@Override
 		public String toString() {
 			return String.format(
 					"keeperOffset:%d, newMasterEndpoint:%s, newMasterRunid:%s, newMasterReplOffset:%d",
 					keeperOffset, newMasterEndpoint.toString(), newMasterRunid, newMasterReplOffset
-					);
+			);
 		}
 	}
 }

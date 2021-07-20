@@ -5,10 +5,10 @@ import com.ctrip.xpipe.redis.meta.server.rest.ForwardInfo;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 3, 2016
  */
-public class MovingTargetException extends MetaRestException{
+public class MovingTargetException extends MetaRestException {
 
 	private static final long serialVersionUID = 1L;
 

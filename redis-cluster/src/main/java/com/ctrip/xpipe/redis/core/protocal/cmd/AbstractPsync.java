@@ -28,15 +28,15 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author marsqing
- *
- *         2016年3月24日 下午2:24:38
+ * <p>
+ * 2016年3月24日 下午2:24:38
  */
 public abstract class AbstractPsync extends AbstractRedisCommand<Object> implements Psync, BulkStringParserListener {
 
 	private boolean saveCommands;
 
 	private BulkStringParser rdbReader;
-	
+
 	private String replIdRequest;
 	private long offsetRequest;
 
@@ -54,7 +54,7 @@ public abstract class AbstractPsync extends AbstractRedisCommand<Object> impleme
 	}
 
 	public AbstractPsync(SimpleObjectPool<NettyClient> clientPool, boolean saveCommands,
-			ScheduledExecutorService scheduled) {
+						 ScheduledExecutorService scheduled) {
 		super(clientPool, scheduled);
 		this.saveCommands = saveCommands;
 	}
@@ -63,12 +63,12 @@ public abstract class AbstractPsync extends AbstractRedisCommand<Object> impleme
 	public String getName() {
 		return "psync";
 	}
-	
+
 	@Override
 	protected void doExecute() throws CommandExecutionException {
 		super.doExecute();
 		addFutureListener();
-		
+
 	}
 
 	//public for unit test
@@ -76,7 +76,7 @@ public abstract class AbstractPsync extends AbstractRedisCommand<Object> impleme
 		future().addListener(new CommandFutureListener<Object>() {
 			@Override
 			public void operationComplete(CommandFuture<Object> commandFuture) throws Exception {
-				if(!commandFuture.isSuccess()){
+				if (!commandFuture.isSuccess()) {
 					failPsync(commandFuture.cause());
 				}
 			}
@@ -84,7 +84,7 @@ public abstract class AbstractPsync extends AbstractRedisCommand<Object> impleme
 	}
 
 	protected void failPsync(Throwable throwable) {
-		if(psyncState == PSYNC_STATE.READING_RDB){
+		if (psyncState == PSYNC_STATE.READING_RDB) {
 			failReadRdb(throwable);
 		}
 	}
@@ -117,12 +117,11 @@ public abstract class AbstractPsync extends AbstractRedisCommand<Object> impleme
 	public void addPsyncObserver(PsyncObserver observer) {
 		this.observers.add(observer);
 	}
-	
-	
+
 
 	@Override
 	protected Object doReceiveResponse(Channel channel, ByteBuf byteBuf) throws Exception {
-		while(true) {
+		while (true) {
 			switch (psyncState) {
 
 				case PSYNC_COMMAND_WAITING_REPONSE:
@@ -193,9 +192,9 @@ public abstract class AbstractPsync extends AbstractRedisCommand<Object> impleme
 		} else if (split[0].equalsIgnoreCase(PARTIAL_SYNC)) {
 
 			psyncState = PSYNC_STATE.READING_COMMANDS;
-			
+
 			String newReplId = null;
-			if(split.length >= 2 && split[1].length() == RedisProtocol.RUN_ID_LENGTH){
+			if (split.length >= 2 && split[1].length() == RedisProtocol.RUN_ID_LENGTH) {
 				newReplId = split[1];
 			}
 			doOnContinue(newReplId);
@@ -231,9 +230,9 @@ public abstract class AbstractPsync extends AbstractRedisCommand<Object> impleme
 			observer.onFullSync();
 		}
 	}
-	
-	protected void doOnContinue(String newReplId) throws IOException{
-		getLogger().debug("[doOnContinue]{}",newReplId);
+
+	protected void doOnContinue(String newReplId) throws IOException {
+		getLogger().debug("[doOnContinue]{}", newReplId);
 		notifyContinue(newReplId);
 	}
 

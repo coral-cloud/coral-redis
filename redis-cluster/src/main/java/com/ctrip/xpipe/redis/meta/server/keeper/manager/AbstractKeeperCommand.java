@@ -17,17 +17,17 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Sep 16, 2016
  */
-public abstract class AbstractKeeperCommand<V> extends AbstractCommand<V>{
-	
+public abstract class AbstractKeeperCommand<V> extends AbstractCommand<V> {
+
 	protected final KeeperContainerService keeperContainerService;
 	protected final KeeperTransMeta keeperTransMeta;
 	protected ScheduledExecutorService scheduled;
-	protected int  timeoutMilli;
-	protected int  checkIntervalMilli = 1000;
-	
+	protected int timeoutMilli;
+	protected int checkIntervalMilli = 1000;
+
 	public AbstractKeeperCommand(KeeperContainerService keeperContainerService, KeeperTransMeta keeperTransMeta, ScheduledExecutorService scheduled, int timeoutMilli, int checkIntervalMilli) {
 		this.keeperContainerService = keeperContainerService;
 		this.keeperTransMeta = keeperTransMeta;
@@ -38,41 +38,41 @@ public abstract class AbstractKeeperCommand<V> extends AbstractCommand<V>{
 
 	@Override
 	protected void doExecute() throws Exception {
-		
+
 		getLogger().info("[doExecute]{}", this);
 		doOpetation();
 	}
 
 	@SuppressWarnings("unchecked")
 	private void doOpetation() {
-		try{
+		try {
 			doKeeperContainerOperation();
 			checkUntilStateOk();
-		}catch(KeeperContainerException e){
-			ErrorMessage<KeeperContainerErrorCode>  error = (ErrorMessage<KeeperContainerErrorCode>) e.getErrorMessage();
-			if(error != null && isSuccess(error)){
+		} catch (KeeperContainerException e) {
+			ErrorMessage<KeeperContainerErrorCode> error = (ErrorMessage<KeeperContainerErrorCode>) e.getErrorMessage();
+			if (error != null && isSuccess(error)) {
 				checkUntilStateOk();
-			}else{
+			} else {
 				future().setFailure(e);
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 			future().setFailure(e);
 		}
 	}
 
-	protected void checkUntilStateOk(){
-		
-		CommandRetryWrapper.buildTimeoutRetry(timeoutMilli, 
-				createRetryPolicy(), 
+	protected void checkUntilStateOk() {
+
+		CommandRetryWrapper.buildTimeoutRetry(timeoutMilli,
+				createRetryPolicy(),
 				createCheckStateCommand(), scheduled).execute().addListener(new CommandFutureListener<V>() {
 
 			@Override
 			public void operationComplete(CommandFuture<V> commandFuture) throws Exception {
-				
-				if(commandFuture.isSuccess()){
+
+				if (commandFuture.isSuccess()) {
 					getLogger().info("[checkUntilStateOk][ok]{}", AbstractKeeperCommand.this);
 					future().setSuccess(commandFuture.get());
-				}else{
+				} else {
 					getLogger().info("[checkUntilStateOk][fail]{}, {}", AbstractKeeperCommand.this, commandFuture.cause());
 					future().setFailure(commandFuture.cause());
 				}
@@ -81,7 +81,7 @@ public abstract class AbstractKeeperCommand<V> extends AbstractCommand<V>{
 	}
 
 	protected RetryPolicy createRetryPolicy() {
-		return new RetryDelay(checkIntervalMilli); 
+		return new RetryDelay(checkIntervalMilli);
 	}
 
 	protected abstract Command<V> createCheckStateCommand();
@@ -89,8 +89,8 @@ public abstract class AbstractKeeperCommand<V> extends AbstractCommand<V>{
 	protected abstract boolean isSuccess(ErrorMessage<KeeperContainerErrorCode> error);
 
 	protected abstract void doKeeperContainerOperation();
-	
-	
+
+
 	@Override
 	public String getName() {
 		return String.format("[%s(%s)]", getClass().getSimpleName(), keeperTransMeta);

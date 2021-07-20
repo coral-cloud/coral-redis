@@ -4,8 +4,8 @@ import com.ctrip.xpipe.redis.core.store.RdbStore;
 
 /**
  * @author marsqing
- *
- *         Aug 4, 2016 1:50:03 PM
+ * <p>
+ * Aug 4, 2016 1:50:03 PM
  */
 public class FullSyncContext {
 

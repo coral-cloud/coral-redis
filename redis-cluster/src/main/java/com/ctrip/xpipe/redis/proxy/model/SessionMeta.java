@@ -15,67 +15,67 @@ import java.io.Serializable;
  */
 public class SessionMeta implements Serializable {
 
-    private String type;
+	private String type;
 
-    private String channel;
+	private String channel;
 
-    private String endpoint;
+	private String endpoint;
 
-    private String state;
+	private String state;
 
-    public SessionMeta(Session session, ProxyEndpoint endpoint, SessionState state) {
-        this.type = session.getSessionType().name();
-        this.channel = ChannelUtil.getDesc(session.getChannel());
-        this.endpoint = endpoint.getUri();
-        this.state = state.name();
-    }
+	public SessionMeta(Session session, ProxyEndpoint endpoint, SessionState state) {
+		this.type = session.getSessionType().name();
+		this.channel = ChannelUtil.getDesc(session.getChannel());
+		this.endpoint = endpoint.getUri();
+		this.state = state.name();
+	}
 
-    public SessionMeta(String type, String channel, String endpoint, String state) {
-        this.type = type;
-        this.channel = channel;
-        this.endpoint = endpoint;
-        this.state = state;
-    }
+	public SessionMeta(String type, String channel, String endpoint, String state) {
+		this.type = type;
+		this.channel = channel;
+		this.endpoint = endpoint;
+		this.state = state;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public String getType() {
+		return type;
+	}
 
-    public SessionMeta setType(String type) {
-        this.type = type;
-        return this;
-    }
+	public SessionMeta setType(String type) {
+		this.type = type;
+		return this;
+	}
 
-    public String getChannel() {
-        return channel;
-    }
+	public String getChannel() {
+		return channel;
+	}
 
-    public SessionMeta setChannel(String channel) {
-        this.channel = channel;
-        return this;
-    }
+	public SessionMeta setChannel(String channel) {
+		this.channel = channel;
+		return this;
+	}
 
-    public String getEndpoint() {
-        return endpoint;
-    }
+	public String getEndpoint() {
+		return endpoint;
+	}
 
-    public SessionMeta setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
-        return this;
-    }
+	public SessionMeta setEndpoint(String endpoint) {
+		this.endpoint = endpoint;
+		return this;
+	}
 
-    public String getState() {
-        return state;
-    }
+	public String getState() {
+		return state;
+	}
 
-    public SessionMeta setState(String state) {
-        this.state = state;
-        return this;
-    }
+	public SessionMeta setState(String state) {
+		this.state = state;
+		return this;
+	}
 
 
-    @Override
-    public String toString() {
-        return JsonCodec.INSTANCE.encode(this);
-    }
+	@Override
+	public String toString() {
+		return JsonCodec.INSTANCE.encode(this);
+	}
 }

@@ -7,10 +7,10 @@ import java.io.File;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 24, 2016
  */
-public class RdbStoreExeption extends RedisKeeperRuntimeException{
+public class RdbStoreExeption extends RedisKeeperRuntimeException {
 
 	private static final long serialVersionUID = 1L;
 

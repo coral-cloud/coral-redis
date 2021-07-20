@@ -7,13 +7,13 @@ package com.ctrip.xpipe.utils;
  */
 public interface LeakyBucket {
 
-    boolean tryAcquire();
+	boolean tryAcquire();
 
-    void release();
+	void release();
 
-    void resize(int newSize);
+	void resize(int newSize);
 
-    int references();
+	int references();
 
-    int getTotalSize();
+	int getTotalSize();
 }

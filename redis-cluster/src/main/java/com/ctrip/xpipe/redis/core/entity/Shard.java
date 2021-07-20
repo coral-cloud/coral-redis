@@ -4,20 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         May 04, 2017
+ * <p>
+ * May 04, 2017
  */
 public interface Shard {
 
-    Cluster parent();
+	Cluster parent();
 
-    @JsonIgnore
-    default String getActiveDc(){
-        return parent().getActiveDc();
-    }
+	@JsonIgnore
+	default String getActiveDc() {
+		return parent().getActiveDc();
+	}
 
-    @JsonIgnore
-    default String getBackupDcs(){
-        return parent().getBackupDcs();
-    }
+	@JsonIgnore
+	default String getBackupDcs() {
+		return parent().getBackupDcs();
+	}
 }

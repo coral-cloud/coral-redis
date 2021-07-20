@@ -17,17 +17,17 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 26, 2016
  */
-public class SlavePromotionJob extends AbstractCommand<Void>{
-	
+public class SlavePromotionJob extends AbstractCommand<Void> {
+
 	private KeeperMeta keeperMeta;
 	private String promoteIp;
 	private int promotePort;
 	private SimpleKeyedObjectPool<InetSocketAddress, NettyClient> keyedClientPool;
 	private ScheduledExecutorService scheduled;
-	
+
 	public SlavePromotionJob(KeeperMeta keeperMeta, String promoteIp, int promotePort, SimpleKeyedObjectPool<InetSocketAddress, NettyClient> keyedClientPool, ScheduledExecutorService scheduled) {
 		this.keeperMeta = keeperMeta;
 		this.promoteIp = promoteIp;
@@ -38,26 +38,28 @@ public class SlavePromotionJob extends AbstractCommand<Void>{
 
 	@Override
 	protected void doExecute() {
-	
+
 		XpipeThreadFactory.create("SLAVE_PROMOTION_JOB").newThread(new SlavePromotionTask(future())).start();
 	}
-	
-	
-	public class SlavePromotionTask implements Runnable, CommandFutureListener<String>{
-		
-		private CommandFuture<Void> future; 
+
+
+	public class SlavePromotionTask implements Runnable, CommandFutureListener<String> {
+
+		private CommandFuture<Void> future;
+
 		public SlavePromotionTask(CommandFuture<Void> future) {
 			this.future = future;
 		}
+
 		@Override
 		public void run() {
-			
+
 			getLogger().info("[run]{},{},{}", keeperMeta, promoteIp, promotePort);
-			
-			try{
-				SimpleObjectPool<NettyClient> client = new XpipeObjectPoolFromKeyed<InetSocketAddress, NettyClient>(keyedClientPool, 
+
+			try {
+				SimpleObjectPool<NettyClient> client = new XpipeObjectPoolFromKeyed<InetSocketAddress, NettyClient>(keyedClientPool,
 						new InetSocketAddress(keeperMeta.getIp(), keeperMeta.getPort()));
-				
+
 				SlaveOfCommand slaveOfCommand = new SlaveOfCommand(client, null, 0, String.format("%s %d", promoteIp, promotePort), scheduled);
 				slaveOfCommand.execute().addListener(this);
 				getLogger().info("[run][write cmd]{}", slaveOfCommand);
@@ -66,20 +68,20 @@ public class SlavePromotionJob extends AbstractCommand<Void>{
 				future.setFailure(e);
 			}
 		}
-		
+
 		@Override
 		public void operationComplete(CommandFuture<String> commandFuture) throws Exception {
 
 			getLogger().info("[operationComplete]{},{}", commandFuture);
-			try{
+			try {
 				String result = commandFuture.get();
-				if(result.equalsIgnoreCase(RedisProtocol.OK)){
+				if (result.equalsIgnoreCase(RedisProtocol.OK)) {
 					future.setSuccess(null);
-				}else{
+				} else {
 					future.setFailure(new IllegalStateException(result));
 				}
 				return;
-			}catch(Exception e){
+			} catch (Exception e) {
 				getLogger().error("[onComplete]" + keeperMeta + "," + promoteIp + ":" + promotePort, e);
 				future.setFailure(e);
 			}
@@ -92,7 +94,7 @@ public class SlavePromotionJob extends AbstractCommand<Void>{
 	}
 
 	@Override
-	protected void doReset(){
+	protected void doReset() {
 		throw new UnsupportedOperationException();
 	}
 }

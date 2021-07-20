@@ -8,16 +8,16 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 3, 2016
  */
 @Component
-public class DefaultRemoteMetaServerFactory extends AbstractRemoteClusterSeverFactory<MetaServer>{
-	
+public class DefaultRemoteMetaServerFactory extends AbstractRemoteClusterSeverFactory<MetaServer> {
 
- 	@Override
+
+	@Override
 	protected MetaServer doCreateRemoteServer(int serverId, ClusterServerInfo clusterServerInfo) {
- 		
+
 		return new RemoteMetaServer(currentClusterServer.getServerId(), serverId, clusterServerInfo);
 	}
 

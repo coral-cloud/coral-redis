@@ -4,8 +4,8 @@ import com.ctrip.xpipe.spring.AbstractSpringConfigContext;
 
 /**
  * @author wenchao.meng
- *
- *         Jun 30, 2016
+ * <p>
+ * Jun 30, 2016
  */
 public class AbstractRedisConfigContext extends AbstractSpringConfigContext {
 

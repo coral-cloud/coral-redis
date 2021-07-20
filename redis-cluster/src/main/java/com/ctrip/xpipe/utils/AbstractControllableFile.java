@@ -16,17 +16,17 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jan 5, 2017
  */
-public abstract class AbstractControllableFile implements ControllableFile{
-	
+public abstract class AbstractControllableFile implements ControllableFile {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	private File file;
-	
+
 	private AtomicReference<RandomAccessFile> randomAccessFile = new AtomicReference<RandomAccessFile>(null);
-	
+
 	private AtomicBoolean closed = new AtomicBoolean(false);
 
 	public AbstractControllableFile(String file) throws IOException {
@@ -43,16 +43,16 @@ public abstract class AbstractControllableFile implements ControllableFile{
 
 	public AbstractControllableFile(File file, long pos) throws IOException {
 		this.file = file;
-		if(pos > 0){
+		if (pos > 0) {
 			getFileChannel().position(pos);
 		}
 	}
 
 	@Override
 	public void close() throws IOException {
-		
+
 		closed.set(true);
-		if(randomAccessFile.get() != null){
+		if (randomAccessFile.get() != null) {
 			randomAccessFile.get().close();
 		}
 	}
@@ -62,34 +62,34 @@ public abstract class AbstractControllableFile implements ControllableFile{
 
 		try {
 			return getFileChannel().size();
-		} catch (FileNotFoundException e){
+		} catch (FileNotFoundException e) {
 			throw new XpipeRuntimeException(String.format("file not found:%s", file), e);
 		} catch (IOException e) {
 			logger.warn("error get file size, use file.length:" + file, e);
 		}
 
-		if(!file.exists()){
+		if (!file.exists()) {
 			throw new XpipeRuntimeException(String.format("file not found:%s", file));
 		}
 		return file.length();
 	}
-	
-	protected void tryOpen() throws IOException{
-		
-		if(randomAccessFile.get() == null){
+
+	protected void tryOpen() throws IOException {
+
+		if (randomAccessFile.get() == null) {
 			doOpen();
-		}else if(!randomAccessFile.get().getChannel().isOpen()){
+		} else if (!randomAccessFile.get().getChannel().isOpen()) {
 			logger.debug("[tryOpen][file closed, reopen it]{}", file);
 			doOpen();
 		}
 	}
 
 	protected synchronized void doOpen() throws IOException {
-		
-		if(randomAccessFile.get() != null && randomAccessFile.get().getChannel().isOpen()){
+
+		if (randomAccessFile.get() != null && randomAccessFile.get().getChannel().isOpen()) {
 			return;
 		}
-		
+
 		logger.debug("[doOpen]{}", file);
 		closed.set(false);
 		randomAccessFile.set(new RandomAccessFile(file, "rw"));
@@ -98,17 +98,17 @@ public abstract class AbstractControllableFile implements ControllableFile{
 	}
 
 	@Override
-	public FileChannel getFileChannel() throws IOException{
-		
+	public FileChannel getFileChannel() throws IOException {
+
 		tryOpen();
 		return randomAccessFile.get().getChannel();
 	}
-	
+
 	@Override
 	public boolean isOpen() {
 		return !closed.get();
 	}
-	
+
 	@Override
 	public String toString() {
 		return FileUtils.shortPath(file.getPath());

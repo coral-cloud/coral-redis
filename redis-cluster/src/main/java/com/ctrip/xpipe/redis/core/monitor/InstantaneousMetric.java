@@ -7,7 +7,7 @@ package com.ctrip.xpipe.redis.core.monitor;
  */
 public interface InstantaneousMetric {
 
-    long getInstantaneousMetric();
+	long getInstantaneousMetric();
 
-    void trackInstantaneousMetric(long currentStats);
+	void trackInstantaneousMetric(long currentStats);
 }

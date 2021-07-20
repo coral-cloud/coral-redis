@@ -16,10 +16,10 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月22日 下午3:51:33
  */
-public class InfoHandler extends AbstractCommandHandler{
+public class InfoHandler extends AbstractCommandHandler {
 
 	private Map<String, InfoSection> sections = Maps.newConcurrentMap();
 
@@ -42,7 +42,7 @@ public class InfoHandler extends AbstractCommandHandler{
 	@Override
 	public boolean isLog(String[] args) {
 		// INFO command is called by sentinel very frequently, so we need to hide the log
-	    return false;
+		return false;
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class InfoHandler extends AbstractCommandHandler{
 
 		RedisKeeperServer redisKeeperServer = redisClient.getRedisKeeperServer();
 		String result;
-		if(args.length == 0){
+		if (args.length == 0) {
 			result = new DefaultInfoSections().getInfo(redisKeeperServer);
 		} else {
 			result = doSectionHandler(args[0], redisKeeperServer);
@@ -161,12 +161,12 @@ public class InfoHandler extends AbstractCommandHandler{
 			sb.append(strAndLong(KEY_TOTAL_SYNC_PARTIAL_ERROR, stats.getPartialSyncErrorCount()));
 			sb.append(strAndLong(KEY_TOTAL_NET_INPUT_BYTES, stats.getInputBytes()));
 			sb.append(strAndLong(KEY_TOTAL_NET_OUTPUT_BYTES, stats.getOutputBytes()));
-			sb.append(strAndFloat(KEY_INSTANTANEOUS_INPUT_KBPS, ((float)stats.getInputInstantaneousBPS() / kilo)));
-			sb.append(strAndFloat(KEY_INSTANTANEOUS_OUTPUT_KBPS, ((float)stats.getOutputInstantaneousBPS() / kilo)));
+			sb.append(strAndFloat(KEY_INSTANTANEOUS_INPUT_KBPS, ((float) stats.getInputInstantaneousBPS() / kilo)));
+			sb.append(strAndFloat(KEY_INSTANTANEOUS_OUTPUT_KBPS, ((float) stats.getOutputInstantaneousBPS() / kilo)));
 			sb.append(strAndLong(KEY_PEAK_INPUT_KBPS, stats.getPeakInputInstantaneousBPS() / kilo));
 			sb.append(strAndLong(KEY_PEAK_OUTPUT_KBPS, stats.getPeakOutputInstantaneousBPS() / kilo));
 			sb.append(strAndLong(KEY_PSYNC_SEND_FAILURE, stats.getPsyncSendFailCount()));
-			if(stats.getLastPsyncFailReason() != null) {
+			if (stats.getLastPsyncFailReason() != null) {
 				sb.append(strAndStr(KEY_LAST_FAIL_REASON, stats.getLastPsyncFailReason().name()));
 			}
 			return sb.toString();
@@ -206,17 +206,17 @@ public class InfoHandler extends AbstractCommandHandler{
 			sb.append("role:" + Server.SERVER_ROLE.SLAVE + RedisProtocol.CRLF);
 			sb.append(RedisProtocol.KEEPER_ROLE_PREFIX + ":" + redisKeeperServer.role() + RedisProtocol.CRLF);
 			sb.append("state:" + redisKeeperServer.getRedisKeeperServerState().keeperState() + RedisProtocol.CRLF);
-			RedisMaster redisMaster =  redisKeeperServer.getRedisMaster();
-			String masterHost = redisMaster == null ? null: redisMaster.masterEndPoint().getHost();
-			Integer masterPort = redisMaster == null ? null: redisMaster.masterEndPoint().getPort();
-			if(masterHost != null){
-				sb.append("master_host:" + masterHost + RedisProtocol.CRLF );
-				sb.append("master_port:"  + masterPort +  RedisProtocol.CRLF );
+			RedisMaster redisMaster = redisKeeperServer.getRedisMaster();
+			String masterHost = redisMaster == null ? null : redisMaster.masterEndPoint().getHost();
+			Integer masterPort = redisMaster == null ? null : redisMaster.masterEndPoint().getPort();
+			if (masterHost != null) {
+				sb.append("master_host:" + masterHost + RedisProtocol.CRLF);
+				sb.append("master_port:" + masterPort + RedisProtocol.CRLF);
 				/**
 				 * If not report master link status as up, then sentinal is found crashed
 				 * when sentinel is doing slaveof new_master_ip new_master_port
 				 */
-				sb.append("master_link_status:up" +  RedisProtocol.CRLF );
+				sb.append("master_link_status:up" + RedisProtocol.CRLF);
 			}
 			/**
 			 * To make sure keeper is the least option to be the new master when master is down
@@ -227,21 +227,21 @@ public class InfoHandler extends AbstractCommandHandler{
 			Set<RedisSlave> slaves = redisKeeperServer.slaves();
 			sb.append("connected_slaves:" + slaves.size() + RedisProtocol.CRLF);
 			int slaveIndex = 0;
-			for(RedisSlave slave : slaves){
+			for (RedisSlave slave : slaves) {
 				sb.append(String.format("slave%d:%s" + RedisProtocol.CRLF, slaveIndex, slave.info()));
 				slaveIndex++;
 			}
 
 			long beginOffset = keeperRepl.getBeginOffset();
 			MetaStore metaStore = replicationStore.getMetaStore();
-			String replid = metaStore == null? ReplicationStoreMeta.EMPTY_REPL_ID : metaStore.getReplId();
-			String replid2 = metaStore == null? ReplicationStoreMeta.EMPTY_REPL_ID : metaStore.getReplId2();
-			long  secondReplIdOffset = metaStore == null? ReplicationStoreMeta.DEFAULT_SECOND_REPLID_OFFSET : metaStore.getSecondReplIdOffset();
+			String replid = metaStore == null ? ReplicationStoreMeta.EMPTY_REPL_ID : metaStore.getReplId();
+			String replid2 = metaStore == null ? ReplicationStoreMeta.EMPTY_REPL_ID : metaStore.getReplId2();
+			long secondReplIdOffset = metaStore == null ? ReplicationStoreMeta.DEFAULT_SECOND_REPLID_OFFSET : metaStore.getSecondReplIdOffset();
 
-			if(replid == null){
+			if (replid == null) {
 				replid = ReplicationStoreMeta.EMPTY_REPL_ID;
 			}
-			if(replid2 == null){
+			if (replid2 == null) {
 				replid2 = ReplicationStoreMeta.EMPTY_REPL_ID;
 			}
 
@@ -251,12 +251,12 @@ public class InfoHandler extends AbstractCommandHandler{
 			sb.append("second_repl_offset:" + secondReplIdOffset + RedisProtocol.CRLF);
 
 			sb.append("repl_backlog_active:1" + RedisProtocol.CRLF);
-			sb.append("repl_backlog_first_byte_offset:" + beginOffset+ RedisProtocol.CRLF);
+			sb.append("repl_backlog_first_byte_offset:" + beginOffset + RedisProtocol.CRLF);
 			try {
 				long endOffset = keeperRepl.getEndOffset();
 				sb.append("master_repl_offset:" + endOffset + RedisProtocol.CRLF);
 				sb.append("repl_backlog_size:" + (endOffset - beginOffset + 1) + RedisProtocol.CRLF);
-				sb.append("repl_backlog_histlen:" + (endOffset - beginOffset + 1)+ RedisProtocol.CRLF);
+				sb.append("repl_backlog_histlen:" + (endOffset - beginOffset + 1) + RedisProtocol.CRLF);
 			} catch (Throwable ex) {
 				sb.append("error_message:" + ex.getMessage() + RedisProtocol.CRLF);
 				logger.info("Cannot calculate end offset", ex);

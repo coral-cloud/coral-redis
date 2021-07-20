@@ -13,87 +13,87 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Sep 07, 2017
+ * <p>
+ * Sep 07, 2017
  */
 public class InfoReplicationComplementCommand extends AbstractCommand<RedisInfo> {
 
-    private SimpleObjectPool<NettyClient> clientPool;
-    private ScheduledExecutorService scheduled;
+	private SimpleObjectPool<NettyClient> clientPool;
+	private ScheduledExecutorService scheduled;
 
-    public InfoReplicationComplementCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled){
-        this.clientPool = clientPool;
-        this.scheduled = scheduled;
-    }
+	public InfoReplicationComplementCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
+		this.clientPool = clientPool;
+		this.scheduled = scheduled;
+	}
 
 
-    @Override
-    public String getName() {
-        return "InfoReplicationComplementCommand";
-    }
+	@Override
+	public String getName() {
+		return "InfoReplicationComplementCommand";
+	}
 
-    @Override
-    protected void doExecute() throws InterruptedException, ExecutionException {
+	@Override
+	protected void doExecute() throws InterruptedException, ExecutionException {
 
-        new InfoReplicationCommand(clientPool, scheduled).execute().addListener(new CommandFutureListener<RedisInfo>() {
-            @Override
-            public void operationComplete(CommandFuture<RedisInfo> commandFuture) throws InterruptedException, ExecutionException {
+		new InfoReplicationCommand(clientPool, scheduled).execute().addListener(new CommandFutureListener<RedisInfo>() {
+			@Override
+			public void operationComplete(CommandFuture<RedisInfo> commandFuture) throws InterruptedException, ExecutionException {
 
-                if(!commandFuture.isSuccess()){
-                    future().setFailure(commandFuture.cause());
-                    return;
-                }
+				if (!commandFuture.isSuccess()) {
+					future().setFailure(commandFuture.cause());
+					return;
+				}
 
-                RedisInfo redisInfo = commandFuture.get();
-                if(redisInfo instanceof MasterInfo){
-                    MasterInfo masterInfo = (MasterInfo) redisInfo;
-                    if (masterInfo.getReplId() == null){
-                        getLogger().info("replid null, get master id. {}, {}", clientPool.desc(), masterInfo);
-                        getRunId(masterInfo);
-                    }else {
-                        future().setSuccess(redisInfo);
-                    }
-                }else {
-                    future().setSuccess(redisInfo);
-                }
-            }
-        });
-    }
+				RedisInfo redisInfo = commandFuture.get();
+				if (redisInfo instanceof MasterInfo) {
+					MasterInfo masterInfo = (MasterInfo) redisInfo;
+					if (masterInfo.getReplId() == null) {
+						getLogger().info("replid null, get master id. {}, {}", clientPool.desc(), masterInfo);
+						getRunId(masterInfo);
+					} else {
+						future().setSuccess(redisInfo);
+					}
+				} else {
+					future().setSuccess(redisInfo);
+				}
+			}
+		});
+	}
 
-    private void getRunId(MasterInfo masterInfo) {
-        new InfoCommand(clientPool, InfoCommand.INFO_TYPE.SERVER, scheduled).execute().addListener(new CommandFutureListener<String>() {
+	private void getRunId(MasterInfo masterInfo) {
+		new InfoCommand(clientPool, InfoCommand.INFO_TYPE.SERVER, scheduled).execute().addListener(new CommandFutureListener<String>() {
 
-            @Override
-            public void operationComplete(CommandFuture<String> commandFuture) throws InterruptedException, ExecutionException {
+			@Override
+			public void operationComplete(CommandFuture<String> commandFuture) throws InterruptedException, ExecutionException {
 
-                if(!commandFuture.isSuccess()){
-                    getLogger().info("[getRunId][fail use previous result]{}, {}", clientPool.desc(), masterInfo);
-                    future().setSuccess(masterInfo);
-                    return;
-                }
-                String serverInfo = commandFuture.get();
-                masterInfo.setReplId(getMasterId(serverInfo));
-                future().setSuccess(masterInfo);
-            }
-        });
-    }
+				if (!commandFuture.isSuccess()) {
+					getLogger().info("[getRunId][fail use previous result]{}, {}", clientPool.desc(), masterInfo);
+					future().setSuccess(masterInfo);
+					return;
+				}
+				String serverInfo = commandFuture.get();
+				masterInfo.setReplId(getMasterId(serverInfo));
+				future().setSuccess(masterInfo);
+			}
+		});
+	}
 
-    private String getMasterId(String serverInfo) {
+	private String getMasterId(String serverInfo) {
 
-        for(String line : serverInfo.split("\\s+")){
-            String []sp = line.split("\\s*:\\s*");
-            if(sp.length != 2){
-                continue;
-            }
-            if(sp[0].trim().equalsIgnoreCase("run_id")){
-                return sp[1].trim();
-            }
-        }
-        return null;
-    }
+		for (String line : serverInfo.split("\\s+")) {
+			String[] sp = line.split("\\s*:\\s*");
+			if (sp.length != 2) {
+				continue;
+			}
+			if (sp[0].trim().equalsIgnoreCase("run_id")) {
+				return sp[1].trim();
+			}
+		}
+		return null;
+	}
 
-    @Override
-    protected void doReset() {
+	@Override
+	protected void doReset() {
 
-    }
+	}
 }

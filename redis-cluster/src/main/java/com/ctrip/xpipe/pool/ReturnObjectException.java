@@ -4,10 +4,10 @@ import com.ctrip.xpipe.exception.XpipeException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
-public class ReturnObjectException extends XpipeException{
+public class ReturnObjectException extends XpipeException {
 
 	private static final long serialVersionUID = 1L;
 

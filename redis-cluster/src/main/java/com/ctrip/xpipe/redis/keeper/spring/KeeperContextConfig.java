@@ -12,16 +12,16 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author marsqing
- *
- *         May 26, 2016 6:23:55 PM
+ * <p>
+ * May 26, 2016 6:23:55 PM
  */
 @Configuration
-@ComponentScan({"com.ctrip.xpipe.redis.keeper" })
-public class KeeperContextConfig extends AbstractRedisConfigContext{
-		
+@ComponentScan({"com.ctrip.xpipe.redis.keeper"})
+public class KeeperContextConfig extends AbstractRedisConfigContext {
+
 	@Bean
-	public LeaderElectorManager geElectorManager(KeeperConfig  keeperConfig, ZkClient zkClient){
-		
+	public LeaderElectorManager geElectorManager(KeeperConfig keeperConfig, ZkClient zkClient) {
+
 		return new DefaultLeaderElectorManager(zkClient);
 	}
 

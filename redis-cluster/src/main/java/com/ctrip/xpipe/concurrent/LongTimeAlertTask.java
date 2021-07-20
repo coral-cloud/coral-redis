@@ -4,29 +4,29 @@ import com.ctrip.xpipe.api.monitor.EventMonitor;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Jan 30, 2018
+ * <p>
+ * Jan 30, 2018
  */
 public class LongTimeAlertTask extends AbstractExceptionLogTask {
 
-    private Runnable task;
-    private long alertMilli;
+	private Runnable task;
+	private long alertMilli;
 
-    public LongTimeAlertTask(Runnable task, long alertMilli){
-        this.task = task;
-        this.alertMilli = alertMilli;
-    }
+	public LongTimeAlertTask(Runnable task, long alertMilli) {
+		this.task = task;
+		this.alertMilli = alertMilli;
+	}
 
-    @Override
-    protected void doRun() throws Exception {
+	@Override
+	protected void doRun() throws Exception {
 
-        long begin = System.currentTimeMillis();
-        task.run();
-        long end = System.currentTimeMillis();
-        long duration = end - begin;
-        if( duration >= alertMilli){
-            getLogger().warn("[doRun]{} ms, {}", duration, task);
-            EventMonitor.DEFAULT.logAlertEvent(String.format("%d ms, %s", duration, task));
-        }
-    }
+		long begin = System.currentTimeMillis();
+		task.run();
+		long end = System.currentTimeMillis();
+		long duration = end - begin;
+		if (duration >= alertMilli) {
+			getLogger().warn("[doRun]{} ms, {}", duration, task);
+			EventMonitor.DEFAULT.logAlertEvent(String.format("%d ms, %s", duration, task));
+		}
+	}
 }

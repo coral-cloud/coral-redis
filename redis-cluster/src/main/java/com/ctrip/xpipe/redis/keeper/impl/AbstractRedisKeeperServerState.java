@@ -18,23 +18,23 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 8, 2016
  */
-public abstract class AbstractRedisKeeperServerState implements RedisKeeperServerState{
+public abstract class AbstractRedisKeeperServerState implements RedisKeeperServerState {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	protected Endpoint masterAddress;
-	
+
 	protected RedisKeeperServer redisKeeperServer;
-	
-	public AbstractRedisKeeperServerState(RedisKeeperServer redisKeeperServer){
+
+	public AbstractRedisKeeperServerState(RedisKeeperServer redisKeeperServer) {
 		this(redisKeeperServer, null);
 	}
 
-	public AbstractRedisKeeperServerState(RedisKeeperServer redisKeeperServer, Endpoint masterAddress){
-		
+	public AbstractRedisKeeperServerState(RedisKeeperServer redisKeeperServer, Endpoint masterAddress) {
+
 		this.redisKeeperServer = redisKeeperServer;
 		this.masterAddress = masterAddress;
 	}
@@ -45,51 +45,50 @@ public abstract class AbstractRedisKeeperServerState implements RedisKeeperServe
 	}
 
 
-	
 	@Override
 	public void setShardStatus(ShardStatus shardStatus) throws IOException {
-		
-		if(shardStatus.getRedisMaster() != null && shardStatus.getUpstreamKeeper() != null){
+
+		if (shardStatus.getRedisMaster() != null && shardStatus.getUpstreamKeeper() != null) {
 			logger.error("[setShardStatus][active keeper and upstream keeper both not null]{}, {}", shardStatus.getActiveKeeper(), shardStatus.getUpstreamKeeper());
 			return;
 		}
 
 		KeeperMeta currentKeeperMeta = redisKeeperServer.getCurrentKeeperMeta();
-		
+
 		KeeperMeta activeKeeper = shardStatus.getActiveKeeper();
-		
-		if(activeKeeper == null){
+
+		if (activeKeeper == null) {
 			logger.info("[setShardStatus][active keeper null]");
 			return;
 		}
-		
-		if(activeKeeper.getIp().equals(currentKeeperMeta.getIp()) && activeKeeper.getPort() == currentKeeperMeta.getPort()){
+
+		if (activeKeeper.getIp().equals(currentKeeperMeta.getIp()) && activeKeeper.getPort() == currentKeeperMeta.getPort()) {
 			RedisMeta redisMaster = shardStatus.getRedisMaster();
 			KeeperMeta upstreamKeeer = shardStatus.getUpstreamKeeper();
-			
+
 			Endpoint masterAddress = null;
-			if(redisMaster != null){
+			if (redisMaster != null) {
 				masterAddress = new DefaultEndPoint(redisMaster.getIp(), redisMaster.getPort());
 			}
-			
-			if(upstreamKeeer != null){
+
+			if (upstreamKeeer != null) {
 				masterAddress = new DefaultEndPoint(upstreamKeeer.getIp(), upstreamKeeer.getPort());
 			}
 			becomeActive(masterAddress);
-		}else{
+		} else {
 			becomeBackup(new DefaultEndPoint(activeKeeper.getIp(), activeKeeper.getPort()));
 		}
 	}
 
 	@Override
 	public void setMasterAddress(Endpoint masterAddress) {
-		
-		if(ObjectUtils.equals(this.masterAddress, masterAddress)){
 
-			if(this.masterAddress instanceof ProxyEnabled) {
+		if (ObjectUtils.equals(this.masterAddress, masterAddress)) {
+
+			if (this.masterAddress instanceof ProxyEnabled) {
 				ProxyEnabled current = (ProxyEnabled) this.masterAddress;
 				ProxyEnabled future = (ProxyEnabled) masterAddress;
-				if(current.isSameWith(future)) {
+				if (current.isSameWith(future)) {
 					logger.info("[setMasterAddress][proxied][master address unchanged]{},{}", this.masterAddress, masterAddress);
 					return;
 				}
@@ -101,22 +100,22 @@ public abstract class AbstractRedisKeeperServerState implements RedisKeeperServe
 		logger.info("[setMasterAddress]{}, {}", this.masterAddress, masterAddress);
 		this.masterAddress = masterAddress;
 		keeperMasterChanged();
-		
+
 	}
 
 
-	protected abstract  void keeperMasterChanged();
+	protected abstract void keeperMasterChanged();
 
 	@Override
 	public void setPromotionState(PROMOTION_STATE promotionState) throws IOException {
 		this.setPromotionState(promotionState, null);
 	}
 
-	protected void reconnectMaster(){
+	protected void reconnectMaster() {
 		logger.info("[reconnectMaster]{}", redisKeeperServer);
 		this.redisKeeperServer.reconnectMaster();
 	}
-	
+
 	@Override
 	public RedisKeeperServer getRedisKeeperServer() {
 		return this.redisKeeperServer;
@@ -124,7 +123,7 @@ public abstract class AbstractRedisKeeperServerState implements RedisKeeperServe
 
 	@Override
 	public String toString() {
-		
+
 		return String.format("state:%s, master:%s", keeperState(), getMaster());
 	}
 
@@ -132,26 +131,26 @@ public abstract class AbstractRedisKeeperServerState implements RedisKeeperServe
 	public void initPromotionState() {
 		logger.info("[initPromotionState][nothing to do]");
 	}
-	
-	protected void doBecomeBackup(Endpoint masterAddress){
-		
+
+	protected void doBecomeBackup(Endpoint masterAddress) {
+
 		logger.info("[doBecomeBackup]{}", this);
-		try{
+		try {
 			redisKeeperServer.getReplicationStore().getMetaStore().becomeBackup();
-		}catch(Exception e){
+		} catch (Exception e) {
 			logger.error("[activedoBecomeBackupToBackup]" + this, e);
 		}
 		redisKeeperServer.setRedisKeeperServerState(new RedisKeeperServerStateBackup(redisKeeperServer, masterAddress));
 		reconnectMaster();
 	}
 
-	protected void doBecomeActive(Endpoint masterAddress){
-		
+	protected void doBecomeActive(Endpoint masterAddress) {
+
 		logger.info("[doBecomeActive]{}", this);
-		try{
+		try {
 			ReplicationStore replicationStore = redisKeeperServer.getReplicationStore();
 			replicationStore.getMetaStore().becomeActive();
-		}catch(Exception e){
+		} catch (Exception e) {
 			logger.error("[doBecomeActive]" + this + "," + masterAddress, e);
 		}
 		redisKeeperServer.setRedisKeeperServerState(new RedisKeeperServerStateActive(redisKeeperServer, masterAddress));

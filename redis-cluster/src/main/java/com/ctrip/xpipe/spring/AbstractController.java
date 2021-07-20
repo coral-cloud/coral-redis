@@ -1,8 +1,6 @@
 package com.ctrip.xpipe.spring;
 
 
-
-
 import com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,11 +8,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author marsqing
- *
- *         May 26, 2016 6:34:49 PM
+ * <p>
+ * May 26, 2016 6:34:49 PM
  */
 public class AbstractController {
-	
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected Joiner joiner = Joiner.on(",");

@@ -13,39 +13,39 @@ import java.io.File;
  */
 public class NettyClientSslHandlerFactory extends AbstractNettySslHandlerFactory {
 
-    private volatile SslContext sslContext;
+	private volatile SslContext sslContext;
 
-    public NettyClientSslHandlerFactory(TLSConfig config) {
-        super(config);
-    }
+	public NettyClientSslHandlerFactory(TLSConfig config) {
+		super(config);
+	}
 
-    @Override
-    public SslHandler createSslHandler(SocketChannel channel) {
-        SslHandler sslHandler = getNettySslContext().newHandler(channel.alloc());
-        return getCustomizedSslHandler(sslHandler);
-    }
+	@Override
+	public SslHandler createSslHandler(SocketChannel channel) {
+		SslHandler sslHandler = getNettySslContext().newHandler(channel.alloc());
+		return getCustomizedSslHandler(sslHandler);
+	}
 
-    private SslContext getNettySslContext() {
-        if(sslContext == null) {
-            synchronized (this) {
-                if(sslContext == null) {
-                    try {
-                        File certChainFile = new File(tlsConfig.getClientCertChainFilePath());
-                        File keyFile = new File(tlsConfig.getClientKeyFilePath());
-                        File rootFile = new File(tlsConfig.getRootFilePath());
+	private SslContext getNettySslContext() {
+		if (sslContext == null) {
+			synchronized (this) {
+				if (sslContext == null) {
+					try {
+						File certChainFile = new File(tlsConfig.getClientCertChainFilePath());
+						File keyFile = new File(tlsConfig.getClientKeyFilePath());
+						File rootFile = new File(tlsConfig.getRootFilePath());
 
-                        sslContext = SslContextBuilder.forClient()
-                                .keyManager(certChainFile, keyFile)
-                                .trustManager(rootFile)
-                                .clientAuth(ClientAuth.REQUIRE)
-                                .sslProvider(SslProvider.OPENSSL).build();
-                    } catch (Exception e) {
-                        logger.error("[getNettySslContext] ", e);
-                    }
-                }
-            }
-        }
-        return sslContext;
-    }
+						sslContext = SslContextBuilder.forClient()
+								.keyManager(certChainFile, keyFile)
+								.trustManager(rootFile)
+								.clientAuth(ClientAuth.REQUIRE)
+								.sslProvider(SslProvider.OPENSSL).build();
+					} catch (Exception e) {
+						logger.error("[getNettySslContext] ", e);
+					}
+				}
+			}
+		}
+		return sslContext;
+	}
 
 }

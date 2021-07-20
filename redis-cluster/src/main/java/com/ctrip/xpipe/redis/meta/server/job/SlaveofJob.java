@@ -15,10 +15,10 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Oct 28, 2016
  */
-public class SlaveofJob extends AbstractRedisesSlaveofJob{
+public class SlaveofJob extends AbstractRedisesSlaveofJob {
 
 	public SlaveofJob(List<RedisMeta> slaves, String masterHost, int masterPort,
 					  SimpleKeyedObjectPool<Endpoint, NettyClient> clientPool, ScheduledExecutorService scheduled, Executor executors) {

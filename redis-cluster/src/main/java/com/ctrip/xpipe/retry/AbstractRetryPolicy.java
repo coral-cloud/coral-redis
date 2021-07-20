@@ -10,15 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 9, 2016
  */
-public abstract class AbstractRetryPolicy implements RetryPolicy{
+public abstract class AbstractRetryPolicy implements RetryPolicy {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	private AtomicInteger  count = new AtomicInteger(0);
-	
+	private AtomicInteger count = new AtomicInteger(0);
+
 	private int waitTimeOutMilli = 3600000;
 
 	@Override
@@ -35,7 +35,7 @@ public abstract class AbstractRetryPolicy implements RetryPolicy{
 	public boolean retry(Throwable th) {
 		return true;
 	}
-	
+
 	@Override
 	public int waitTimeoutMilli() {
 		return waitTimeOutMilli;
@@ -43,13 +43,13 @@ public abstract class AbstractRetryPolicy implements RetryPolicy{
 
 	@Override
 	public int retryWaitMilli(boolean sleep) throws InterruptedException {
-		
+
 		int current = count.incrementAndGet();
 		int sleepTime = getSleepTime(current);
-		if(!sleep){
+		if (!sleep) {
 			return sleepTime;
 		}
-		
+
 		try {
 			TimeUnit.MILLISECONDS.sleep(sleepTime);
 		} catch (InterruptedException e) {
@@ -59,18 +59,18 @@ public abstract class AbstractRetryPolicy implements RetryPolicy{
 		return sleepTime;
 	}
 
-	
+
 	@Override
 	public int getRetryTimes() {
 		return count.get();
 	}
-	
+
 	protected abstract int getSleepTime(int currentRetryTime);
 
-	
+
 	@Override
 	public boolean timeoutCancel() {
 		return false;
 	}
-	
+
 }

@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月24日 下午6:29:33
  */
-public abstract class AbstractRedisProtocol implements RedisProtocol{
-	
+public abstract class AbstractRedisProtocol implements RedisProtocol {
+
 }

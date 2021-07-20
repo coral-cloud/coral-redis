@@ -6,5 +6,5 @@ package com.ctrip.xpipe.redis.core.protocal.cmd.pubsub;
  * Apr 04, 2018
  */
 public interface SubscribeListener {
-    void message(String channel, String message);
+	void message(String channel, String message);
 }

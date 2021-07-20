@@ -5,23 +5,23 @@ import com.ctrip.xpipe.api.migration.DcMapper;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Apr 07, 2017
+ * <p>
+ * Apr 07, 2017
  */
-public class DefaultDcMapper implements DcMapper{
+public class DefaultDcMapper implements DcMapper {
 
-    @Override
-    public String getDc(String dcName) {
-        return dcName;
-    }
+	@Override
+	public String getDc(String dcName) {
+		return dcName;
+	}
 
-    @Override
-    public String reverse(String otherDcName) {
-        return otherDcName;
-    }
+	@Override
+	public String reverse(String otherDcName) {
+		return otherDcName;
+	}
 
-    @Override
-    public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE;
-    }
+	@Override
+	public int getOrder() {
+		return Ordered.LOWEST_PRECEDENCE;
+	}
 }

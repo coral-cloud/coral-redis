@@ -14,50 +14,50 @@ import java.util.List;
  */
 public interface SessionStats extends Startable, Stoppable, SessionEventHandler {
 
-    void increaseInputBytes(long bytes);
+	void increaseInputBytes(long bytes);
 
-    void increaseOutputBytes(long bytes);
+	void increaseOutputBytes(long bytes);
 
-    long lastUpdateTime();
+	long lastUpdateTime();
 
-    long getInputBytes();
+	long getInputBytes();
 
-    long getOutputBytes();
+	long getOutputBytes();
 
-    long getInputInstantaneousBPS();
+	long getInputInstantaneousBPS();
 
-    long getOutputInstantaneousBPS();
+	long getOutputInstantaneousBPS();
 
-    List<AutoReadEvent> getAutoReadEvents();
+	List<AutoReadEvent> getAutoReadEvents();
 
-    class AutoReadEvent {
-        private long startTime;
-        private long endTime;
+	class AutoReadEvent {
+		private long startTime;
+		private long endTime;
 
-        public long getStartTime() {
-            return startTime;
-        }
+		public long getStartTime() {
+			return startTime;
+		}
 
-        public AutoReadEvent setStartTime(long startTime) {
-            this.startTime = startTime;
-            return this;
-        }
+		public AutoReadEvent setStartTime(long startTime) {
+			this.startTime = startTime;
+			return this;
+		}
 
-        public long getEndTime() {
-            return endTime;
-        }
+		public long getEndTime() {
+			return endTime;
+		}
 
-        public AutoReadEvent setEndTime(long endTime) {
-            this.endTime = endTime;
-            return this;
-        }
+		public AutoReadEvent setEndTime(long endTime) {
+			this.endTime = endTime;
+			return this;
+		}
 
-        @Override
-        public String toString() {
-            return "AutoReadEvent{" +
-                    "startTime=" + DateTimeUtils.timeAsString(startTime) +
-                    ", endTime=" + DateTimeUtils.timeAsString(endTime) +
-                    '}';
-        }
-    }
+		@Override
+		public String toString() {
+			return "AutoReadEvent{" +
+					"startTime=" + DateTimeUtils.timeAsString(startTime) +
+					", endTime=" + DateTimeUtils.timeAsString(endTime) +
+					'}';
+		}
+	}
 }

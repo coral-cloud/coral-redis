@@ -4,12 +4,12 @@ import com.ctrip.xpipe.redis.keeper.exception.RedisKeeperRuntimeException;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Jan 16, 2018
+ * <p>
+ * Jan 16, 2018
  */
-public class RedisKeeperServerStateException extends RedisKeeperRuntimeException{
+public class RedisKeeperServerStateException extends RedisKeeperRuntimeException {
 
-    public RedisKeeperServerStateException(String keeperDesc, String currentLifecycle) {
-        super(String.format("keeper:%s, currentState:%s", keeperDesc, currentLifecycle));
-    }
+	public RedisKeeperServerStateException(String keeperDesc, String currentLifecycle) {
+		super(String.format("keeper:%s, currentState:%s", keeperDesc, currentLifecycle));
+	}
 }

@@ -15,29 +15,29 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 26, 2016
  */
-public class BackupDcClusterRedisStateAjust extends AbstractClusterRedisStateAjustTask{
-	
+public class BackupDcClusterRedisStateAjust extends AbstractClusterRedisStateAjustTask {
+
 	private String clusterId;
-	
+
 	private CurrentMetaManager currentMetaManager;
 
 	private DcMetaCache dcMetaCache;
-	
+
 	private XpipeNettyClientKeyedObjectPool pool;
-	
+
 	private ScheduledExecutorService scheduled;
 
 	private Executor executors;
 
-	private KeyedOneThreadMutexableTaskExecutor<Pair<String, String> > clusterShardExecutors;
-	
+	private KeyedOneThreadMutexableTaskExecutor<Pair<String, String>> clusterShardExecutors;
+
 	public BackupDcClusterRedisStateAjust(String clusterId, DcMetaCache dcMetaCache,
 										  CurrentMetaManager currentMetaManager, XpipeNettyClientKeyedObjectPool pool,
 										  ScheduledExecutorService scheduled, Executor executors,
-										  KeyedOneThreadMutexableTaskExecutor<Pair<String, String> > clusterShardExecutors) {
+										  KeyedOneThreadMutexableTaskExecutor<Pair<String, String>> clusterShardExecutors) {
 		this.clusterId = clusterId;
 		this.currentMetaManager = currentMetaManager;
 		this.pool = pool;
@@ -46,7 +46,7 @@ public class BackupDcClusterRedisStateAjust extends AbstractClusterRedisStateAju
 		this.dcMetaCache = dcMetaCache;
 		this.clusterShardExecutors = clusterShardExecutors;
 	}
-	
+
 
 	@Override
 	protected void doRun() throws Exception {

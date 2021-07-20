@@ -1,4 +1,5 @@
 package com.ctrip.xpipe.redis.proxy.monitor.session;
+
 /**
  * @author chen.zhu
  * <p>
@@ -6,6 +7,6 @@ package com.ctrip.xpipe.redis.proxy.monitor.session;
  */
 public interface OutboundBufferMonitor {
 
-    long getOutboundBufferCumulation();
+	long getOutboundBufferCumulation();
 
 }

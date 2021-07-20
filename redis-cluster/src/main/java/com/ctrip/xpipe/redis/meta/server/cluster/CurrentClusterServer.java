@@ -6,17 +6,17 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 25, 2016
  */
-public interface CurrentClusterServer extends ClusterServer, Lifecycle{
-	
+public interface CurrentClusterServer extends ClusterServer, Lifecycle {
+
 	int ORDER = SlotManager.ORDER + 1;
-	
-	Set<Integer>  slots();
-	
+
+	Set<Integer> slots();
+
 	boolean isLeader();
 
 	boolean hasKey(Object key);
-	
+
 }

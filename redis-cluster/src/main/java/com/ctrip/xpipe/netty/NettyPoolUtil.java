@@ -7,13 +7,13 @@ import com.ctrip.xpipe.pool.XpipeNettyClientPool;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
 public class NettyPoolUtil {
-	
-	public static SimpleObjectPool<NettyClient>  createNettyPool(Endpoint target){
-		
+
+	public static SimpleObjectPool<NettyClient> createNettyPool(Endpoint target) {
+
 		try {
 			XpipeNettyClientPool xpipeObjectPool = new XpipeNettyClientPool(target);
 			xpipeObjectPool.initialize();

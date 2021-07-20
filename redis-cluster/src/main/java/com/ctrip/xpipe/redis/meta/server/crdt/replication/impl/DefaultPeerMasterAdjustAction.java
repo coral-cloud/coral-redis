@@ -14,21 +14,21 @@ import static com.ctrip.xpipe.spring.AbstractSpringConfigContext.PEER_MASTER_ADJ
 @Component
 public class DefaultPeerMasterAdjustAction implements PeerMasterAdjustAction {
 
-    private PeerMasterAdjustJobFactory adjustJobFactory;
+	private PeerMasterAdjustJobFactory adjustJobFactory;
 
-    private KeyedOneThreadTaskExecutor<Pair<String, String> > peerMasterAdjustExecutors;
+	private KeyedOneThreadTaskExecutor<Pair<String, String>> peerMasterAdjustExecutors;
 
-    @Autowired
-    public DefaultPeerMasterAdjustAction(PeerMasterAdjustJobFactory adjustJobFactory,
-                                         @Qualifier(PEER_MASTER_ADJUST_EXECUTOR) KeyedOneThreadTaskExecutor<Pair<String, String> > peerMasterAdjustExecutors) {
-        this.adjustJobFactory = adjustJobFactory;
-        this.peerMasterAdjustExecutors = peerMasterAdjustExecutors;
-    }
+	@Autowired
+	public DefaultPeerMasterAdjustAction(PeerMasterAdjustJobFactory adjustJobFactory,
+										 @Qualifier(PEER_MASTER_ADJUST_EXECUTOR) KeyedOneThreadTaskExecutor<Pair<String, String>> peerMasterAdjustExecutors) {
+		this.adjustJobFactory = adjustJobFactory;
+		this.peerMasterAdjustExecutors = peerMasterAdjustExecutors;
+	}
 
-    @Override
-    public void adjustPeerMaster(String clusterId, String shardId) {
-        PeerMasterAdjustJob adjustJob = adjustJobFactory.buildPeerMasterAdjustJob(clusterId, shardId);
-        if (null != adjustJob) peerMasterAdjustExecutors.execute(Pair.of(clusterId, shardId), adjustJob);
-    }
+	@Override
+	public void adjustPeerMaster(String clusterId, String shardId) {
+		PeerMasterAdjustJob adjustJob = adjustJobFactory.buildPeerMasterAdjustJob(clusterId, shardId);
+		if (null != adjustJob) peerMasterAdjustExecutors.execute(Pair.of(clusterId, shardId), adjustJob);
+	}
 
 }

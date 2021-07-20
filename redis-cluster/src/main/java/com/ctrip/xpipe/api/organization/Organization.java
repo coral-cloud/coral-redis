@@ -7,11 +7,11 @@ import java.util.List;
 
 /**
  * @author chen.zhu
- *
+ * <p>
  * Sep 04, 2017
  */
 public interface Organization extends Ordered {
-    Organization DEFAULT = ServicesUtil.getOrganizationService();
+	Organization DEFAULT = ServicesUtil.getOrganizationService();
 
-    List<OrganizationModel> retrieveOrganizationInfo();
+	List<OrganizationModel> retrieveOrganizationInfo();
 }

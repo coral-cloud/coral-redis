@@ -4,13 +4,13 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Jun 13, 2017
+ * <p>
+ * Jun 13, 2017
  */
 public interface ClusterServer {
 
-    boolean amILeader();
+	boolean amILeader();
 
-    List<String> getAllServers();
+	List<String> getAllServers();
 
 }

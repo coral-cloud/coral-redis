@@ -15,42 +15,42 @@ import io.netty.channel.FileRegion;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月21日 下午3:09:44
  */
-public class NettySlaveHandler extends ChannelTrafficStatisticsHandler{
+public class NettySlaveHandler extends ChannelTrafficStatisticsHandler {
 
-    private RedisKeeperServer redisKeeperServer;
-    
+	private RedisKeeperServer redisKeeperServer;
+
 	private RedisMasterReplication redisMasterReplication;
-	
+
 	public NettySlaveHandler(RedisMasterReplication redisMasterReplication, RedisKeeperServer redisKeeperServer, long trafficReportIntervalMillis) {
-	    super(trafficReportIntervalMillis);
+		super(trafficReportIntervalMillis);
 		this.redisMasterReplication = redisMasterReplication;
 		this.redisKeeperServer = redisKeeperServer;
 	}
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		
+
 		Channel channel = ctx.channel();
 
 		redisMasterReplication.masterConnected(channel);
 		super.channelActive(ctx);
 	}
 
-	
+
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		
-		if(logger.isInfoEnabled()){
+
+		if (logger.isInfoEnabled()) {
 			logger.info("[channelInactive]" + ctx.channel());
 		}
-		
+
 		redisMasterReplication.masterDisconntected(ctx.channel());
 		super.channelInactive(ctx);
 	}
-	
+
 	@Override
 	protected void doChannelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		ByteBuf byteBuf = (ByteBuf) msg;
@@ -61,23 +61,23 @@ public class NettySlaveHandler extends ChannelTrafficStatisticsHandler{
 				try {
 					redisMasterReplication.handleResponse(channel, byteBuf);
 				} catch (XpipeException e) {
-					throw new ByteBufReadActionException("handle:" + channel ,e);
+					throw new ByteBufReadActionException("handle:" + channel, e);
 				}
 			}
 		});
 	}
-	
-	@Override
-    protected void doReportTraffic(long readBytes, long writtenBytes, String remoteIp, int remotePort) {
-        if (readBytes > 0) {
-            String type = String.format("Keeper.In.%s", redisKeeperServer.getClusterId());
-            String name = String.format("%s-%s-%s:%s", redisMasterReplication.redisMaster().roleDesc(), redisKeeperServer.getShardId(), remoteIp, remotePort);
-            EventMonitor.DEFAULT.logEvent(type, name, readBytes);
-        }
-    }
 
 	@Override
-    protected void doWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+	protected void doReportTraffic(long readBytes, long writtenBytes, String remoteIp, int remotePort) {
+		if (readBytes > 0) {
+			String type = String.format("Keeper.In.%s", redisKeeperServer.getClusterId());
+			String name = String.format("%s-%s-%s:%s", redisMasterReplication.redisMaster().roleDesc(), redisKeeperServer.getShardId(), remoteIp, remotePort);
+			EventMonitor.DEFAULT.logEvent(type, name, readBytes);
+		}
+	}
+
+	@Override
+	protected void doWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
 		long writtenBytes = 0L;
 		if (msg instanceof ByteBuf) {
 			writtenBytes = ((ByteBuf) msg).readableBytes();
@@ -85,5 +85,5 @@ public class NettySlaveHandler extends ChannelTrafficStatisticsHandler{
 			writtenBytes = (((FileRegion) msg).count());
 		}
 		redisKeeperServer.getKeeperMonitor().getKeeperStats().increaseOutputBytes(writtenBytes);
-    }
+	}
 }

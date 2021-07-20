@@ -9,5 +9,5 @@ import com.ctrip.xpipe.utils.LeakyBucket;
  * Feb 19, 2020
  */
 public interface KeeperResourceManager extends ProxyResourceManager {
-    LeakyBucket getLeakyBucket();
+	LeakyBucket getLeakyBucket();
 }

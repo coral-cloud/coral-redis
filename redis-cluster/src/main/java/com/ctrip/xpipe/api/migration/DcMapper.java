@@ -5,14 +5,14 @@ import com.ctrip.xpipe.utils.ServicesUtil;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Apr 07, 2017
+ * <p>
+ * Apr 07, 2017
  */
-public interface DcMapper extends Ordered{
+public interface DcMapper extends Ordered {
 
-    DcMapper INSTANCE = ServicesUtil.getDcMapperService();
+	DcMapper INSTANCE = ServicesUtil.getDcMapperService();
 
-    String getDc(String dcName);
+	String getDc(String dcName);
 
-    String reverse(String otherDcName);
+	String reverse(String otherDcName);
 }

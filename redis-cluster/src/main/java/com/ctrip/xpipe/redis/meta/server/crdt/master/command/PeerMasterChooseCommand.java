@@ -6,19 +6,19 @@ import com.ctrip.xpipe.redis.meta.server.multidc.MultiDcService;
 
 public class PeerMasterChooseCommand extends AbstractMasterChooseCommand {
 
-    private String dcId;
+	private String dcId;
 
-    private MultiDcService multiDcService;
+	private MultiDcService multiDcService;
 
-    public PeerMasterChooseCommand(String dcId, String clusterId, String shardId, MultiDcService multiDcService) {
-        super(clusterId, shardId);
-        this.dcId = dcId;
-        this.multiDcService = multiDcService;
-    }
+	public PeerMasterChooseCommand(String dcId, String clusterId, String shardId, MultiDcService multiDcService) {
+		super(clusterId, shardId);
+		this.dcId = dcId;
+		this.multiDcService = multiDcService;
+	}
 
-    @Override
-    public RedisMeta choose() {
-        return multiDcService.getPeerMaster(dcId, clusterId, shardId);
-    }
+	@Override
+	public RedisMeta choose() {
+		return multiDcService.getPeerMaster(dcId, clusterId, shardId);
+	}
 
 }

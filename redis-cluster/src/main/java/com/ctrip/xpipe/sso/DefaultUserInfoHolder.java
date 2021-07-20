@@ -9,16 +9,16 @@ import com.ctrip.xpipe.api.sso.UserInfoHolder;
  */
 public class DefaultUserInfoHolder implements UserInfoHolder {
 
-    private UserInfo defaultUser = new DefaultUserInfo();
+	private UserInfo defaultUser = new DefaultUserInfo();
 
-    @Override
-    public UserInfo getUser() {
-        return defaultUser;
-    }
+	@Override
+	public UserInfo getUser() {
+		return defaultUser;
+	}
 
-    @Override
-    public int getOrder() {
-        return LOWEST_PRECEDENCE;
-    }
+	@Override
+	public int getOrder() {
+		return LOWEST_PRECEDENCE;
+	}
 
 }

@@ -5,17 +5,17 @@ import com.ctrip.xpipe.pool.ReturnObjectException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
 public interface SimpleObjectPool<T> {
-	
+
 	T borrowObject() throws BorrowObjectException;
-	
+
 	void returnObject(T obj) throws ReturnObjectException;
 
 	void clear() throws ObjectPoolException;
-	
+
 	String desc();
 
 }

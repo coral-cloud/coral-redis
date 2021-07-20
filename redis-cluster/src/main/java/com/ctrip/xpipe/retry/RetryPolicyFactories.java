@@ -2,8 +2,8 @@ package com.ctrip.xpipe.retry;
 
 /**
  * @author shyin
- *
- *         Sep 21, 2016
+ * <p>
+ * Sep 21, 2016
  */
 public class RetryPolicyFactories {
 	public static RetryPolicyFactory newRestOperationsRetryPolicyFactory() {

@@ -11,49 +11,49 @@ import org.apache.curator.framework.CuratorFramework;
 
 /**
  * @author marsqing
- *
- *         Jun 16, 2016 12:05:57 PM
+ * <p>
+ * Jun 16, 2016 12:05:57 PM
  */
 public class DefaultZkClient extends AbstractLifecycle implements ZkClient, TopElement, Lifecycle {
 
 	private ZkConfig zkConfig = new DefaultZkConfig();
 
 	private CuratorFramework client;
-	
+
 	private String address;
-	
+
 	protected void doInitialize() throws Exception {
-		
-	}
-	
-	@Override
-	protected void doStart() throws Exception {
-		
-		logger.info("[doStart]{}", address);
-		client= zkConfig.create(address);
+
 	}
 
-	
+	@Override
+	protected void doStart() throws Exception {
+
+		logger.info("[doStart]{}", address);
+		client = zkConfig.create(address);
+	}
+
+
 	@Override
 	protected void doStop() throws Exception {
 		client.close();
 	}
-	
+
 	@Override
 	public CuratorFramework get() {
 		return client;
 	}
-	
+
 	@Override
 	public void setZkAddress(String address) {
 		this.address = address;
 	}
-	
+
 	@Override
-	public String getZkAddress(){
+	public String getZkAddress() {
 		return this.address;
 	}
-	
+
 	public void setZkConfig(ZkConfig zkConfig) {
 		this.zkConfig = zkConfig;
 	}

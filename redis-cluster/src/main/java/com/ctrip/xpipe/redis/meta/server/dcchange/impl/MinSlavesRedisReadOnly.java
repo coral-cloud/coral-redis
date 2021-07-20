@@ -14,16 +14,16 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 2, 2016
  */
 @Deprecated
-public class MinSlavesRedisReadOnly extends AbstractRedisReadOnly implements RedisReadonly{
-	
+public class MinSlavesRedisReadOnly extends AbstractRedisReadOnly implements RedisReadonly {
+
 	public static int READ_ONLY_NUMBER = Integer.MAX_VALUE;
-	
+
 	public static int WRITABLE_NUMBER = 0;
-	
+
 	public MinSlavesRedisReadOnly(String ip, int port, XpipeNettyClientKeyedObjectPool keyedObjectPool, ScheduledExecutorService scheduled) {
 		super(ip, port, keyedObjectPool, scheduled);
 	}
@@ -39,11 +39,11 @@ public class MinSlavesRedisReadOnly extends AbstractRedisReadOnly implements Red
 		return createTransactionalCommand(WRITABLE_NUMBER);
 	}
 
-	private Command<?> createTransactionalCommand(int number){
-		
+	private Command<?> createTransactionalCommand(int number) {
+
 		SimpleObjectPool<NettyClient> clientPool = keyedObjectPool.getKeyPool(new DefaultEndPoint(ip, port));
 		ConfigSetMinSlavesToWrite configSetMinSlavesToWrite = new ConfigSetMinSlavesToWrite(null, number, scheduled);
-		
+
 		return new TransactionalCommand(clientPool, scheduled, configSetMinSlavesToWrite, new ConfigRewrite(null, scheduled));
 	}
 

@@ -6,13 +6,13 @@ import com.ctrip.xpipe.redis.core.entity.DcMeta;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 7, 2016
  */
 public interface MetaServerMetaUpdateOperation {
-	
+
 	/**********update from console***********/
 	void refresh(DcMeta dcMeta);
-	
+
 	void refresh(ClusterMeta clusterMeta);
 }

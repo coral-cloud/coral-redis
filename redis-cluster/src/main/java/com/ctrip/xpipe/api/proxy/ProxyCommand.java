@@ -10,6 +10,6 @@ import io.netty.buffer.ByteBuf;
  */
 public interface ProxyCommand<T> extends Command<T> {
 
-    ByteBuf getRequest();
+	ByteBuf getRequest();
 
 }

@@ -4,18 +4,18 @@ import com.ctrip.xpipe.monitor.CatEventMonitor;
 
 /**
  * @author leoliang
- *
- *         2017年3月1日
+ * <p>
+ * 2017年3月1日
  */
 public interface EventMonitor {
 
-    EventMonitor DEFAULT = new CatEventMonitor();
+	EventMonitor DEFAULT = new CatEventMonitor();
 
-    String ALERT_TYPE = "alert";
+	String ALERT_TYPE = "alert";
 
-    void logEvent(String type, String name, long count);
+	void logEvent(String type, String name, long count);
 
-    void logEvent(String type, String name);
+	void logEvent(String type, String name);
 
-    void logAlertEvent(String simpleAlertMessage);
+	void logAlertEvent(String simpleAlertMessage);
 }

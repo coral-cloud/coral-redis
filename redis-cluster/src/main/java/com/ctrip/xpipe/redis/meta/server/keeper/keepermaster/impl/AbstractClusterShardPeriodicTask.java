@@ -16,68 +16,68 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractClusterShardPeriodicTask extends AbstractStartStoppable implements Releasable, Startable, Stoppable {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected DcMetaCache dcMetaCache;
+	protected DcMetaCache dcMetaCache;
 
-    protected CurrentMetaManager currentMetaManager;
+	protected CurrentMetaManager currentMetaManager;
 
-    protected ScheduledExecutorService scheduled;
+	protected ScheduledExecutorService scheduled;
 
-    private ScheduledFuture<?> future;
+	private ScheduledFuture<?> future;
 
-    protected String clusterId, shardId;
+	protected String clusterId, shardId;
 
-    public static final int DEFAULT_WORK_INTERVAL_SECONDS = Integer
-            .parseInt(System.getProperty("DEFAULT_WORK_INTERVAL_SECONDS", "10"));
+	public static final int DEFAULT_WORK_INTERVAL_SECONDS = Integer
+			.parseInt(System.getProperty("DEFAULT_WORK_INTERVAL_SECONDS", "10"));
 
-    public AbstractClusterShardPeriodicTask(String clusterId, String shardId, DcMetaCache dcMetaCache,
-                                            CurrentMetaManager currentMetaManager, ScheduledExecutorService scheduled) {
+	public AbstractClusterShardPeriodicTask(String clusterId, String shardId, DcMetaCache dcMetaCache,
+											CurrentMetaManager currentMetaManager, ScheduledExecutorService scheduled) {
 
-        this.dcMetaCache = dcMetaCache;
-        this.currentMetaManager = currentMetaManager;
-        this.scheduled = scheduled;
-        this.clusterId = clusterId;
-        this.shardId = shardId;
-    }
+		this.dcMetaCache = dcMetaCache;
+		this.currentMetaManager = currentMetaManager;
+		this.scheduled = scheduled;
+		this.clusterId = clusterId;
+		this.shardId = shardId;
+	}
 
-    @Override
-    protected void doStart() throws Exception {
+	@Override
+	protected void doStart() throws Exception {
 
-        future = scheduled.scheduleWithFixedDelay(new AbstractExceptionLogTask() {
+		future = scheduled.scheduleWithFixedDelay(new AbstractExceptionLogTask() {
 
-            @Override
-            protected void doRun() throws Exception {
-                work();
-            }
+			@Override
+			protected void doRun() throws Exception {
+				work();
+			}
 
-        }, 0, getWorkIntervalSeconds(), TimeUnit.SECONDS);
-    }
+		}, 0, getWorkIntervalSeconds(), TimeUnit.SECONDS);
+	}
 
-    @Override
-    protected void doStop() throws Exception {
+	@Override
+	protected void doStop() throws Exception {
 
-        if (future != null) {
-            logger.info("[doStop]");
-            future.cancel(true);
-        }
+		if (future != null) {
+			logger.info("[doStop]");
+			future.cancel(true);
+		}
 
-    }
+	}
 
-    protected abstract void work();
+	protected abstract void work();
 
-    @Override
-    public void release() throws Exception {
-        stop();
-    }
+	@Override
+	public void release() throws Exception {
+		stop();
+	}
 
-    @Override
-    public String toString() {
-        return String.format("%s,%s,%s", getClass().getSimpleName(), clusterId, shardId);
-    }
+	@Override
+	public String toString() {
+		return String.format("%s,%s,%s", getClass().getSimpleName(), clusterId, shardId);
+	}
 
-    protected int getWorkIntervalSeconds() {
-        return DEFAULT_WORK_INTERVAL_SECONDS;
-    }
+	protected int getWorkIntervalSeconds() {
+		return DEFAULT_WORK_INTERVAL_SECONDS;
+	}
 
 }

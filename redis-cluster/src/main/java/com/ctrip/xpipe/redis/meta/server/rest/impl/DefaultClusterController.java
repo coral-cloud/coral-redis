@@ -21,79 +21,79 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 29, 2016
  */
 @RestController
 @RequestMapping(ClusterApi.PATH_PREFIX)
-public class DefaultClusterController implements ClusterApi{
-	
+public class DefaultClusterController implements ClusterApi {
+
 	@Autowired
 	private CurrentClusterServer currentClusterServer;
-	
+
 	@Autowired
 	private MetaServerConfig metaServerConfig;
-	
+
 	@Autowired
 	private DcMetaCache dcMetaCache;
-	
+
 	@Autowired
 	private SlotManager slotManager;
 
 	@Autowired
 	private ClusterServers<?> clusterServers;
-	
+
 	@Autowired
-	private CurrentMetaManager  currentMetaServerMetaManager;
-	
+	private CurrentMetaManager currentMetaServerMetaManager;
+
 	@Autowired
 	private ZkClient zkClient;
 
-	@RequestMapping(path = "/serverid", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(path = "/serverid", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@Override
 	public int getServerId() {
 		return currentClusterServer.getServerId();
 	}
 
-	@RequestMapping(path = "/clusterinfo", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(path = "/clusterinfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@Override
 	public ClusterServerInfo getClusterInfo() {
 		return currentClusterServer.getClusterInfo();
 	}
-	
 
-	@RequestMapping(path = PATH_ADD_SLOT, method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+
+	@RequestMapping(path = PATH_ADD_SLOT, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@Override
 	public void addSlot(@PathVariable int slotId) throws Exception {
 		currentClusterServer.addSlot(slotId).sync();
 	}
 
-	@RequestMapping(path = PATH_DELETE_SLOT, method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(path = PATH_DELETE_SLOT, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@Override
 	public void deleteSlot(@PathVariable int slotId) throws Exception {
 		currentClusterServer.deleteSlot(slotId).sync();
 	}
 
-	@RequestMapping(path = PATH_EXPORT_SLOT, method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(path = PATH_EXPORT_SLOT, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@Override
-	public void exportSlot(@PathVariable int slotId) throws Exception{
+	public void exportSlot(@PathVariable int slotId) throws Exception {
 		currentClusterServer.exportSlot(slotId).sync();
 	}
 
-	@RequestMapping(path = PATH_IMPORT_SLOT, method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(path = PATH_IMPORT_SLOT, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@Override
-	public void importSlot(@PathVariable int slotId) throws Exception{
+	public void importSlot(@PathVariable int slotId) throws Exception {
 		currentClusterServer.importSlot(slotId).sync();
 	}
-	
-	
-	@RequestMapping(path = PATH_NOTIFY_SLOT_CHANGE, method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+
+
+	@RequestMapping(path = PATH_NOTIFY_SLOT_CHANGE, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@Override
 	public void notifySlotChange(@PathVariable int slotId) throws Exception {
 		currentClusterServer.notifySlotChange(slotId);
 	}
-	
-	@RequestMapping(path = "/debug", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+
+	@RequestMapping(path = "/debug", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@Override
 	public String debug() {
 		JsonCodec pretty = new JsonCodec(true);
@@ -102,16 +102,16 @@ public class DefaultClusterController implements ClusterApi{
 						dcMetaCache.getCurrentDc(),
 						zkClient.getZkAddress(),
 						metaServerConfig.getZkNameSpace(),
-						currentClusterServer.isLeader(), 
-						currentClusterServer.getClusterInfo(), 
+						currentClusterServer.isLeader(),
+						currentClusterServer.getClusterInfo(),
 						currentClusterServer.slots(),
 						currentMetaServerMetaManager.allClusters(),
 						clusterServers.allClusterServerInfos(),
 						slotManager.allSlotsInfo()
-						));
+				));
 	}
 
-	@RequestMapping(path = "/refresh", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(path = "/refresh", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@Override
 	public void refresh() throws Exception {
 		slotManager.refresh();

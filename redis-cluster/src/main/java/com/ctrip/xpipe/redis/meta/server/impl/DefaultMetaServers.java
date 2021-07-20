@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 3, 2016
  */
 @Component
-public class DefaultMetaServers extends AbstractClusterServers<MetaServer>{
+public class DefaultMetaServers extends AbstractClusterServers<MetaServer> {
 
 }

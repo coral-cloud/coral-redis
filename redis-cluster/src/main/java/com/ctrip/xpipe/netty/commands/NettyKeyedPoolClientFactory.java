@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
- *         Jul 1, 2016
+ * <p>
+ * Jul 1, 2016
  */
 public class NettyKeyedPoolClientFactory extends AbstractStartStoppable implements KeyedPooledObjectFactory<Endpoint, NettyClient> {
 
@@ -38,10 +38,10 @@ public class NettyKeyedPoolClientFactory extends AbstractStartStoppable implemen
 		this.eventLoopThreads = eventLoopThreads;
 
 	}
-	
+
 	@Override
 	protected void doStart() throws Exception {
-		
+
 		eventLoopGroup = new NioEventLoopGroup(eventLoopThreads, XpipeThreadFactory.create("NettyKeyedPoolClientFactory"));
 		initBootstrap();
 	}
@@ -82,7 +82,7 @@ public class NettyKeyedPoolClientFactory extends AbstractStartStoppable implemen
 	@Override
 	public boolean validateObject(Endpoint key, PooledObject<NettyClient> p) {
 		Channel channel = p.getObject().channel();
-		if(channel == null) {
+		if (channel == null) {
 			return false;
 		}
 		return channel.isOpen();

@@ -14,16 +14,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * May 18, 2016 4:14:57 PM
  */
-public abstract class AbstractObservable implements Observable{
-	
+public abstract class AbstractObservable implements Observable {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	private ReadWriteLock observersLock = new ReentrantReadWriteLock();
 	private List<Observer> observers = new ArrayList<>();
-		
+
 	private Executor executors = MoreExecutors.directExecutor();
 
 	public AbstractObservable() {
@@ -43,7 +43,7 @@ public abstract class AbstractObservable implements Observable{
 		try {
 			observersLock.writeLock().lock();
 			observers.add(observer);
-		}finally {
+		} finally {
 			observersLock.writeLock().unlock();
 		}
 	}
@@ -53,31 +53,31 @@ public abstract class AbstractObservable implements Observable{
 		try {
 			observersLock.writeLock().lock();
 			observers.remove(observer);
-		}finally {
+		} finally {
 			observersLock.writeLock().unlock();
 		}
 	}
-	
-	
-	protected void notifyObservers(final Object arg){
-		
-		Object []tmpObservers;
+
+
+	protected void notifyObservers(final Object arg) {
+
+		Object[] tmpObservers;
 
 		try {
 			observersLock.readLock().lock();
 			tmpObservers = observers.toArray();
-		}finally {
+		} finally {
 			observersLock.readLock().unlock();
 		}
-		
-		for(final Object observer : tmpObservers){
-			
+
+		for (final Object observer : tmpObservers) {
+
 			executors.execute(new Runnable() {
 				@Override
 				public void run() {
-					try{
-						((Observer)observer).update(arg, AbstractObservable.this);
-					}catch(Exception e){
+					try {
+						((Observer) observer).update(arg, AbstractObservable.this);
+					} catch (Exception e) {
 						logger.error("[notifyObservers]" + observer, e);
 					}
 				}

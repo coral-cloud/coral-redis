@@ -10,11 +10,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 2, 2016
  */
-public abstract class ConfigSetCommand<T> extends AbstractConfigCommand<T>{
-	
+public abstract class ConfigSetCommand<T> extends AbstractConfigCommand<T> {
+
 	public ConfigSetCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 		super(clientPool, scheduled);
 	}
@@ -28,13 +28,13 @@ public abstract class ConfigSetCommand<T> extends AbstractConfigCommand<T>{
 	public ByteBuf getRequest() {
 		return new RequestStringParser(CONFIG, " set " + getConfigName() + " " + getValue()).format();
 	}
-	
+
 	protected abstract String getValue();
 
 	protected abstract String getConfigName();
 
 
-	public static class ConfigSetMinSlavesToWrite extends ConfigSetCommand<Boolean>{
+	public static class ConfigSetMinSlavesToWrite extends ConfigSetCommand<Boolean> {
 
 		private int minSlavesToWrite;
 
@@ -66,7 +66,7 @@ public abstract class ConfigSetCommand<T> extends AbstractConfigCommand<T>{
 		}
 	}
 
-	public static class ConfigSetSlaveReadOnly extends ConfigSetCommand<Boolean>{
+	public static class ConfigSetSlaveReadOnly extends ConfigSetCommand<Boolean> {
 
 		private boolean readonly = false;
 
@@ -96,13 +96,13 @@ public abstract class ConfigSetCommand<T> extends AbstractConfigCommand<T>{
 		}
 	}
 
-	public static class ConfigSetReplAll extends ConfigSetCommand<Boolean>{
+	public static class ConfigSetReplAll extends ConfigSetCommand<Boolean> {
 
 		private boolean replall = false;
 
 		public ConfigSetReplAll(boolean replall, SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 			super(clientPool, scheduled);
-			this.replall  = replall;
+			this.replall = replall;
 		}
 
 		@Override

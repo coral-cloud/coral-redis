@@ -11,10 +11,10 @@ import com.ctrip.xpipe.redis.keeper.RedisMaster;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Sep 14, 2016
  */
-public class RoleCommandHandler extends AbstractCommandHandler{
+public class RoleCommandHandler extends AbstractCommandHandler {
 
 	@Override
 	public String[] getCommands() {
@@ -23,22 +23,22 @@ public class RoleCommandHandler extends AbstractCommandHandler{
 
 	@Override
 	protected void doHandle(String[] args, RedisClient redisClient) {
-		
+
 		RedisKeeperServer redisKeeperServer = redisClient.getRedisKeeperServer();
 		ReplicationStore replicationStore = redisKeeperServer.getReplicationStore();
 		RedisMaster redisMaster = redisKeeperServer.getRedisMaster();
-		Endpoint    masterEndPoint = null;
-		
-		if(redisMaster != null){
+		Endpoint masterEndPoint = null;
+
+		if (redisMaster != null) {
 			masterEndPoint = redisMaster.masterEndPoint();
 		}
-		
-		Object [] result = new Object[5];
+
+		Object[] result = new Object[5];
 		result[0] = redisKeeperServer.role().toString();
-		result[1] = masterEndPoint == null ? "0.0.0.0": masterEndPoint.getHost();
-		result[2] = masterEndPoint == null ? "0": masterEndPoint.getPort();
-		result[3] = redisMaster == null ? MASTER_STATE.REDIS_REPL_NONE.getDesc(): redisMaster.getMasterState().getDesc();
-		result[4] = replicationStore == null ? -1L: replicationStore.getEndOffset();
+		result[1] = masterEndPoint == null ? "0.0.0.0" : masterEndPoint.getHost();
+		result[2] = masterEndPoint == null ? "0" : masterEndPoint.getPort();
+		result[3] = redisMaster == null ? MASTER_STATE.REDIS_REPL_NONE.getDesc() : redisMaster.getMasterState().getDesc();
+		result[4] = replicationStore == null ? -1L : replicationStore.getEndOffset();
 		redisClient.sendMessage(ParserManager.parse(result));
 	}
 }

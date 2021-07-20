@@ -15,11 +15,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Sep 16, 2016
  */
-public class RoleCommand extends AbstractRedisCommand<Role>{
-	
+public class RoleCommand extends AbstractRedisCommand<Role> {
+
 	private boolean log = true;
 
 	@VisibleForTesting
@@ -53,12 +53,12 @@ public class RoleCommand extends AbstractRedisCommand<Role>{
 
 	@Override
 	protected Role format(Object payload) {
-		
-		if(payload instanceof Object[]){
-			Object []arrayPayload = (Object[]) payload;
-			if(arrayPayload.length == 5){
+
+		if (payload instanceof Object[]) {
+			Object[] arrayPayload = (Object[]) payload;
+			if (arrayPayload.length == 5) {
 				return new SlaveRole(arrayPayload);
-			}else if(arrayPayload.length == 3){
+			} else if (arrayPayload.length == 3) {
 				return new MasterRole(arrayPayload);
 			}
 			throw new IllegalStateException("unknown supported payload:" + StringUtil.join(",", arrayPayload));
@@ -70,12 +70,12 @@ public class RoleCommand extends AbstractRedisCommand<Role>{
 	public ByteBuf getRequest() {
 		return new RequestStringParser("role").format();
 	}
-	
+
 	@Override
 	protected boolean logRequest() {
 		return log;
 	}
-	
+
 	@Override
 	protected boolean logResponse() {
 		return log;

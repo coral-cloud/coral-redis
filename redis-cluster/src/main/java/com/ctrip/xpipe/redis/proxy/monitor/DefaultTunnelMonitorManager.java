@@ -23,46 +23,46 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class DefaultTunnelMonitorManager implements TunnelMonitorManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultTunnelMonitorManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultTunnelMonitorManager.class);
 
-    private Map<Tunnel, TunnelMonitor> tunnelMonitors = new ConcurrentHashMap<>();
+	private Map<Tunnel, TunnelMonitor> tunnelMonitors = new ConcurrentHashMap<>();
 
-    @Autowired
-    private ResourceManager resourceManager;
+	@Autowired
+	private ResourceManager resourceManager;
 
-    private TunnelRecorder recorder = new DefaultTunnelRecorder();
+	private TunnelRecorder recorder = new DefaultTunnelRecorder();
 
-    public DefaultTunnelMonitorManager() {
-    }
+	public DefaultTunnelMonitorManager() {
+	}
 
-    public DefaultTunnelMonitorManager(ResourceManager resourceManager) {
-        this.resourceManager = resourceManager;
-    }
+	public DefaultTunnelMonitorManager(ResourceManager resourceManager) {
+		this.resourceManager = resourceManager;
+	}
 
-    @Override
-    public TunnelMonitor getOrCreate(Tunnel tunnel) {
-        return MapUtils.getOrCreate(tunnelMonitors, tunnel, new ObjectFactory<TunnelMonitor>() {
-            @Override
-            public TunnelMonitor create() {
-                return new DefaultTunnelMonitor(resourceManager, tunnel, recorder);
-            }
-        });
-    }
+	@Override
+	public TunnelMonitor getOrCreate(Tunnel tunnel) {
+		return MapUtils.getOrCreate(tunnelMonitors, tunnel, new ObjectFactory<TunnelMonitor>() {
+			@Override
+			public TunnelMonitor create() {
+				return new DefaultTunnelMonitor(resourceManager, tunnel, recorder);
+			}
+		});
+	}
 
-    @Override
-    public void remove(Tunnel tunnel) {
-        TunnelMonitor monitor = tunnelMonitors.remove(tunnel);
-        try {
-            if(monitor != null) {
-                monitor.stop();
-            }
-        } catch (Exception e) {
-            logger.error("[stop tunnel-monitor]", e);
-        }
-    }
+	@Override
+	public void remove(Tunnel tunnel) {
+		TunnelMonitor monitor = tunnelMonitors.remove(tunnel);
+		try {
+			if (monitor != null) {
+				monitor.stop();
+			}
+		} catch (Exception e) {
+			logger.error("[stop tunnel-monitor]", e);
+		}
+	}
 
-    @VisibleForTesting
-    protected Map<Tunnel, TunnelMonitor> getTunnelMonitors() {
-        return tunnelMonitors;
-    }
+	@VisibleForTesting
+	protected Map<Tunnel, TunnelMonitor> getTunnelMonitors() {
+		return tunnelMonitors;
+	}
 }

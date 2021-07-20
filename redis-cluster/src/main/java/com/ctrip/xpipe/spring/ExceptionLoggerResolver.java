@@ -11,17 +11,17 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 1, 2016
  */
-public class ExceptionLoggerResolver implements HandlerExceptionResolver{
-	
-	protected Logger logger = LoggerFactory.getLogger(getClass()); 
+public class ExceptionLoggerResolver implements HandlerExceptionResolver {
+
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler,
-			Exception ex) {
-		logger.error(request.getRequestURI().toString(), ex);
+										 Exception ex) {
+		logger.error(request.getRequestURI(), ex);
 		return null;
 	}
 

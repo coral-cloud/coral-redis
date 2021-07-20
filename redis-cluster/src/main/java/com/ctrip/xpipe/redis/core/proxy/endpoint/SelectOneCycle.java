@@ -7,15 +7,15 @@ package com.ctrip.xpipe.redis.core.proxy.endpoint;
  */
 public class SelectOneCycle implements SelectStrategy {
 
-    private ProxyEndpointSelector selector;
+	private ProxyEndpointSelector selector;
 
-    public SelectOneCycle(ProxyEndpointSelector selector) {
-        this.selector = selector;
-    }
+	public SelectOneCycle(ProxyEndpointSelector selector) {
+		this.selector = selector;
+	}
 
-    @Override
-    public boolean select() {
-        return selector.selectCounts() < selector.getCandidates().size();
-    }
+	@Override
+	public boolean select() {
+		return selector.selectCounts() < selector.getCandidates().size();
+	}
 
 }

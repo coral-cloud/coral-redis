@@ -4,8 +4,8 @@ import com.ctrip.xpipe.api.codec.Codec;
 
 /**
  * @author marsqing
- *
- *         May 25, 2016 5:48:16 PM
+ * <p>
+ * May 25, 2016 5:48:16 PM
  */
 public class ElectContext {
 
@@ -25,7 +25,7 @@ public class ElectContext {
 	public String getLeaderElectionID() {
 		return leaderElectionID;
 	}
-	
+
 	@Override
 	public String toString() {
 		return Codec.DEFAULT.encode(this);

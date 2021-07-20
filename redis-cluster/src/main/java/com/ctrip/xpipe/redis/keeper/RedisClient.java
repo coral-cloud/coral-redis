@@ -12,18 +12,18 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月22日 上午11:25:07
  */
-public interface RedisClient extends Observable, Infoable, Closeable, RedisRole, Releasable, Keeperable{
-	
-	public static enum CLIENT_ROLE{
+public interface RedisClient extends Observable, Infoable, Closeable, RedisRole, Releasable, Keeperable {
+
+	enum CLIENT_ROLE {
 		NORMAL,
 		SLAVE
 	}
-	
+
 	RedisSlave becomeSlave();
-	
+
 	RedisKeeperServer getRedisKeeperServer();
 
 	void setSlaveListeningPort(int port);
@@ -39,19 +39,19 @@ public interface RedisClient extends Observable, Infoable, Closeable, RedisRole,
 	boolean capaOf(CAPA capa);
 
 	Set<CAPA> getCapas();
-	
-	String []readCommands(ByteBuf byteBuf);
+
+	String[] readCommands(ByteBuf byteBuf);
 
 	String info();
 
 	String ip();
-	
+
 	Channel channel();
 
 	void sendMessage(ByteBuf byteBuf);
-	
+
 	void sendMessage(byte[] bytes);
-	
+
 	void addChannelCloseReleaseResources(Releasable releasable);
 
 	void setClientEndpoint(Endpoint endpoint);

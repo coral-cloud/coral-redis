@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 
 /**
  * @author marsqing
- *
- *         Jun 16, 2016 11:50:44 AM
+ * <p>
+ * Jun 16, 2016 11:50:44 AM
  */
 public class DefaultMetaServerConfig extends AbstractCoreConfig implements MetaServerConfig {
-	
+
 	public static String KEY_CONSOLE_ADDRESS = "console.address";
 	public static String KEY_META_REFRESH_MILLI = "meta.refresh.milli";
 	public static String KEY_SLOT_REFRESH_MILLI = "slot.refresh.milli";
@@ -34,11 +34,11 @@ public class DefaultMetaServerConfig extends AbstractCoreConfig implements MetaS
 	public static String KEY_WAITFOR_OFFSET_MILLI = "dcchange.waitfor.offset.milli";
 	public static String KEY_DC_INFOS = "dcinfos";
 	public static String KEY_VALIDATE_DOMAIN = "metaserver.validate.domain";
-	
-	
+
+
 	public static String META_SRRVER_PROPERTIES_PATH = String.format("/opt/data/%s", FoundationService.DEFAULT.getAppId());
 	public static String META_SRRVER_PROPERTIES_FILE = "meta_server.properties";
-	
+
 	public static String KEY_SERVER_ID = "metaserver.id";
 	public static String KEY_SERVER_IP = "server.ip";
 	public static String KEY_SERVER_PORT = "server.port";
@@ -49,27 +49,27 @@ public class DefaultMetaServerConfig extends AbstractCoreConfig implements MetaS
 	private static final String KEY_OWN_CLUSTER_TYPES = "meta.cluster.types";
 
 	private static final String KEY_CORRECT_PEER_MASTER_PERIODICALLY = "meta.cluster.peermaster.correct.periodically";
-	
+
 	private String defaultConsoleAddress = System.getProperty("consoleAddress", "http://localhost:8080");
-	
+
 	private int defaultMetaServerId = Integer.parseInt(System.getProperty(KEY_SERVER_ID, "1"));
 	private int defaultServerPort = Integer.parseInt(System.getProperty(KEY_SERVER_ID, "8080"));
-	
+
 	private Config serverConfig;
 
 	private Map<String, DcInfo> dcInfos = Maps.newConcurrentMap();
 
-	public DefaultMetaServerConfig(){
+	public DefaultMetaServerConfig() {
 
 		CompositeConfig compositeConfig = new CompositeConfig();
-		try{
+		try {
 			compositeConfig.addConfig(new DefaultFileConfig(META_SRRVER_PROPERTIES_PATH, META_SRRVER_PROPERTIES_FILE));
-		}catch (Exception e){
+		} catch (Exception e) {
 			logger.info("[DefaultMetaServerConfig]{}", e);
 		}
-		try{
+		try {
 			compositeConfig.addConfig(new DefaultFileConfig());
-		}catch (Exception e){
+		} catch (Exception e) {
 			logger.info("[DefaultMetaServerConfig]{}", e);
 		}
 		compositeConfig.addConfig(new DefaultPropertyConfig());
@@ -80,7 +80,7 @@ public class DefaultMetaServerConfig extends AbstractCoreConfig implements MetaS
 	public String getConsoleAddress() {
 		return getProperty(KEY_CONSOLE_ADDRESS, defaultConsoleAddress);
 	}
-	
+
 	public void setDefaultConsoleAddress(String defaultConsoleAddress) {
 		this.defaultConsoleAddress = defaultConsoleAddress;
 	}
@@ -88,7 +88,7 @@ public class DefaultMetaServerConfig extends AbstractCoreConfig implements MetaS
 	public void setDefaultMetaServerId(int defaultMetaServerId) {
 		this.defaultMetaServerId = defaultMetaServerId;
 	}
-	
+
 	@Override
 	public int getMetaRefreshMilli() {
 		return getIntProperty(KEY_META_REFRESH_MILLI, 60000);
@@ -111,7 +111,7 @@ public class DefaultMetaServerConfig extends AbstractCoreConfig implements MetaS
 
 	@Override
 	public Map<String, DcInfo> getDcInofs() {
-		if(dcInfos.isEmpty()) {
+		if (dcInfos.isEmpty()) {
 			dcInfos = getDcInofMapping();
 		}
 		return dcInfos;
@@ -124,7 +124,7 @@ public class DefaultMetaServerConfig extends AbstractCoreConfig implements MetaS
 		});
 
 		Map<String, DcInfo> result = Maps.newConcurrentMap();
-		for(Entry<String, DcInfo> entry : dcInfos.entrySet()){
+		for (Entry<String, DcInfo> entry : dcInfos.entrySet()) {
 			result.put(entry.getKey().toLowerCase(), entry.getValue());
 		}
 
@@ -179,7 +179,7 @@ public class DefaultMetaServerConfig extends AbstractCoreConfig implements MetaS
 	public int getMetaServerPort() {
 		return Integer.parseInt(serverConfig.get(KEY_SERVER_PORT, String.valueOf(defaultServerPort)));
 	}
-	
+
 	public void setDefaultServerPort(int defaultServerPort) {
 		this.defaultServerPort = defaultServerPort;
 	}

@@ -10,12 +10,12 @@ import com.ctrip.xpipe.redis.core.proxy.PROXY_OPTION;
  */
 public interface ProxyOptionParser {
 
-    String output();
+	String output();
 
-    ProxyOptionParser read(String option);
+	ProxyOptionParser read(String option);
 
-    PROXY_OPTION option();
+	PROXY_OPTION option();
 
-    boolean isImportant();
+	boolean isImportant();
 
 }

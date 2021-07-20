@@ -6,11 +6,11 @@ import com.ctrip.xpipe.zk.ZkClient;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 26, 2016
  */
-public class MoveSlotFromDeadOrEmpty extends AbstractSlotMoveTask{
-	
+public class MoveSlotFromDeadOrEmpty extends AbstractSlotMoveTask {
+
 	public MoveSlotFromDeadOrEmpty(Integer slot, ClusterServer from, ClusterServer to, ZkClient zkClient) {
 		super(slot, from, to, zkClient);
 	}
@@ -22,7 +22,7 @@ public class MoveSlotFromDeadOrEmpty extends AbstractSlotMoveTask{
 
 	@Override
 	protected void doExecute() throws Exception {
-		
+
 		logger.info("[doExecute]{},{}->{}", slot, from, to);
 		setSlotInfo(new SlotInfo(getTo().getServerId()));
 		to.addSlot(slot);
@@ -30,8 +30,8 @@ public class MoveSlotFromDeadOrEmpty extends AbstractSlotMoveTask{
 	}
 
 	@Override
-	protected void doReset(){
-		
+	protected void doReset() {
+
 	}
 
 }

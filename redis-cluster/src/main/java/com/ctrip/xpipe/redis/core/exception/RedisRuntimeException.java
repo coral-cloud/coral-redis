@@ -5,10 +5,10 @@ import com.ctrip.xpipe.exception.XpipeRuntimeException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月24日 下午3:00:24
  */
-public class RedisRuntimeException extends XpipeRuntimeException{
+public class RedisRuntimeException extends XpipeRuntimeException {
 
 	private static final long serialVersionUID = -2100200337989565310L;
 
@@ -16,11 +16,11 @@ public class RedisRuntimeException extends XpipeRuntimeException{
 		super(message);
 	}
 
-	public RedisRuntimeException(String message, Throwable th){
+	public RedisRuntimeException(String message, Throwable th) {
 		super(message, th);
 	}
 
-	public <T extends Enum<T>> RedisRuntimeException(ErrorMessage<T> errorMessage, Throwable th){
+	public <T extends Enum<T>> RedisRuntimeException(ErrorMessage<T> errorMessage, Throwable th) {
 		super(errorMessage, th);
 	}
 }

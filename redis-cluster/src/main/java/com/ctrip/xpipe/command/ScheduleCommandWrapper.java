@@ -12,16 +12,16 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 21, 2016
  */
-public class ScheduleCommandWrapper<V> extends AbstractCommand<V>{
-	
+public class ScheduleCommandWrapper<V> extends AbstractCommand<V> {
+
 	private ScheduledExecutorService scheduled;
 	private int time;
 	private TimeUnit timeUnit;
 	private Command<V> command;
-	
+
 	public ScheduleCommandWrapper(Command<V> command, ScheduledExecutorService scheduled, int time, TimeUnit timeUnit) {
 		this.command = command;
 		this.scheduled = scheduled;
@@ -38,22 +38,22 @@ public class ScheduleCommandWrapper<V> extends AbstractCommand<V>{
 	protected void doExecute() throws Exception {
 
 		final ScheduledFuture<?> scheduleFuture = scheduled.schedule(new AbstractExceptionLogTask() {
-			
+
 			@Override
 			protected void doRun() throws Exception {
-				try{
+				try {
 					command.execute().addListener(new CommandFutureListener<V>() {
 
 						@Override
 						public void operationComplete(CommandFuture<V> commandFuture) throws Exception {
-							if(commandFuture.isSuccess()){
+							if (commandFuture.isSuccess()) {
 								future().setSuccess(commandFuture.get());
-							}else{
+							} else {
 								future().setFailure(ExceptionUtils.getRootCause(commandFuture.cause()));
 							}
 						}
 					});
-				}catch(Exception e){
+				} catch (Exception e) {
 					future().setFailure(ExceptionUtils.getRootCause(e));
 				}
 			}
@@ -63,7 +63,7 @@ public class ScheduleCommandWrapper<V> extends AbstractCommand<V>{
 
 			@Override
 			public void operationComplete(CommandFuture<V> commandFuture) throws Exception {
-				if(commandFuture.isCancelled()){
+				if (commandFuture.isCancelled()) {
 					getLogger().info("[command canceled][cancel execution]{}", time);
 					command.future().cancel(true);
 					scheduleFuture.cancel(false);
@@ -74,6 +74,6 @@ public class ScheduleCommandWrapper<V> extends AbstractCommand<V>{
 
 	@Override
 	protected void doReset() {
-		
+
 	}
 }

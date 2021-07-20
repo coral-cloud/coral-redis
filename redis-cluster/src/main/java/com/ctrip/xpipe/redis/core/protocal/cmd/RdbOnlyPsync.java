@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.ctrip.xpipe.redis.core.protocal.cmd;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
  *
  *         Jul 21, 2016 5:29:44 PM
  */
-public class RdbOnlyPsync extends AbstractReplicationStorePsync{
+public class RdbOnlyPsync extends AbstractReplicationStorePsync {
 
 	public RdbOnlyPsync(SimpleObjectPool<NettyClient> clientPool, ReplicationStore store, ScheduledExecutorService scheduled) {
 		super(clientPool, false, scheduled);

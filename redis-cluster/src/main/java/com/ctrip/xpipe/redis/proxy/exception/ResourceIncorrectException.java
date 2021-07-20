@@ -9,15 +9,15 @@ import com.ctrip.xpipe.exception.XpipeRuntimeException;
  * May 23, 2018
  */
 public class ResourceIncorrectException extends XpipeRuntimeException {
-    public ResourceIncorrectException(String message) {
-        super(message);
-    }
+	public ResourceIncorrectException(String message) {
+		super(message);
+	}
 
-    public ResourceIncorrectException(String message, Throwable th) {
-        super(message, th);
-    }
+	public ResourceIncorrectException(String message, Throwable th) {
+		super(message, th);
+	}
 
-    public <T extends Enum<T>> ResourceIncorrectException(ErrorMessage<T> errorMessage, Throwable th) {
-        super(errorMessage, th);
-    }
+	public <T extends Enum<T>> ResourceIncorrectException(ErrorMessage<T> errorMessage, Throwable th) {
+		super(errorMessage, th);
+	}
 }

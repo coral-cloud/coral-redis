@@ -10,16 +10,16 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 8, 2016
  */
-@SuppressWarnings("rawtypes") 
-public class OneTranscationCommand extends AbstractRedisCommand<String>{
+@SuppressWarnings("rawtypes")
+public class OneTranscationCommand extends AbstractRedisCommand<String> {
 
 	public static final String SUCCESS_STRING = "QUEUED";
 
 	private RedisCommand redisCommand;
-	
+
 	public OneTranscationCommand(SimpleObjectPool<NettyClient> clientPool, RedisCommand redisCommand, ScheduledExecutorService scheduled) {
 		super(clientPool, scheduled);
 		this.redisCommand = redisCommand;
@@ -33,7 +33,7 @@ public class OneTranscationCommand extends AbstractRedisCommand<String>{
 
 	@Override
 	protected String format(Object payload) {
-		
+
 		return payloadToString(payload);
 	}
 
@@ -41,6 +41,6 @@ public class OneTranscationCommand extends AbstractRedisCommand<String>{
 	public ByteBuf getRequest() {
 		return redisCommand.getRequest();
 	}
-	
+
 
 }

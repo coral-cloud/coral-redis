@@ -9,6 +9,6 @@ import com.ctrip.xpipe.api.endpoint.Endpoint;
  */
 public interface EndpointHealthChecker<T extends Endpoint> {
 
-    boolean checkConnectivity(T endpoint);
+	boolean checkConnectivity(T endpoint);
 
 }

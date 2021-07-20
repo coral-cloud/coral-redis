@@ -4,14 +4,14 @@ import com.ctrip.xpipe.redis.core.entity.KeeperContainerMeta;
 
 /**
  * @author wenchao.meng
- *
- *         Aug 2, 2016
+ * <p>
+ * Aug 2, 2016
  */
 public interface MetaServerKeeperService extends MetaServerService {
 
-	public static String PATH_PING = "cluster/{clusterId}/shard/{shardId}/ping";
+	String PATH_PING = "cluster/{clusterId}/shard/{shardId}/ping";
 
-	public static String PATH_GET_ALL_KEEPERS = "getallkeepers";
+	String PATH_GET_ALL_KEEPERS = "getallkeepers";
 
 	/*********************** for keeper *******************/
 
@@ -21,7 +21,7 @@ public interface MetaServerKeeperService extends MetaServerService {
 
 	/**
 	 * meta server merge all meta server's results
-	 * 
+	 *
 	 * @param keeperContainerMeta
 	 * @return
 	 */
@@ -29,7 +29,7 @@ public interface MetaServerKeeperService extends MetaServerService {
 
 	KeeperContainerTokenStatusResponse refreshKeeperContainerTokenStatus(KeeperContainerTokenStatusRequest request);
 
-	public static class KeeperContainerTokenStatusResponse {
+	class KeeperContainerTokenStatusResponse {
 		private int tokenSize;
 
 		public KeeperContainerTokenStatusResponse(int tokenSize) {
@@ -42,7 +42,7 @@ public interface MetaServerKeeperService extends MetaServerService {
 
 	}
 
-	public static class KeeperContainerTokenStatusRequest {
+	class KeeperContainerTokenStatusRequest {
 
 		private KeeperContainerMeta keeperContainerMeta;
 

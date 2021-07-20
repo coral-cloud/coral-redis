@@ -21,10 +21,10 @@ import static com.ctrip.xpipe.redis.core.proxy.parser.AbstractProxyOptionParser.
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 7, 2016
  */
-public class KeeperCommandHandler extends AbstractCommandHandler{
+public class KeeperCommandHandler extends AbstractCommandHandler {
 
 	@Override
 	public String[] getCommands() {
@@ -33,23 +33,23 @@ public class KeeperCommandHandler extends AbstractCommandHandler{
 
 	@Override
 	protected void doHandle(String[] args, RedisClient redisClient) throws Exception {
-		
-		if(args.length >= 1){
-			
-			if(args[0].equalsIgnoreCase(AbstractKeeperCommand.GET_STATE)){
-				
+
+		if (args.length >= 1) {
+
+			if (args[0].equalsIgnoreCase(AbstractKeeperCommand.GET_STATE)) {
+
 				KeeperState keeperState = redisClient.getRedisKeeperServer().getRedisKeeperServerState().keeperState();
 				redisClient.sendMessage(new SimpleStringParser(keeperState.toString()).format());
-			}else if(args[0].equalsIgnoreCase(AbstractKeeperCommand.SET_STATE)){
-				
-				if(args.length >= 4){
+			} else if (args[0].equalsIgnoreCase(AbstractKeeperCommand.SET_STATE)) {
+
+				if (args.length >= 4) {
 					KeeperState keeperState = KeeperState.valueOf(args[1]);
 					Endpoint masterAddress = getMasterAddress(args);
 					doSetKeeperState(redisClient, keeperState, masterAddress);
-				}else{
+				} else {
 					throw new IllegalArgumentException("setstate argument error:" + StringUtil.join(" ", args));
 				}
-			}else{
+			} else {
 				throw new IllegalStateException("unknown command:" + args[0]);
 			}
 		}
@@ -60,8 +60,8 @@ public class KeeperCommandHandler extends AbstractCommandHandler{
 		RedisKeeperServer redisKeeperServer = redisClient.getRedisKeeperServer();
 
 		RedisKeeperServerState currentState = redisKeeperServer.getRedisKeeperServerState();
-		try{
-			switch(keeperState){
+		try {
+			switch (keeperState) {
 				case ACTIVE:
 					currentState.becomeActive(masterAddress);
 					break;
@@ -74,14 +74,14 @@ public class KeeperCommandHandler extends AbstractCommandHandler{
 					throw new IllegalStateException("unrecognised state:" + keeperState);
 			}
 			redisClient.sendMessage(new SimpleStringParser(RedisProtocol.OK).format());
-		}catch(Exception e){
+		} catch (Exception e) {
 			logger.error("[doSetKeeperState]" + String.format("%s, %s, %s", redisClient, keeperState, masterAddress), e);
 			redisClient.sendMessage(new RedisErrorParser(e.getMessage()).format());
 		}
 	}
 
 	private Endpoint getMasterAddress(String[] args) {
-		if(containsProxyProtocol(args)) {
+		if (containsProxyProtocol(args)) {
 			return new ProxyEnabledEndpoint(args[2], Integer.parseInt(args[3]), getProxyProtocol(args));
 		} else {
 			return new DefaultEndPoint(args[2], Integer.parseInt(args[3]));

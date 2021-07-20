@@ -15,10 +15,10 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 12, 2016
  */
-public class DefaultSlaveOfJob extends AbstractRedisesSlaveofJob{
+public class DefaultSlaveOfJob extends AbstractRedisesSlaveofJob {
 
 	public DefaultSlaveOfJob(List<RedisMeta> slaves, String masterHost, int masterPort,
 							 SimpleKeyedObjectPool<Endpoint, NettyClient> clientPool, ScheduledExecutorService scheduled, Executor executors) {
@@ -27,7 +27,7 @@ public class DefaultSlaveOfJob extends AbstractRedisesSlaveofJob{
 
 	@Override
 	protected Command<?> createSlaveOfCommand(SimpleObjectPool<NettyClient> clientPool, String masterHost,
-			int masterPort) {
+											  int masterPort) {
 		return new DefaultSlaveOfCommand(clientPool, masterHost, masterPort, scheduled);
 	}
 

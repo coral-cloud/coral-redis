@@ -4,12 +4,13 @@ import java.util.function.LongSupplier;
 
 /**
  * control the size returned
- * @author wenchao.meng
  *
+ * @author wenchao.meng
+ * <p>
  * Jan 5, 2017
  */
 public interface FileSize {
-	
-	long getSize(LongSupplier realSizeProvider) ;
+
+	long getSize(LongSupplier realSizeProvider);
 
 }

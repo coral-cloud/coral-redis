@@ -10,24 +10,24 @@ import io.netty.channel.Channel;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 24, 2016
  */
-public interface RedisMasterReplication extends PsyncChecker, Lifecycle{
+public interface RedisMasterReplication extends PsyncChecker, Lifecycle {
 
 	void handleResponse(Channel channel, ByteBuf msg) throws XpipeException;
 
 	void masterDisconntected(Channel channel);
 
 	void masterConnected(Channel channel);
-	
+
 	PARTIAL_STATE partialState();
-	
+
 	RedisMaster redisMaster();
 
 	void updateReplicationObserver(RedisMasterReplicationObserver observer);
 
-	public interface RedisMasterReplicationObserver extends PsyncChecker {
+	interface RedisMasterReplicationObserver extends PsyncChecker {
 
 		void onMasterConnected();
 

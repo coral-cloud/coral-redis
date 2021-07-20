@@ -10,36 +10,36 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月28日 下午2:17:45
  */
-public class RedisErrorParser extends AbstractRedisClientProtocol<RedisError>{
+public class RedisErrorParser extends AbstractRedisClientProtocol<RedisError> {
 
 	private static final Logger logger = LoggerFactory.getLogger(RedisErrorParser.class);
-	
-	public RedisErrorParser(){
+
+	public RedisErrorParser() {
 	}
-	
+
 	public RedisErrorParser(String errorMessage) {
 		this(new RedisError(errorMessage));
 	}
-	
+
 
 	public RedisErrorParser(RedisError redisError) {
 		super(redisError, true, true);
 	}
 
 	@Override
-	public RedisClientProtocol<RedisError> read(ByteBuf byteBuf){
-		
+	public RedisClientProtocol<RedisError> read(ByteBuf byteBuf) {
+
 		String error = readTilCRLFAsString(byteBuf);
 		return new RedisErrorParser(new RedisError(error));
 	}
 
-	
+
 	@Override
 	protected ByteBuf getWriteByteBuf() {
-		
+
 		return Unpooled.wrappedBuffer(getRequestBytes(MINUS_BYTE, payload.errorMessage()));
 	}
 

@@ -13,13 +13,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Leo Liang(jhliang@ctrip.com)
- *
  */
 public class XpipeThreadFactory implements ThreadFactory {
 	private static Logger logger = LoggerFactory.getLogger(XpipeThreadFactory.class);
 
 	protected final AtomicLong m_threadNumber = new AtomicLong(1);
-	
+
 	public static final int RANDOM_STRING_LEN = 5;
 
 	protected final String m_namePrefix;
@@ -29,7 +28,7 @@ public class XpipeThreadFactory implements ThreadFactory {
 	private final static ThreadGroup m_threadGroup = new ThreadGroup("Xpipe");
 
 	public static ThreadGroup getThreadGroup() {
-		
+
 		return m_threadGroup;
 	}
 
@@ -42,9 +41,9 @@ public class XpipeThreadFactory implements ThreadFactory {
 	}
 
 	private static String getThreadName(String namePrefix) {
-		
-		if(AbstractProfile.PROFILE_NAME_TEST.equals(System.getProperty(AbstractProfile.PROFILE_KEY))){
-			return namePrefix + "-" + StringUtil.randomString(RANDOM_STRING_LEN); 
+
+		if (AbstractProfile.PROFILE_NAME_TEST.equals(System.getProperty(AbstractProfile.PROFILE_KEY))) {
+			return namePrefix + "-" + StringUtil.randomString(RANDOM_STRING_LEN);
 		}
 		return namePrefix;
 	}
@@ -80,7 +79,7 @@ public class XpipeThreadFactory implements ThreadFactory {
 		return false;
 	}
 
-	private static interface ClassifyStandard<T> {
+	private interface ClassifyStandard<T> {
 		boolean satisfy(T t);
 	}
 
@@ -102,7 +101,7 @@ public class XpipeThreadFactory implements ThreadFactory {
 
 	public Thread newThread(Runnable r) {
 		Thread t = new Thread(m_threadGroup, r,//
-		      m_namePrefix + "-" + m_threadNumber.getAndIncrement());
+				m_namePrefix + "-" + m_threadNumber.getAndIncrement());
 		t.setDaemon(m_daemon);
 		if (t.getPriority() != Thread.NORM_PRIORITY)
 			t.setPriority(Thread.NORM_PRIORITY);

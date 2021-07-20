@@ -8,11 +8,11 @@ import java.util.Set;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 4, 2016
  */
 public class ClusterDebugInfo {
-	
+
 	private int currentServerId;
 	private String currentDc;
 	private String zkAddress;
@@ -24,10 +24,10 @@ public class ClusterDebugInfo {
 	private Map<Integer, SlotInfo> allSlotInfo;
 	private String zkNameSpace;
 
-	public ClusterDebugInfo(int currentServerId, String currentDc, String zkAddress, String zkNameSpace, boolean isLeader, 
-			ClusterServerInfo currentClusterServerInfo, Set<Integer> inchargeSlots, Set<String> inchargeClusters, 
-			Map<Integer, ClusterServerInfo> clusterServerInfos, 
-			Map<Integer, SlotInfo> allSlotInfo){
+	public ClusterDebugInfo(int currentServerId, String currentDc, String zkAddress, String zkNameSpace, boolean isLeader,
+							ClusterServerInfo currentClusterServerInfo, Set<Integer> inchargeSlots, Set<String> inchargeClusters,
+							Map<Integer, ClusterServerInfo> clusterServerInfos,
+							Map<Integer, SlotInfo> allSlotInfo) {
 		this.currentServerId = currentServerId;
 		this.currentDc = currentDc;
 		this.zkAddress = zkAddress;
@@ -39,15 +39,15 @@ public class ClusterDebugInfo {
 		this.clusterServerInfos = clusterServerInfos;
 		this.allSlotInfo = allSlotInfo;
 	}
-	
+
 	public int getCurrentServerId() {
 		return currentServerId;
 	}
-	
+
 	public String getCurrentDc() {
 		return currentDc;
 	}
-	
+
 	public boolean isLeader() {
 		return isLeader;
 	}
@@ -59,13 +59,13 @@ public class ClusterDebugInfo {
 	public String getZkNameSpace() {
 		return zkNameSpace;
 	}
-	
+
 	public ClusterServerInfo getCurrentClusterServerInfo() {
 		return currentClusterServerInfo;
 	}
-	
+
 	public int getInchargeSlotsSize() {
-		if(inchargeSlots != null){
+		if (inchargeSlots != null) {
 			return inchargeSlots.size();
 		}
 		return -1;
@@ -74,16 +74,17 @@ public class ClusterDebugInfo {
 	public Set<Integer> getInchargeSlots() {
 		return inchargeSlots;
 	}
+
 	public Set<String> getInchargeClusters() {
 		return inchargeClusters;
 	}
-	
+
 	public Map<Integer, ClusterServerInfo> getClusterServerInfos() {
 		return clusterServerInfos;
 	}
-	
+
 	public Map<Integer, SlotInfo> getAllSlotInfo() {
 		return allSlotInfo;
 	}
-	
+
 }

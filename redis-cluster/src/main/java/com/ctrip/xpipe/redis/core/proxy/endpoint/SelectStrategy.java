@@ -7,5 +7,5 @@ package com.ctrip.xpipe.redis.core.proxy.endpoint;
  */
 public interface SelectStrategy {
 
-    boolean select();
+	boolean select();
 }

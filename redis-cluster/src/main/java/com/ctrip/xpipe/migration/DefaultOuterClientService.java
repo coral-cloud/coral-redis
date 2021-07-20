@@ -14,8 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author shyin
- *
- *         Dec 22, 2016
+ * <p>
+ * Dec 22, 2016
  */
 public class DefaultOuterClientService extends AbstractOuterClientService {
 
@@ -32,7 +32,7 @@ public class DefaultOuterClientService extends AbstractOuterClientService {
 	public boolean isInstanceUp(ClusterShardHostPort clusterShardHostPort) throws OuterClientException {
 
 		Boolean result = instanceStatus.get(clusterShardHostPort.getHostPort());
-		if(result == null){
+		if (result == null) {
 			return Boolean.parseBoolean(System.getProperty("InstanceUp", "true"));
 		}
 		return result;
@@ -45,13 +45,14 @@ public class DefaultOuterClientService extends AbstractOuterClientService {
 	}
 
 	@Override
-	public MigrationPublishResult doMigrationPublish(String clusterName, String primaryDcName, List<InetSocketAddress> newMasters) throws OuterClientException{
+	public MigrationPublishResult doMigrationPublish(String clusterName, String primaryDcName, List<InetSocketAddress> newMasters) throws OuterClientException {
 		logger.info("[doMigrationPublish]Cluster:{}, NewPrimaryDc:{}, Masters:{}", clusterName, primaryDcName,
 				newMasters);
 		String startTime = DateTimeUtils.currentTimeAsString();
 		MigrationPublishResult res = new MigrationPublishResult("default-addr", clusterName, primaryDcName, newMasters);
 		String endTime = DateTimeUtils.currentTimeAsString();
-		res.setSuccess(true);res.setMessage("default-success");
+		res.setSuccess(true);
+		res.setMessage("default-success");
 		res.setStartTime(startTime);
 		res.setEndTime(endTime);
 		return res;
@@ -59,14 +60,15 @@ public class DefaultOuterClientService extends AbstractOuterClientService {
 
 	@Override
 	public MigrationPublishResult doMigrationPublish(String clusterName, String shardName, String primaryDcName,
-			InetSocketAddress newMaster) throws OuterClientException{
+													 InetSocketAddress newMaster) throws OuterClientException {
 
 		logger.info("[doMigrationPublish]Cluster:{}, Shard:{}, NewPrimaryDc:{}, NewMaster:{}", clusterName, shardName,
 				primaryDcName, newMaster);
 		String startTime = DateTimeUtils.currentTimeAsString();
 		MigrationPublishResult res = new MigrationPublishResult("default-addr", clusterName, primaryDcName, Arrays.asList(newMaster));
 		String endTime = DateTimeUtils.currentTimeAsString();
-		res.setSuccess(true);res.setMessage("default-success");
+		res.setSuccess(true);
+		res.setMessage("default-success");
 		res.setStartTime(startTime);
 		res.setEndTime(endTime);
 		return res;

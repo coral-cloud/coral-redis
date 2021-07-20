@@ -30,23 +30,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月22日 上午11:30:49
  */
-public class DefaultRedisClient extends AbstractObservable implements RedisClient{
-	
+public class DefaultRedisClient extends AbstractObservable implements RedisClient {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
-	private Set<CAPA>  capas = new HashSet<CAPA>(); 
+
+	private Set<CAPA> capas = new HashSet<CAPA>();
 
 	private int slaveListeningPort;
-	
+
 	private AtomicBoolean isKeeper = new AtomicBoolean(false);
-	
+
 	protected Channel channel;
-	
+
 	protected RedisKeeperServer redisKeeperServer;
-	
+
 	private CLIENT_ROLE clientRole = CLIENT_ROLE.NORMAL;
 
 	private String clientIpAddress;
@@ -55,11 +55,11 @@ public class DefaultRedisClient extends AbstractObservable implements RedisClien
 
 	public DefaultRedisClient(Channel channel, RedisKeeperServer redisKeeperServer) {
 		this.redisKeeperServer = redisKeeperServer;
-		
+
 		this.channel = channel;
 		String remoteIpLocalPort = ChannelUtil.getRemoteAddr(channel);
 		channel.closeFuture().addListener(new ChannelFutureListener() {
-			
+
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				logger.info("[operationComplete][channel closed]{}, {}, {}, {}", future.channel(), this, future.isDone(), future.isSuccess());
@@ -76,7 +76,7 @@ public class DefaultRedisClient extends AbstractObservable implements RedisClien
 
 	@Override
 	public void setSlaveListeningPort(int port) {
-		if(logger.isInfoEnabled()){
+		if (logger.isInfoEnabled()) {
 			logger.info("[setSlaveListeningPort]" + this + "," + port);
 		}
 		this.slaveListeningPort = port;
@@ -87,12 +87,12 @@ public class DefaultRedisClient extends AbstractObservable implements RedisClien
 		logger.info("[capa]{}, {}", capa, this);
 		capas.add(capa);
 	}
-	
+
 	@Override
 	public boolean capaOf(CAPA capa) {
 		return capas.contains(capa);
 	}
-	
+
 	@Override
 	public int getSlaveListeningPort() {
 		return this.slaveListeningPort;
@@ -114,55 +114,55 @@ public class DefaultRedisClient extends AbstractObservable implements RedisClien
 	}
 
 
-	public static enum COMMAND_STATE{
+	public enum COMMAND_STATE {
 		READ_SIGN,
 		READ_COMMANDS
 	}
-	
-	private COMMAND_STATE commandState = COMMAND_STATE.READ_SIGN;
-	private RedisClientProtocol<?>  redisClientProtocol;
 
-	
+	private COMMAND_STATE commandState = COMMAND_STATE.READ_SIGN;
+	private RedisClientProtocol<?> redisClientProtocol;
+
+
 	@Override
 	public String[] readCommands(ByteBuf byteBuf) {
-	
-		while(true){
 
-			switch(commandState){
+		while (true) {
+
+			switch (commandState) {
 				case READ_SIGN:
-					if(!hasDataRead(byteBuf)){
+					if (!hasDataRead(byteBuf)) {
 						return null;
 					}
 					int readIndex = byteBuf.readerIndex();
 					byte sign = byteBuf.getByte(readIndex);
-					if(sign == RedisClientProtocol.ASTERISK_BYTE){
+					if (sign == RedisClientProtocol.ASTERISK_BYTE) {
 						redisClientProtocol = new ArrayParser();
-					}else if(sign == '\n'){
+					} else if (sign == '\n') {
 						byteBuf.readByte();
 						return new String[]{"\n"};
-					}else{
+					} else {
 						redisClientProtocol = new SimpleStringParser();
 					}
 					commandState = COMMAND_STATE.READ_COMMANDS;
 					break;
 				case READ_COMMANDS:
 					RedisClientProtocol<?> resultParser = redisClientProtocol.read(byteBuf);
-					if(resultParser == null){
+					if (resultParser == null) {
 						return null;
 					}
-					
+
 					Object result = resultParser.getPayload();
-					if(result == null){
+					if (result == null) {
 						return new String[0];
 					}
-					
-					commandState = COMMAND_STATE.READ_SIGN ;
-					String []ret = null;
-					if(result instanceof String){
-						ret = handleString((String)result);
-					}else if(result instanceof Object[]){
-						ret = handleArray((Object[])result);
-					}else{
+
+					commandState = COMMAND_STATE.READ_SIGN;
+					String[] ret = null;
+					if (result instanceof String) {
+						ret = handleString((String) result);
+					} else if (result instanceof Object[]) {
+						ret = handleArray((Object[]) result);
+					} else {
 						throw new IllegalStateException("unkonw result array:" + result);
 					}
 					return ret;
@@ -171,21 +171,21 @@ public class DefaultRedisClient extends AbstractObservable implements RedisClien
 			}
 		}
 	}
-	
+
 
 	private String[] handleArray(Object[] result) {
 
-		String []strArray = new String[result.length];
+		String[] strArray = new String[result.length];
 		int index = 0;
-		for(Object param : result){
-			
-			if(param instanceof String){
+		for (Object param : result) {
+
+			if (param instanceof String) {
 				strArray[index] = (String) param;
-			}else if(param instanceof ByteArrayOutputStreamPayload){
-				
-				byte [] bytes = ((ByteArrayOutputStreamPayload)param).getBytes();
+			} else if (param instanceof ByteArrayOutputStreamPayload) {
+
+				byte[] bytes = ((ByteArrayOutputStreamPayload) param).getBytes();
 				strArray[index] = new String(bytes, Codec.defaultCharset);
-			}else{
+			} else {
 				throw new RedisRuntimeException("request unkonwn, can not be transformed to string!");
 			}
 			index++;
@@ -194,9 +194,9 @@ public class DefaultRedisClient extends AbstractObservable implements RedisClien
 	}
 
 	private String[] handleString(String result) {
-		
-		String [] args = StringUtil.splitRemoveEmpty("\\s+", result);
-		if(args.length == 0){
+
+		String[] args = StringUtil.splitRemoveEmpty("\\s+", result);
+		if (args.length == 0) {
 			logger.info("[handleString][split null]{}", result);
 			return null;
 		}
@@ -204,11 +204,8 @@ public class DefaultRedisClient extends AbstractObservable implements RedisClien
 	}
 
 	private boolean hasDataRead(ByteBuf byteBuf) {
-		
-		if(byteBuf.readableBytes() > 0){
-			return true;
-		}
-		return false;
+
+		return byteBuf.readableBytes() > 0;
 	}
 
 	@Override
@@ -218,26 +215,26 @@ public class DefaultRedisClient extends AbstractObservable implements RedisClien
 
 	@Override
 	public String ip() {
-		if(this.clientIpAddress != null) {
+		if (this.clientIpAddress != null) {
 			return clientIpAddress;
 		}
 		Channel channel = channel();
-		return channel == null? "null": IpUtils.getIp(channel.remoteAddress());
+		return channel == null ? "null" : IpUtils.getIp(channel.remoteAddress());
 	}
 
 	@Override
 	public void close() {
 		channel.close();
 	}
-	
+
 	@Override
 	public RedisSlave becomeSlave() {
-		
+
 		RedisSlave redisSlave = null;
-		switch(clientRole){
+		switch (clientRole) {
 			case NORMAL:
 				logger.info("[becomeSlave]" + this);
-				redisSlave = new DefaultRedisSlave(this); 
+				redisSlave = new DefaultRedisSlave(this);
 				notifyObservers(redisSlave);
 				break;
 			case SLAVE:
@@ -256,23 +253,23 @@ public class DefaultRedisClient extends AbstractObservable implements RedisClien
 
 	@Override
 	public void sendMessage(ByteBuf byteBuf) {
-		
+
 		channel.writeAndFlush(byteBuf);
 	}
-	
+
 	@Override
 	public void sendMessage(byte[] bytes) {
-		
+
 		sendMessage(Unpooled.wrappedBuffer(bytes));
 	}
-	
-	public void addChannelCloseReleaseResources(final Releasable releasable){
-		
+
+	public void addChannelCloseReleaseResources(final Releasable releasable) {
+
 		channel.closeFuture().addListener(new ChannelFutureListener() {
-			
+
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
-				
+
 				logger.info("[channel close][release resource]{}", releasable);
 				releasable.release();
 			}

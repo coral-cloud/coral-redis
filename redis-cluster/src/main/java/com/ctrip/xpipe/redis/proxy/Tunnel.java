@@ -20,22 +20,22 @@ import io.netty.buffer.ByteBuf;
  */
 public interface Tunnel extends Lifecycle, Releasable, Observable, Observer {
 
-    FrontendSession frontend();
+	FrontendSession frontend();
 
-    BackendSession backend();
+	BackendSession backend();
 
-    TunnelMeta getTunnelMeta();
+	TunnelMeta getTunnelMeta();
 
-    TunnelState getState();
+	TunnelState getState();
 
-    TunnelIdentity identity();
+	TunnelIdentity identity();
 
-    void forwardToBackend(ByteBuf message);
+	void forwardToBackend(ByteBuf message);
 
-    void forwardToFrontend(ByteBuf message);
+	void forwardToFrontend(ByteBuf message);
 
-    ProxyConnectProtocol getProxyProtocol();
+	ProxyConnectProtocol getProxyProtocol();
 
-    TunnelMonitor getTunnelMonitor();
+	TunnelMonitor getTunnelMonitor();
 
 }

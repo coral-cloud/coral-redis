@@ -11,49 +11,50 @@ import java.util.List;
 
 public abstract class AbstractCurrentShardMeta implements CurrentShardMeta {
 
-    @JsonIgnore
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+	@JsonIgnore
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    @JsonIgnore
-    private List<Releasable> resources = new LinkedList<>();
+	@JsonIgnore
+	private List<Releasable> resources = new LinkedList<>();
 
-    protected String clusterId, shardId;
+	protected String clusterId, shardId;
 
-    public AbstractCurrentShardMeta() {}
+	public AbstractCurrentShardMeta() {
+	}
 
-    public AbstractCurrentShardMeta(String clusterId, String shardId) {
-        this.clusterId = clusterId;
-        this.shardId = shardId;
-    }
+	public AbstractCurrentShardMeta(String clusterId, String shardId) {
+		this.clusterId = clusterId;
+		this.shardId = shardId;
+	}
 
-    public void addResource(Releasable releasable) {
-        synchronized (resources) {
-            resources.add(releasable);
-        }
-    }
+	public void addResource(Releasable releasable) {
+		synchronized (resources) {
+			resources.add(releasable);
+		}
+	}
 
-    @Override
-    public void release() throws Exception {
-        logger.info("[release]{},{}", clusterId, shardId);
-        for (Releasable resource : resources) {
-            try {
-                resource.release();
-            } catch (Exception e) {
-                logger.error("[release]" + resource, e);
-            }
-        }
-    }
+	@Override
+	public void release() throws Exception {
+		logger.info("[release]{},{}", clusterId, shardId);
+		for (Releasable resource : resources) {
+			try {
+				resource.release();
+			} catch (Exception e) {
+				logger.error("[release]" + resource, e);
+			}
+		}
+	}
 
-    public String getClusterId() {
-        return clusterId;
-    }
+	public String getClusterId() {
+		return clusterId;
+	}
 
-    public String getShardId() {
-        return shardId;
-    }
+	public String getShardId() {
+		return shardId;
+	}
 
-    public boolean watchIfNotWatched() {
-        return false;
-    }
+	public boolean watchIfNotWatched() {
+		return false;
+	}
 
 }

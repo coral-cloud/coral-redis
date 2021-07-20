@@ -19,75 +19,75 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
-public abstract class AbstractNettyRequestResponseCommand<V> extends AbstractNettyCommand<V> implements ByteBufReceiver, RequestResponseCommand<V>{
-		
+public abstract class AbstractNettyRequestResponseCommand<V> extends AbstractNettyCommand<V> implements ByteBufReceiver, RequestResponseCommand<V> {
+
 	protected ScheduledExecutorService scheduled;
 
 	private ScheduledFuture<?> timeoutFuture = null;
-	
-	public AbstractNettyRequestResponseCommand(String host, int port, ScheduledExecutorService scheduled){
+
+	public AbstractNettyRequestResponseCommand(String host, int port, ScheduledExecutorService scheduled) {
 		super(host, port);
 		this.scheduled = scheduled;
 	}
-	
+
 	public AbstractNettyRequestResponseCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 		super(clientPool);
 		this.scheduled = scheduled;
 	}
-	
+
 	@Override
 	protected void doSendRequest(final NettyClient nettyClient, ByteBuf byteBuf) {
-		
-		if(logRequest()){
+
+		if (logRequest()) {
 			getLogger().info("[doSendRequest]{}, {}", nettyClient, ByteBufUtils.readToString(byteBuf.slice()));
 		}
 
-		if(hasResponse()){
+		if (hasResponse()) {
 			nettyClient.sendRequest(byteBuf, this);
-		}else{
+		} else {
 			nettyClient.sendRequest(byteBuf);
 			//TODO sendfuture, make sure send success
 			future().setSuccess(null);
 			return;
 		}
-		
-		if(getCommandTimeoutMilli() > 0 && scheduled != null){
+
+		if (getCommandTimeoutMilli() > 0 && scheduled != null) {
 
 			getLogger().debug("[doSendRequest][schedule timeout]{}, {}", this, getCommandTimeoutMilli());
 			timeoutFuture = scheduled.schedule(new AbstractExceptionLogTask() {
-				
+
 				@Override
 				public void doRun() {
 					getLogger().info("[{}][run][timeout]{}", AbstractNettyRequestResponseCommand.this, nettyClient);
-					future().setFailure(new CommandTimeoutException("timeout " +  + getCommandTimeoutMilli()));
+					future().setFailure(new CommandTimeoutException("timeout " + +getCommandTimeoutMilli()));
 				}
 			}, getCommandTimeoutMilli(), TimeUnit.MILLISECONDS);
-			
+
 			future().addListener(new CommandFutureListener<V>() {
 
 				@Override
 				public void operationComplete(CommandFuture<V> commandFuture) {
-					
+
 					boolean cancel = true;
 					try {
 						commandFuture.get();
 					} catch (InterruptedException e) {
-					}catch(ExecutionException e){
-						if(e.getCause() instanceof CommandTimeoutException){
+					} catch (ExecutionException e) {
+						if (e.getCause() instanceof CommandTimeoutException) {
 							handleTimeout(nettyClient);
 							cancel = false;
 						}
 					}
-					if(cancel){
+					if (cancel) {
 						getLogger().debug("[operationComplete][cancel timeout future]");
 						cancelTimeout();
 					}
 				}
 			});
-			
+
 		}
 	}
 
@@ -98,36 +98,36 @@ public abstract class AbstractNettyRequestResponseCommand<V> extends AbstractNet
 
 	@Override
 	public RECEIVER_RESULT receive(Channel channel, ByteBuf byteBuf) {
-		
-		if(future().isDone()){
+
+		if (future().isDone()) {
 			getLogger().debug("[receive][done, return]{}", channel);
 			return RECEIVER_RESULT.ALREADY_FINISH;
 		}
-		
-		try{
-			 V result = doReceiveResponse(channel, byteBuf);
-			 if(result != null){
-				 if(logResponse()){
-					 getLogger().info("[receive]{}, {}", ChannelUtil.getDesc(channel), result);
-				 }
-				 if(!future().isDone()) {
-					 future().setSuccess(result);
-				 }
-			 }
 
-			 if(result == null){
-			 	return RECEIVER_RESULT.CONTINUE;
-			 }
-			 return RECEIVER_RESULT.SUCCESS;
-		}catch(Exception e){
+		try {
+			V result = doReceiveResponse(channel, byteBuf);
+			if (result != null) {
+				if (logResponse()) {
+					getLogger().info("[receive]{}, {}", ChannelUtil.getDesc(channel), result);
+				}
+				if (!future().isDone()) {
+					future().setSuccess(result);
+				}
+			}
+
+			if (result == null) {
+				return RECEIVER_RESULT.CONTINUE;
+			}
+			return RECEIVER_RESULT.SUCCESS;
+		} catch (Exception e) {
 			future().setFailure(e);
-			if(e instanceof ProtocalErrorResponse){
+			if (e instanceof ProtocalErrorResponse) {
 				return RECEIVER_RESULT.SUCCESS;
 			}
 		}
 		return RECEIVER_RESULT.FAIL;
 	}
-	
+
 
 	protected boolean logRequest() {
 		return true;
@@ -140,7 +140,7 @@ public abstract class AbstractNettyRequestResponseCommand<V> extends AbstractNet
 
 	@Override
 	public void clientClosed(NettyClient nettyClient) {
-		if(!future().isDone()){
+		if (!future().isDone()) {
 			future().setFailure(new SocketException("remote closed:" + nettyClient));
 		}
 	}

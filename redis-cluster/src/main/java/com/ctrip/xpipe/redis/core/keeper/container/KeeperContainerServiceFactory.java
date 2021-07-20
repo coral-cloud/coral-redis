@@ -5,7 +5,7 @@ import com.ctrip.xpipe.redis.core.entity.KeeperContainerMeta;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 2, 2016
  */
 public interface KeeperContainerServiceFactory {

@@ -26,122 +26,122 @@ import java.lang.reflect.Proxy;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Aug 5, 2016
+ * <p>
+ * Aug 5, 2016
  */
 public class RestTemplateFactory {
 
-    public static RestTemplate createRestTemplate() {
+	public static RestTemplate createRestTemplate() {
 
-        return new RestTemplate();
-    }
+		return new RestTemplate();
+	}
 
-    public static RestOperations createCommonsHttpRestTemplateWithRetry(int retryTimes, int retryIntervalMilli, int connectionTimeout, int soTimeout) {
-        return createCommonsHttpRestTemplate(100, 1000, connectionTimeout, soTimeout, retryTimes,
-                RetryPolicyFactories.newRestOperationsRetryPolicyFactory(retryIntervalMilli));
-    }
-
-
-    public static RestOperations createCommonsHttpRestTemplateWithRetry(int retryTimes, int retryIntervalMilli) {
-        return createCommonsHttpRestTemplate(100, 1000, 5000, 5000, retryTimes,
-                RetryPolicyFactories.newRestOperationsRetryPolicyFactory(retryIntervalMilli));
-    }
+	public static RestOperations createCommonsHttpRestTemplateWithRetry(int retryTimes, int retryIntervalMilli, int connectionTimeout, int soTimeout) {
+		return createCommonsHttpRestTemplate(100, 1000, connectionTimeout, soTimeout, retryTimes,
+				RetryPolicyFactories.newRestOperationsRetryPolicyFactory(retryIntervalMilli));
+	}
 
 
-    public static RestOperations createCommonsHttpRestTemplate() {
+	public static RestOperations createCommonsHttpRestTemplateWithRetry(int retryTimes, int retryIntervalMilli) {
+		return createCommonsHttpRestTemplate(100, 1000, 5000, 5000, retryTimes,
+				RetryPolicyFactories.newRestOperationsRetryPolicyFactory(retryIntervalMilli));
+	}
 
-        return createCommonsHttpRestTemplateWithRetry(0, 10);
-    }
 
-    public static RestOperations createCommonsHttpRestTemplate(int maxConnPerRoute, int maxConnTotal,
-                                                               int connectTimeout, int soTimeout) {
-        return createCommonsHttpRestTemplate(maxConnPerRoute, maxConnTotal, connectTimeout, soTimeout, 0,
-                RetryPolicyFactories.newRestOperationsRetryPolicyFactory(10));
-    }
+	public static RestOperations createCommonsHttpRestTemplate() {
 
-    public static RestOperations createCommonsHttpRestTemplate(int maxConnPerRoute, int maxConnTotal,
-                                                               int connectTimeout, int soTimeout, int retryTimes) {
-        return createCommonsHttpRestTemplate(maxConnPerRoute, maxConnTotal, connectTimeout, soTimeout, retryTimes,
-                RetryPolicyFactories.newRestOperationsRetryPolicyFactory(10));
-    }
+		return createCommonsHttpRestTemplateWithRetry(0, 10);
+	}
 
-    public static RestOperations createCommonsHttpRestTemplate(int maxConnPerRoute, int maxConnTotal,
-                                                               int connectTimeout, int soTimeout, int retryTimes, RetryPolicyFactory retryPolicyFactory) {
-        HttpClient httpClient = HttpClientBuilder.create()
-                .setMaxConnPerRoute(maxConnPerRoute)
-                .setMaxConnTotal(maxConnTotal)
-                .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(soTimeout).build())
-                .setDefaultRequestConfig(RequestConfig.custom().setConnectTimeout(connectTimeout).build())
-                .build();
-        ClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
-        RestTemplate restTemplate = new RestTemplate(factory);
-        //set jackson mapper
-        for (HttpMessageConverter<?> hmc : restTemplate.getMessageConverters()) {
-            if (hmc instanceof MappingJackson2HttpMessageConverter) {
-                ObjectMapper objectMapper = createObjectMapper();
-                MappingJackson2HttpMessageConverter mj2hmc = (MappingJackson2HttpMessageConverter) hmc;
-                mj2hmc.setObjectMapper(objectMapper);
-            }
-        }
+	public static RestOperations createCommonsHttpRestTemplate(int maxConnPerRoute, int maxConnTotal,
+															   int connectTimeout, int soTimeout) {
+		return createCommonsHttpRestTemplate(maxConnPerRoute, maxConnTotal, connectTimeout, soTimeout, 0,
+				RetryPolicyFactories.newRestOperationsRetryPolicyFactory(10));
+	}
 
-        return (RestOperations) Proxy.newProxyInstance(RestOperations.class.getClassLoader(),
-                new Class[]{RestOperations.class},
-                new RetryableRestOperationsHandler(restTemplate, retryTimes, retryPolicyFactory));
-    }
+	public static RestOperations createCommonsHttpRestTemplate(int maxConnPerRoute, int maxConnTotal,
+															   int connectTimeout, int soTimeout, int retryTimes) {
+		return createCommonsHttpRestTemplate(maxConnPerRoute, maxConnTotal, connectTimeout, soTimeout, retryTimes,
+				RetryPolicyFactories.newRestOperationsRetryPolicyFactory(10));
+	}
 
-    private static ObjectMapper createObjectMapper() {
+	public static RestOperations createCommonsHttpRestTemplate(int maxConnPerRoute, int maxConnTotal,
+															   int connectTimeout, int soTimeout, int retryTimes, RetryPolicyFactory retryPolicyFactory) {
+		HttpClient httpClient = HttpClientBuilder.create()
+				.setMaxConnPerRoute(maxConnPerRoute)
+				.setMaxConnTotal(maxConnTotal)
+				.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(soTimeout).build())
+				.setDefaultRequestConfig(RequestConfig.custom().setConnectTimeout(connectTimeout).build())
+				.build();
+		ClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+		RestTemplate restTemplate = new RestTemplate(factory);
+		//set jackson mapper
+		for (HttpMessageConverter<?> hmc : restTemplate.getMessageConverters()) {
+			if (hmc instanceof MappingJackson2HttpMessageConverter) {
+				ObjectMapper objectMapper = createObjectMapper();
+				MappingJackson2HttpMessageConverter mj2hmc = (MappingJackson2HttpMessageConverter) hmc;
+				mj2hmc.setObjectMapper(objectMapper);
+			}
+		}
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
-        return objectMapper;
+		return (RestOperations) Proxy.newProxyInstance(RestOperations.class.getClassLoader(),
+				new Class[]{RestOperations.class},
+				new RetryableRestOperationsHandler(restTemplate, retryTimes, retryPolicyFactory));
+	}
 
-    }
+	private static ObjectMapper createObjectMapper() {
 
-    private static class RetryableRestOperationsHandler implements InvocationHandler {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+		return objectMapper;
 
-        private RestTemplate restTemplate;
+	}
 
-        private int retryTimes;
+	private static class RetryableRestOperationsHandler implements InvocationHandler {
 
-        private RetryPolicyFactory retryPolicyFactory;
+		private RestTemplate restTemplate;
 
-        public RetryableRestOperationsHandler(RestTemplate restTemplate, int retryTimes,
-                                              RetryPolicyFactory retryPolicyFactory) {
-            this.restTemplate = restTemplate;
-            this.retryTimes = retryTimes;
-            this.retryPolicyFactory = retryPolicyFactory;
-        }
+		private int retryTimes;
 
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Exception {
-            return retryableInvoke(restTemplate, method, args);
-        }
+		private RetryPolicyFactory retryPolicyFactory;
 
-        public Object retryableInvoke(final Object proxy, final Method method, final Object[] args) throws Exception {
-            final RetryPolicy retryPolicy = retryPolicyFactory.create();
+		public RetryableRestOperationsHandler(RestTemplate restTemplate, int retryTimes,
+											  RetryPolicyFactory retryPolicyFactory) {
+			this.restTemplate = restTemplate;
+			this.retryTimes = retryTimes;
+			this.retryPolicyFactory = retryPolicyFactory;
+		}
 
-            return new RetryNTimes<Object>(retryTimes, retryPolicy, false).execute(new AbstractCommand<Object>() {
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Exception {
+			return retryableInvoke(restTemplate, method, args);
+		}
 
-                @Override
-                public String getName() {
-                    return String.format("[retryable-invoke]%s(%s)", method.getName(), (args.length >= 1 ? args[0] : ""));
-                }
+		public Object retryableInvoke(final Object proxy, final Method method, final Object[] args) throws Exception {
+			final RetryPolicy retryPolicy = retryPolicyFactory.create();
 
-                @Override
-                protected void doExecute() throws Exception {
-                    future().setSuccess(method.invoke(proxy, args));
-                }
+			return new RetryNTimes<Object>(retryTimes, retryPolicy, false).execute(new AbstractCommand<Object>() {
 
-                @Override
-                protected void doReset() {
+				@Override
+				public String getName() {
+					return String.format("[retryable-invoke]%s(%s)", method.getName(), (args.length >= 1 ? args[0] : ""));
+				}
 
-                }
+				@Override
+				protected void doExecute() throws Exception {
+					future().setSuccess(method.invoke(proxy, args));
+				}
 
-            });
-        }
+				@Override
+				protected void doReset() {
 
-    }
+				}
+
+			});
+		}
+
+	}
 
 }

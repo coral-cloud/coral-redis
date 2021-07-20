@@ -14,22 +14,22 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月22日 下午6:05:05
  */
-public class ArrayParser extends AbstractRedisClientProtocol<Object[]>{
+public class ArrayParser extends AbstractRedisClientProtocol<Object[]> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ArrayParser.class);
-	
-	public enum ARRAY_STATE{
+
+	public enum ARRAY_STATE {
 		READ_SIZE,
 		READ_CONTENT
 	}
 
 	private Object[] resultArray;
-	private int  arraySize = 0;
-	private int  currentIndex = 0;
-	private RedisClientProtocol<?> currentParser  = null;
+	private int arraySize = 0;
+	private int currentIndex = 0;
+	private RedisClientProtocol<?> currentParser = null;
 	private ARRAY_STATE arrayState = ARRAY_STATE.READ_SIZE;
 
 	private InOutPayloadFactory inOutPayloadFactory;
@@ -37,58 +37,58 @@ public class ArrayParser extends AbstractRedisClientProtocol<Object[]>{
 	public ArrayParser() {
 
 	}
-	
-	public ArrayParser(Object []payload){
+
+	public ArrayParser(Object[] payload) {
 		super(payload, true, true);
 	}
 
 	@Override
 	public RedisClientProtocol<Object[]> read(ByteBuf byteBuf) {
-		
-		
-		switch(arrayState){
-		
+
+
+		switch (arrayState) {
+
 			case READ_SIZE:
-				
+
 				String arrayNumString = readTilCRLFAsString(byteBuf);
-				if(arrayNumString == null){
+				if (arrayNumString == null) {
 					return null;
 				}
-				
-				if(arrayNumString.charAt(0) == ASTERISK_BYTE){
+
+				if (arrayNumString.charAt(0) == ASTERISK_BYTE) {
 					arrayNumString = arrayNumString.substring(1);
 				}
 				arrayNumString = arrayNumString.trim();
-				
+
 				arraySize = Integer.valueOf(arrayNumString);
 				resultArray = new Object[arraySize];
 				arrayState = ARRAY_STATE.READ_CONTENT;
 				currentIndex = 0;
-				if(arraySize == 0){
+				if (arraySize == 0) {
 					return new ArrayParser(resultArray);
 				}
-				if(arraySize < 0){
+				if (arraySize < 0) {
 					return new ArrayParser(null);
 				}
 			case READ_CONTENT:
-				
-				for(int i=currentIndex; i < arraySize ; i++){
-					
-					while(true){
-						if(currentParser == null){
-							
-							if(byteBuf.readableBytes() == 0){
+
+				for (int i = currentIndex; i < arraySize; i++) {
+
+					while (true) {
+						if (currentParser == null) {
+
+							if (byteBuf.readableBytes() == 0) {
 								return null;
 							}
 							int readerIndex = byteBuf.readerIndex();
 							int data = byteBuf.getByte(readerIndex);
-							switch(data){
+							switch (data) {
 								case '\r':
 								case '\n':
 									byteBuf.readByte();
 									break;
 								case DOLLAR_BYTE:
-									if(inOutPayloadFactory != null) {
+									if (inOutPayloadFactory != null) {
 										currentParser = new BulkStringParser(inOutPayloadFactory.create());
 									} else {
 										currentParser = new BulkStringParser(new ByteArrayOutputStreamPayload());
@@ -107,22 +107,22 @@ public class ArrayParser extends AbstractRedisClientProtocol<Object[]>{
 									currentParser = new SimpleStringParser();
 									break;
 								default:
-									throw new RedisRuntimeException("unknown protocol type:" + (char)data);
+									throw new RedisRuntimeException("unknown protocol type:" + (char) data);
 							}
 						}
-						if(currentParser != null){
+						if (currentParser != null) {
 							break;
 						}
 					}
 					RedisClientProtocol<?> result = currentParser.read(byteBuf);
-					if(result == null){
+					if (result == null) {
 						return null;
 					}
 					resultArray[currentIndex] = result.getPayload();
 					currentParser = null;
 					currentIndex++;
 				}
-				if(currentIndex == arraySize){
+				if (currentIndex == arraySize) {
 					return new ArrayParser(resultArray);
 				}
 				break;
@@ -134,12 +134,12 @@ public class ArrayParser extends AbstractRedisClientProtocol<Object[]>{
 
 	@Override
 	protected ByteBuf getWriteByteBuf() {
-		
+
 		int length = payload.length;
 		CompositeByteBuf result = new CompositeByteBuf(UnpooledByteBufAllocator.DEFAULT, false, payload.length + 1);
 		String prefix = String.format("%c%d\r\n", ASTERISK_BYTE, length);
 		result.addComponent(Unpooled.wrappedBuffer(prefix.getBytes()));
-		for(Object o : payload){
+		for (Object o : payload) {
 			ByteBuf buff = ParserManager.parse(o);
 			result.addComponent(buff);
 		}

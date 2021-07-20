@@ -70,7 +70,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月24日 下午2:08:26
  */
 public class DefaultRedisKeeperServer extends AbstractRedisServer implements RedisKeeperServer {
@@ -83,33 +83,32 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 	private static final int DEFAULT_LONG_TIME_ALERT_TASK_MILLI = 1000;
 
 
-
 	/**
 	 * when keeper is active, it's redis master, else it's another keeper
 	 */
 	private volatile RedisMaster keeperRedisMaster;
-	
+
 	private long keeperStartTime;
-	
+
 	private ReplicationStoreManager replicationStoreManager;
 
 	private ServerSocketChannel serverSocketChannel;
-	
-    private EventLoopGroup bossGroup ;
-    private EventLoopGroup workerGroup;
-    private NioEventLoopGroup masterEventLoopGroup;
+
+	private EventLoopGroup bossGroup;
+	private EventLoopGroup workerGroup;
+	private NioEventLoopGroup masterEventLoopGroup;
 
 
-	private Map<Channel, RedisClient>  redisClients = new ConcurrentHashMap<Channel, RedisClient>();
-	
+	private Map<Channel, RedisClient> redisClients = new ConcurrentHashMap<Channel, RedisClient>();
+
 	private ScheduledExecutorService scheduled;
 	private ExecutorService clientExecutors;
-	
+
 	private final String clusterId, shardId;
-	
+
 	private volatile RedisKeeperServerState redisKeeperServerState;
-	private KeeperConfig keeperConfig; 
-	
+	private KeeperConfig keeperConfig;
+
 	private KeeperMeta currentKeeperMeta;
 	private LeaderElector leaderElector;
 
@@ -118,16 +117,16 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 	private volatile AtomicReference<RdbDumper> rdbDumper = new AtomicReference<RdbDumper>(null);
 	private long lastDumpTime = -1;
 	//for test
-	private AtomicInteger  rdbDumpTryCount = new AtomicInteger();
-	
+	private AtomicInteger rdbDumpTryCount = new AtomicInteger();
+
 	private KeepersMonitorManager keepersMonitorManager;
 	private KeeperMonitor keeperMonitor;
 
 	private KeeperResourceManager resourceManager;
-	
+
 	public DefaultRedisKeeperServer(KeeperMeta currentKeeperMeta, KeeperConfig keeperConfig, File baseDir,
 									LeaderElectorManager leaderElectorManager,
-									KeepersMonitorManager keepersMonitorManager, KeeperResourceManager resourceManager){
+									KeepersMonitorManager keepersMonitorManager, KeeperResourceManager resourceManager) {
 		this.clusterId = currentKeeperMeta.parent().parent().getId();
 		this.shardId = currentKeeperMeta.parent().getId();
 		this.currentKeeperMeta = currentKeeperMeta;
@@ -140,8 +139,8 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 		this.resourceManager = resourceManager;
 	}
 
-	private LeaderElector createLeaderElector(){
-		
+	private LeaderElector createLeaderElector() {
+
 		String leaderElectionZKPath = MetaZkConfig.getKeeperLeaderLatchPath(clusterId, shardId);
 		String leaderElectionID = MetaZkConfig.getKeeperLeaderElectionId(currentKeeperMeta);
 		ElectContext ctx = new ElectContext(leaderElectionZKPath, leaderElectionID);
@@ -153,39 +152,39 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 		super.doInitialize();
 
 		replicationStoreManager.initialize();
-		
+
 		String threadPoolName = String.format("keeper:%s-%s", clusterId, shardId);
 		logger.info("[doInitialize][keeper config]{}", keeperConfig);
 
 		clientExecutors = Executors.newSingleThreadExecutor(ClusterShardAwareThreadFactory.create(clusterId, shardId, "RedisClient-" + threadPoolName));
-		scheduled = Executors.newScheduledThreadPool(DEFAULT_SCHEDULED_CORE_POOL_SIZE , ClusterShardAwareThreadFactory.create(clusterId, shardId, "sch-" + threadPoolName));
+		scheduled = Executors.newScheduledThreadPool(DEFAULT_SCHEDULED_CORE_POOL_SIZE, ClusterShardAwareThreadFactory.create(clusterId, shardId, "sch-" + threadPoolName));
 		bossGroup = new NioEventLoopGroup(DEFAULT_BOSS_EVENT_LOOP_SIZE, ClusterShardAwareThreadFactory.create(clusterId, shardId, "boss-" + threadPoolName));
-		workerGroup = new NioEventLoopGroup(DEFAULT_KEEPER_WORKER_GROUP_THREAD_COUNT, ClusterShardAwareThreadFactory.create(clusterId, shardId, "work-"+ threadPoolName));
+		workerGroup = new NioEventLoopGroup(DEFAULT_KEEPER_WORKER_GROUP_THREAD_COUNT, ClusterShardAwareThreadFactory.create(clusterId, shardId, "work-" + threadPoolName));
 		masterEventLoopGroup = new NioEventLoopGroup(DEFAULT_MASTER_EVENT_LOOP_SIZE, ClusterShardAwareThreadFactory.create(clusterId, shardId, "master-" + threadPoolName));
 
 
 		this.leaderElector = createLeaderElector();
 		this.leaderElector.initialize();
-	 	this.redisKeeperServerState = initKeeperServerState();
-	 	logger.info("[doInitialize]{}", this.redisKeeperServerState.keeperState());
+		this.redisKeeperServerState = initKeeperServerState();
+		logger.info("[doInitialize]{}", this.redisKeeperServerState.keeperState());
 
 	}
-	
+
 	private RedisKeeperServerState initKeeperServerState() {
-		
+
 		try {
 			ReplicationStore replicationStore = replicationStoreManager.getCurrent();
-			if(replicationStore == null){
-				return new RedisKeeperServerStateUnknown(this);  
+			if (replicationStore == null) {
+				return new RedisKeeperServerStateUnknown(this);
 			}
 			KeeperState keeperState = replicationStore.getMetaStore().dupReplicationStoreMeta().getKeeperState();
-			if(keeperState == null){
+			if (keeperState == null) {
 				logger.warn("[initKeeperServerState][keeperState null]");
 				return new RedisKeeperServerStateUnknown(this);
 			}
-			
-			RedisKeeperServerState redisKeeperServerState = null; 
-			switch(keeperState){
+
+			RedisKeeperServerState redisKeeperServerState = null;
+			switch (keeperState) {
 				case ACTIVE:
 					redisKeeperServerState = new RedisKeeperServerStatePreActive(this);
 					break;
@@ -207,7 +206,7 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 		} catch (Exception e) {
 			logger.error("[initKeeperServerState]" + this, e);
 		}
-		return new RedisKeeperServerStateUnknown(this);  
+		return new RedisKeeperServerStateUnknown(this);
 	}
 
 	@Override
@@ -219,16 +218,16 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 		startServer();
 		this.leaderElector.start();
 		LifecycleHelper.startIfPossible(keeperRedisMaster);
-		
+
 	}
-	
+
 	@Override
 	protected void doStop() throws Exception {
 		keeperMonitor.stop();
 		LifecycleHelper.stopIfPossible(keeperRedisMaster);
 		this.leaderElector.stop();
 		stopServer();
-		replicationStoreManager.stop();		
+		replicationStoreManager.stop();
 		super.doStop();
 	}
 
@@ -246,23 +245,23 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 		super.doDispose();
 	}
 
-	
+
 	@Override
 	public synchronized void reconnectMaster() {
-		
+
 		Endpoint target = redisKeeperServerState.getMaster();
 		logger.info("[reconnectMaster]{} -> {}", this, target);
 
-		if(keeperRedisMaster != null && target != null && keeperRedisMaster.getLifecycleState().isStarted()){
+		if (keeperRedisMaster != null && target != null && keeperRedisMaster.getLifecycleState().isStarted()) {
 			Endpoint current = keeperRedisMaster.masterEndPoint();
-			if(current != null && isMasterSame(current, target)) {
+			if (current != null && isMasterSame(current, target)) {
 				logger.info("[reconnectMaster][master the same]{},{}", current, target);
 				return;
 			}
 		}
-		
+
 		stopAndDisposeMaster();
-		if(target == null){
+		if (target == null) {
 			logger.info("[reconnectMaster][target null][close master connection]{}, {}", this, redisKeeperServerState);
 			return;
 		}
@@ -271,10 +270,10 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 
 	private boolean isMasterSame(Endpoint current, Endpoint target) {
 		boolean result = ObjectUtils.equals(current, target);
-		if(!result) {
+		if (!result) {
 			return false;
 		}
-		if(current instanceof ProxyEnabled && target instanceof ProxyEnabled) {
+		if (current instanceof ProxyEnabled && target instanceof ProxyEnabled) {
 			result = ((ProxyEnabled) current).isSameWith((ProxyEnabled) target);
 		}
 		return result;
@@ -282,10 +281,10 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 
 	private void initAndStartMaster(Endpoint target) {
 		try {
-			this.keeperRedisMaster = new DefaultRedisMaster(this, (DefaultEndPoint)target, masterEventLoopGroup,
+			this.keeperRedisMaster = new DefaultRedisMaster(this, (DefaultEndPoint) target, masterEventLoopGroup,
 					replicationStoreManager, scheduled, resourceManager);
 
-			if(getLifecycleState().isStopping() || getLifecycleState().isStopped()){
+			if (getLifecycleState().isStopping() || getLifecycleState().isStopped()) {
 				logger.info("[initAndStartMaster][stopped, exit]{}, {}", target, this);
 				return;
 			}
@@ -297,60 +296,60 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 	}
 
 	private void stopServer() {
-		
-		if(serverSocketChannel != null){
+
+		if (serverSocketChannel != null) {
 			serverSocketChannel.close();
 		}
 	}
 
 	protected void startServer() throws InterruptedException {
-		
-        ServerBootstrap b = new ServerBootstrap();
-        b.group(bossGroup, workerGroup)
-         .channel(NioServerSocketChannel.class)
-         .handler(new LoggingHandler(LogLevel.INFO))
-         .childHandler(new ChannelInitializer<SocketChannel>() {
-             @Override
-             public void initChannel(SocketChannel ch) throws Exception {
-                 ChannelPipeline p = ch.pipeline();
-                 p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                 p.addLast(new NettySimpleMessageHandler());
-                 p.addLast(new NettyMasterHandler(DefaultRedisKeeperServer.this, new CommandHandlerManager(), keeperConfig.getTrafficReportIntervalMillis()));
-             }
-         });
-        serverSocketChannel = (ServerSocketChannel) b.bind(currentKeeperMeta.getPort()).sync().channel();
-    }
-		
+
+		ServerBootstrap b = new ServerBootstrap();
+		b.group(bossGroup, workerGroup)
+				.channel(NioServerSocketChannel.class)
+				.handler(new LoggingHandler(LogLevel.INFO))
+				.childHandler(new ChannelInitializer<SocketChannel>() {
+					@Override
+					public void initChannel(SocketChannel ch) throws Exception {
+						ChannelPipeline p = ch.pipeline();
+						p.addLast(new LoggingHandler(LogLevel.DEBUG));
+						p.addLast(new NettySimpleMessageHandler());
+						p.addLast(new NettyMasterHandler(DefaultRedisKeeperServer.this, new CommandHandlerManager(), keeperConfig.getTrafficReportIntervalMillis()));
+					}
+				});
+		serverSocketChannel = (ServerSocketChannel) b.bind(currentKeeperMeta.getPort()).sync().channel();
+	}
+
 
 	@Override
 	public RedisClient clientConnected(Channel channel) {
-		
+
 		RedisClient redisClient = new DefaultRedisClient(channel, this);
 		redisClients.put(channel, redisClient);
-		
+
 		redisClient.addObserver(new Observer() {
-			
+
 			@Override
 			public void update(Object args, Observable observable) {
-				
-				if(args instanceof RedisSlave){
-					becomeSlave(((RedisClient)observable).channel(), (RedisSlave)args);
+
+				if (args instanceof RedisSlave) {
+					becomeSlave(((RedisClient) observable).channel(), (RedisSlave) args);
 				}
 			}
 		});
-		
+
 		return redisClient;
 	}
 
 	protected void becomeSlave(Channel channel, RedisSlave redisSlave) {
 
-		logger.info("[update][redis client become slave]{}",channel);
+		logger.info("[update][redis client become slave]{}", channel);
 		redisClients.put(channel, redisSlave);
 	}
 
 	@Override
 	public void clientDisConnected(Channel channel) {
-		
+
 		redisClients.remove(channel);
 	}
 
@@ -361,27 +360,27 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 
 	@Override
 	public String getKeeperRunid() {
-		
+
 		return this.currentKeeperMeta.getId();
 	}
 
-	
+
 	@Override
 	public KeeperRepl getKeeperRepl() {
-		
+
 		return new DefaultKeeperRepl(getCurrentReplicationStore());
 	}
-	
-	
-	protected ReplicationStore getCurrentReplicationStore(){
 
-		if(!getLifecycleState().isInitialized()){
+
+	protected ReplicationStore getCurrentReplicationStore() {
+
+		if (!getLifecycleState().isInitialized()) {
 
 			throw new RedisKeeperServerStateException(toString(), getLifecycleState().getPhaseName());
 		}
-		
+
 		try {
-			ReplicationStore replicationStore = replicationStoreManager.createIfNotExist(); 
+			ReplicationStore replicationStore = replicationStoreManager.createIfNotExist();
 			return replicationStore;
 		} catch (IOException e) {
 			logger.error("[getCurrentReplicationStore]" + this, e);
@@ -401,10 +400,10 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 
 	@Override
 	public String info() {
-		
+
 		String info = "os:" + OsUtils.osInfo() + RedisProtocol.CRLF;
 		info += "run_id:" + currentKeeperMeta.getId() + RedisProtocol.CRLF;
-		info += "uptime_in_seconds:" + (System.currentTimeMillis() - keeperStartTime)/1000;
+		info += "uptime_in_seconds:" + (System.currentTimeMillis() - keeperStartTime) / 1000;
 		return info;
 	}
 
@@ -416,16 +415,16 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 		for (Entry<Channel, RedisClient> entry : redisClients.entrySet()) {
 
 			RedisClient redisClient = entry.getValue();
-			if(redisClient instanceof RedisSlave){
-				slaves.add((RedisSlave)redisClient);
+			if (redisClient instanceof RedisSlave) {
+				slaves.add((RedisSlave) redisClient);
 			}
 		}
 		return slaves;
 	}
 
-   public ReplicationStore getReplicationStore() {
-	   return getCurrentReplicationStore();
-   }
+	public ReplicationStore getReplicationStore() {
+		return getCurrentReplicationStore();
+	}
 
 	@Override
 	public int getListeningPort() {
@@ -438,7 +437,7 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 
 	@Override
 	public void endWriteRdb() {
-		
+
 	}
 
 	@Override
@@ -456,8 +455,8 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 	}
 
 	private void closeSlaves(String reason) {
-		
-		for(RedisSlave redisSlave : slaves()){
+
+		for (RedisSlave redisSlave : slaves()) {
 			try {
 				logger.info("[{}][close slave]{}", reason, redisSlave);
 				redisSlave.close();
@@ -469,12 +468,12 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 
 	@Override
 	public void onContinue(String requestReplId, String responseReplId) {
-		
-		if( responseReplId != null && !requestReplId.equals(responseReplId) ){
+
+		if (responseReplId != null && !requestReplId.equals(responseReplId)) {
 			closeSlaves(String.format("replid changed: %s->%s", requestReplId, responseReplId));
 		}
 	}
-	
+
 	@Override
 	public String getClusterId() {
 		return this.clusterId;
@@ -486,27 +485,27 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 	}
 
 	@Override
-	public synchronized void setRedisKeeperServerState(final RedisKeeperServerState redisKeeperServerState){
-		
+	public synchronized void setRedisKeeperServerState(final RedisKeeperServerState redisKeeperServerState) {
+
 		TransactionMonitor transactionMonitor = TransactionMonitor.DEFAULT;
 		String name = String.format("%s,%s,%s", clusterId, shardId, redisKeeperServerState);
 		transactionMonitor.logTransactionSwallowException("setRedisKeeperServerState", name, new Task() {
-			
+
 			@Override
 			public void go() throws Exception {
-				
+
 				RedisKeeperServerState previous = DefaultRedisKeeperServer.this.redisKeeperServerState;
 				logger.info("[setRedisKeeperServerState]{}, {}->{}", this, previous, redisKeeperServerState);
 				DefaultRedisKeeperServer.this.redisKeeperServerState = redisKeeperServerState;
 				notifyObservers(new KeeperServerStateChanged(previous, redisKeeperServerState));
 			}
 		});
-		
+
 	}
-	
+
 	@Override
 	public synchronized boolean compareAndDo(RedisKeeperServerState expected, Runnable action) {
-		if(this.redisKeeperServerState == expected){
+		if (this.redisKeeperServerState == expected) {
 			action.run();
 			return true;
 		}
@@ -522,7 +521,7 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 	@Override
 	public void stopAndDisposeMaster() {
 
-		if(this.keeperRedisMaster != null){
+		if (this.keeperRedisMaster != null) {
 			try {
 				LifecycleHelper.stopIfPossible(this.keeperRedisMaster);
 				LifecycleHelper.disposeIfPossible(this.keeperRedisMaster);
@@ -545,56 +544,56 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 
 	@Override
 	public void promoteSlave(String ip, int port) throws RedisSlavePromotionException {
-		
+
 		logger.info("[promoteSlave]{}:{}", ip, port);
 		RedisPromotor promotor = new RedisPromotor(this, ip, port, scheduled);
 		promotor.promote();
 	}
-	
+
 	@Override
 	public void fullSyncToSlave(final RedisSlave redisSlave) throws IOException {
-		
+
 		logger.info("[fullSyncToSlave]{}, {}", redisSlave, rdbDumper.get());
-		if(rdbDumper.get() == null){
+		if (rdbDumper.get() == null) {
 			logger.info("[fullSyncToSlave][dumper null]{}", redisSlave);
 			FullSyncListener fullSyncListener = new DefaultFullSyncListener(redisSlave);
-			if(!getCurrentReplicationStore().fullSyncIfPossible(fullSyncListener)){
+			if (!getCurrentReplicationStore().fullSyncIfPossible(fullSyncListener)) {
 				//go dump rdb
-				try{
+				try {
 					dumpNewRdb();
 					redisSlave.waitForRdbDumping();
-				}catch(AbstractRdbDumperException e){
+				} catch (AbstractRdbDumperException e) {
 					logger.error("[fullSyncToSlave]", e);
-					if(e.isCancelSlave()){
-						logger.info("[fullSyncToSlave][cancel slave]");	
+					if (e.isCancelSlave()) {
+						logger.info("[fullSyncToSlave][cancel slave]");
 						redisSlave.close();
 					}
 				}
 			}
-		}else{
+		} else {
 			rdbDumper.get().tryFullSync(redisSlave);
 		}
 	}
-	
+
 	private RdbDumper dumpNewRdb() throws CreateRdbDumperException, SetRdbDumperException {
-		
+
 		RdbDumper rdbDumper = keeperRedisMaster.createRdbDumper();
 		setRdbDumper(rdbDumper);
 		rdbDumper.execute();
 		return rdbDumper;
 	}
 
-	
+
 	public void setRdbDumper(RdbDumper rdbDumper) throws SetRdbDumperException {
 		setRdbDumper(rdbDumper, false);
 	}
-	
+
 
 	@Override
 	public KeeperInstanceMeta getKeeperInstanceMeta() {
 		return new KeeperInstanceMeta(clusterId, shardId, currentKeeperMeta);
 	}
-	
+
 	public KeeperConfig getKeeperConfig() {
 		return keeperConfig;
 	}
@@ -607,27 +606,27 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 
 	@Override
 	public void setRdbDumper(RdbDumper newDumper, boolean force) throws SetRdbDumperException {
-		
-		if(newDumper == null){
+
+		if (newDumper == null) {
 			throw new IllegalArgumentException("new dumper null");
 		}
-		
+
 		logger.info("[setRdbDumper]{},{}", newDumper, force);
 		rdbDumpTryCount.incrementAndGet();
-		
-		if(lastDumpTime > 0 && !force && (System.currentTimeMillis() - lastDumpTime < keeperConfig.getRdbDumpMinIntervalMilli())){
+
+		if (lastDumpTime > 0 && !force && (System.currentTimeMillis() - lastDumpTime < keeperConfig.getRdbDumpMinIntervalMilli())) {
 			logger.info("[setRdbDumper][too quick]{}", new Date(lastDumpTime));
 			throw new SetRdbDumperException(lastDumpTime, keeperConfig.getRdbDumpMinIntervalMilli());
 		}
-		
-		if(rdbDumper.compareAndSet(null, newDumper)){
+
+		if (rdbDumper.compareAndSet(null, newDumper)) {
 			lastDumpTime = System.currentTimeMillis();
 			dumpListener(newDumper);
 			return;
 		}
-		
+
 		RdbDumper olRdbDumper = rdbDumper.get();
-		if(force){
+		if (force) {
 			try {
 				logger.info("[setRdbDumper][cancel old dumper]{}", olRdbDumper);
 				olRdbDumper.future().cancel(true);
@@ -637,22 +636,22 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 			rdbDumper.set(newDumper);
 			lastDumpTime = System.currentTimeMillis();
 			dumpListener(newDumper);
-		}else{
+		} else {
 			throw new SetRdbDumperException(olRdbDumper);
 		}
 	}
 
 	private void dumpListener(RdbDumper newDumper) {
-		
+
 		CommandFuture<Void> future = newDumper.future();
-		if(future == null){
+		if (future == null) {
 			return;
 		}
 		future.addListener(new CommandFutureListener<Void>() {
 			@Override
 			public void operationComplete(CommandFuture<Void> commandFuture) throws Exception {
-				
-				if(!commandFuture.isSuccess()){
+
+				if (!commandFuture.isSuccess()) {
 					logger.info("[operationComplete][dump fail, clear dump time]", commandFuture.cause());
 					lastDumpTime = 0;
 				}
@@ -662,44 +661,44 @@ public class DefaultRedisKeeperServer extends AbstractRedisServer implements Red
 
 	@Override
 	public void clearRdbDumper(RdbDumper oldDumper) {
-		
+
 		logger.info("[clearRdbDumper]{}", oldDumper);
-		if(!rdbDumper.compareAndSet(oldDumper, null)){
+		if (!rdbDumper.compareAndSet(oldDumper, null)) {
 			logger.warn("[clearRdbDumper][current is not request]{}, {}", oldDumper, rdbDumper.get());
 		}
 	}
-	
+
 	public int getRdbDumpTryCount() {
 		return rdbDumpTryCount.get();
 	}
 
-	public class ReplicationStoreManagerListener implements Observer{
+	public class ReplicationStoreManagerListener implements Observer {
 
 		@Override
 		public void update(Object args, Observable observable) {
-			
-			if(args instanceof NodeAdded){
+
+			if (args instanceof NodeAdded) {
 				@SuppressWarnings("unchecked")
 				ReplicationStore replicationStore = ((NodeAdded<ReplicationStore>) args).getNode();
 				initReplicationStore(replicationStore);
 			}
 		}
-		
+
 	}
 
 	public synchronized void initReplicationStore(ReplicationStore replicationStore) {
-		
+
 		logger.info("[initReplicationStore]{}", replicationStore);
 		RedisKeeperServerState redisKeeperServerState = getRedisKeeperServerState();
-		if(redisKeeperServerState != null){
+		if (redisKeeperServerState != null) {
 			KeeperState keeperState = redisKeeperServerState.keeperState();
-			
+
 			try {
-				if(keeperState.isActive()){
-						replicationStore.getMetaStore().becomeActive();
-				}else if(keeperState.isBackup()){
+				if (keeperState.isActive()) {
+					replicationStore.getMetaStore().becomeActive();
+				} else if (keeperState.isBackup()) {
 					replicationStore.getMetaStore().becomeBackup();
-				}else{
+				} else {
 					logger.warn("[initReplicationStore][not active and not backup]{}, {}", keeperState, replicationStore);
 				}
 			} catch (IOException e) {

@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 21, 2016
  */
 @Component
-public class MetaserverLeaderElector extends AbstractLeaderElector implements TopElement{
+public class MetaserverLeaderElector extends AbstractLeaderElector implements TopElement {
 
 	@Autowired
 	private MetaServerConfig config;

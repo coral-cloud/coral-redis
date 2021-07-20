@@ -13,8 +13,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author wenchao.meng
- *
- *         Nov 9, 2016
+ * <p>
+ * Nov 9, 2016
  */
 public class ReferenceFileChannel implements Closeable, Releasable {
 
@@ -23,7 +23,7 @@ public class ReferenceFileChannel implements Closeable, Releasable {
 	private AtomicLong reference = new AtomicLong();
 
 	private AtomicBoolean closed = new AtomicBoolean(false);
-	
+
 	private AtomicLong currentPos = new AtomicLong(0L);
 
 	private ControllableFile file;
@@ -40,7 +40,7 @@ public class ReferenceFileChannel implements Closeable, Releasable {
 
 	@Override
 	public void close() throws IOException {
-		
+
 		logger.debug("[close]{}", this);
 		closed.set(true);
 		tryCloseChannel();
@@ -48,20 +48,20 @@ public class ReferenceFileChannel implements Closeable, Releasable {
 
 	protected ReferenceFileRegion readTilEnd(int maxBytes) throws IOException {
 
-		while(true){
-			
+		while (true) {
+
 			final long fileEnd = file.size();
 			final long previousPos = currentPos.get();
-			
+
 			long end = fileEnd;
-			if(maxBytes > 0){
+			if (maxBytes > 0) {
 				end = Math.min(fileEnd, previousPos + maxBytes);
 			}
-			
-			if(currentPos.compareAndSet(previousPos, end)){
-				
+
+			if (currentPos.compareAndSet(previousPos, end)) {
+
 				increase();
-				if(end - previousPos < 0){
+				if (end - previousPos < 0) {
 					logger.warn("[readTilEnd]pre:{}, end:{}, filelen:{}", previousPos, end, fileEnd);
 				}
 				return new ReferenceFileRegion(file.getFileChannel(), previousPos, end - previousPos, this);
@@ -97,33 +97,33 @@ public class ReferenceFileChannel implements Closeable, Releasable {
 		if (current <= 0) {
 			tryCloseChannel();
 		}
-		
-		if(current < 0){
+
+		if (current < 0) {
 			logger.error("[release][current < 0]{}, {}", file, current);
 		}
 	}
-	
 
-	protected boolean isFileChannelClosed(){
-		
+
+	protected boolean isFileChannelClosed() {
+
 		return !file.isOpen();
 	}
-	
-	public boolean hasAnythingToRead() throws IOException{
-		
+
+	public boolean hasAnythingToRead() throws IOException {
+
 		long fileSize = file.size();
 		long current = currentPos.get();
 
-		if(current > fileSize){
+		if (current > fileSize) {
 			throw new IllegalStateException("currentPos > fileSize + " + current + ">" + fileSize);
 		}
-		
+
 		return current < fileSize;
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("file:%s, pos:%d", file, currentPos.get());
 	}
-	
+
 }

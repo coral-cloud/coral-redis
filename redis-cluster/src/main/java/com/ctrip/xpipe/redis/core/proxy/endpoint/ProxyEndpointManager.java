@@ -14,10 +14,10 @@ import java.util.List;
 
 public interface ProxyEndpointManager extends Startable, Stoppable {
 
-    List<ProxyEndpoint> getAvailableProxyEndpoints();
+	List<ProxyEndpoint> getAvailableProxyEndpoints();
 
-    List<ProxyEndpoint> getAllProxyEndpoints();
+	List<ProxyEndpoint> getAllProxyEndpoints();
 
-    void storeProxyEndpoints(List<ProxyEndpoint> endpoints);
+	void storeProxyEndpoints(List<ProxyEndpoint> endpoints);
 
 }

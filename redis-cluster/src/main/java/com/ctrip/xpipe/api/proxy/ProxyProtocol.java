@@ -9,8 +9,8 @@ import io.netty.channel.Channel;
  * Oct 23, 2018
  */
 public interface ProxyProtocol {
-    String KEY_WORD = "PROXY";
+	String KEY_WORD = "PROXY";
 
-    ByteBuf output();
+	ByteBuf output();
 
 }

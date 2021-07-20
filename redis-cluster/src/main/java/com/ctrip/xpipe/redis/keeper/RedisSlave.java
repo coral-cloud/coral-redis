@@ -9,31 +9,31 @@ import io.netty.channel.ChannelFuture;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * May 20, 2016 3:55:37 PM
  */
-public interface RedisSlave extends RedisClient, PartialAware, CommandsListener{
-	
+public interface RedisSlave extends RedisClient, PartialAware, CommandsListener {
+
 	void waitForRdbDumping();
-	
+
 	SLAVE_STATE getSlaveState();
 
 	void ack(Long valueOf);
-	
+
 	Long getAck();
-	
+
 	Long getAckTime();
-	
+
 	void beginWriteCommands(long beginOffset);
-	
+
 	void beginWriteRdb(EofType eofType, long rdbFileOffset);
-	
+
 	ChannelFuture writeFile(ReferenceFileRegion referenceFileRegion);
 
 	void rdbWriteComplete();
 
 	void partialSync();
-	
+
 	void processPsyncSequentially(Runnable runnable);
 
 	/**

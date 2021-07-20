@@ -12,16 +12,16 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractNettySslHandlerFactory implements NettySslHandlerFactory {
 
-    protected static Logger logger = LoggerFactory.getLogger(AbstractNettySslHandlerFactory.class);
+	protected static Logger logger = LoggerFactory.getLogger(AbstractNettySslHandlerFactory.class);
 
-    protected TLSConfig tlsConfig;
+	protected TLSConfig tlsConfig;
 
-    public AbstractNettySslHandlerFactory(TLSConfig tlsConfig) {
-        this.tlsConfig = tlsConfig;
-    }
+	public AbstractNettySslHandlerFactory(TLSConfig tlsConfig) {
+		this.tlsConfig = tlsConfig;
+	}
 
-    protected SslHandler getCustomizedSslHandler(SslHandler sslHandler) {
-        return sslHandler;
-    }
+	protected SslHandler getCustomizedSslHandler(SslHandler sslHandler) {
+		return sslHandler;
+	}
 
 }

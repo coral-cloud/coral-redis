@@ -21,17 +21,17 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 8, 2016
  */
-public class PrimaryDcKeeperMasterChooserAlgorithm extends AbstractKeeperMasterChooserAlgorithm{
-	
+public class PrimaryDcKeeperMasterChooserAlgorithm extends AbstractKeeperMasterChooserAlgorithm {
+
 	private XpipeNettyClientKeyedObjectPool keyedObjectPool;
-	
+
 	private int checkRedisTimeoutSeconds;
 
 	public PrimaryDcKeeperMasterChooserAlgorithm(String clusterId, String shardId, DcMetaCache dcMetaCache,
-			CurrentMetaManager currentMetaManager, XpipeNettyClientKeyedObjectPool keyedObjectPool, int checkRedisTimeoutSeconds, ScheduledExecutorService scheduled) {
+												 CurrentMetaManager currentMetaManager, XpipeNettyClientKeyedObjectPool keyedObjectPool, int checkRedisTimeoutSeconds, ScheduledExecutorService scheduled) {
 		super(clusterId, shardId, dcMetaCache, currentMetaManager, scheduled);
 		this.keyedObjectPool = keyedObjectPool;
 		this.checkRedisTimeoutSeconds = checkRedisTimeoutSeconds;
@@ -41,22 +41,22 @@ public class PrimaryDcKeeperMasterChooserAlgorithm extends AbstractKeeperMasterC
 	protected Pair<String, Integer> doChoose() {
 
 		Pair<String, Integer> currentMaster = currentMetaManager.getKeeperMaster(clusterId, shardId);
-		
-		
-		List<RedisMeta>  allRedises = dcMetaCache.getShardRedises(clusterId, shardId);
-		
-		List<RedisMeta>  redisMasters = getMasters(allRedises);
-		
-		if(redisMasters.size() == 0){
+
+
+		List<RedisMeta> allRedises = dcMetaCache.getShardRedises(clusterId, shardId);
+
+		List<RedisMeta> redisMasters = getMasters(allRedises);
+
+		if (redisMasters.size() == 0) {
 
 			logger.info("[chooseKeeperMaster][none redis is master]{}", allRedises);
 
-			if(currentMaster != null){
+			if (currentMaster != null) {
 				logger.info("[chooseKeeperMaster][use current master]{}", currentMaster);
 				return currentMaster;
 			}
 
-			if(allRedises.size() == 0){
+			if (allRedises.size() == 0) {
 				logger.info("[chooseKeeperMaster][no redis]{}", allRedises);
 				return null;
 			}
@@ -64,14 +64,14 @@ public class PrimaryDcKeeperMasterChooserAlgorithm extends AbstractKeeperMasterC
 			currentMaster = new Pair<>(allRedises.get(0).getIp(), allRedises.get(0).getPort());
 			logger.info("[chooseKeeperMaster][use first redis]{}", currentMaster);
 			return currentMaster;
-		}else if(redisMasters.size() == 1){
+		} else if (redisMasters.size() == 1) {
 			return new Pair<>(redisMasters.get(0).getIp(), redisMasters.get(0).getPort());
-		}else{
+		} else {
 			logger.error("[chooseKeeperMaster][multi master]{}, {}", redisMasters.size(), redisMasters);
-			for(RedisMeta redisMaster : redisMasters){
-				
+			for (RedisMeta redisMaster : redisMasters) {
+
 				Pair<String, Integer> masterPair = new Pair<>(redisMaster.getIp(), redisMaster.getPort());
-				if(currentMaster != null && currentMaster.equals(masterPair)){
+				if (currentMaster != null && currentMaster.equals(masterPair)) {
 					logger.info("[chooseKeeperMaster][choose previous master]{}", redisMaster);
 					return masterPair;
 				}
@@ -80,25 +80,25 @@ public class PrimaryDcKeeperMasterChooserAlgorithm extends AbstractKeeperMasterC
 			return new Pair<>(redisMasters.get(0).getIp(), redisMasters.get(0).getPort());
 		}
 	}
-	
+
 	protected List<RedisMeta> getMasters(List<RedisMeta> allRedises) {
-		
+
 		List<RedisMeta> result = new LinkedList<>();
-		
-		for(RedisMeta redisMeta : allRedises){
-			if(isMaster(redisMeta)){
+
+		for (RedisMeta redisMeta : allRedises) {
+			if (isMaster(redisMeta)) {
 				result.add(redisMeta);
 			}
 		}
-		
+
 		return result;
 	}
 
 	protected boolean isMaster(RedisMeta redisMeta) {
-		
+
 		try {
 			SimpleObjectPool<NettyClient> clientPool = keyedObjectPool.getKeyPool(new DefaultEndPoint(redisMeta.getIp(), redisMeta.getPort()));
-			Role role = new RoleCommand(clientPool, checkRedisTimeoutSeconds*1000, false, scheduled).execute().get(checkRedisTimeoutSeconds, TimeUnit.SECONDS);
+			Role role = new RoleCommand(clientPool, checkRedisTimeoutSeconds * 1000, false, scheduled).execute().get(checkRedisTimeoutSeconds, TimeUnit.SECONDS);
 			return SERVER_ROLE.MASTER == role.getServerRole();
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			logger.error("[isMaster]" + redisMeta, e);

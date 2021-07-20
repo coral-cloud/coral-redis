@@ -19,21 +19,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 26, 2016
  */
-public abstract class AbstractResharding extends AbstractCommand<Void> implements ReshardingTask{
-	
+public abstract class AbstractResharding extends AbstractCommand<Void> implements ReshardingTask {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
-	private static String MONITOR_NAME = "resharding";  
-	
+
+	private static String MONITOR_NAME = "resharding";
+
 	protected ExecutorService executors;
-	
+
 	protected SlotManager slotManager;
 	protected ClusterServers<? extends ClusterServer> servers;
 	protected ZkClient zkClient;
-	
+
 	private volatile boolean allTaskSubmited = false;
 	private AtomicInteger totalTasks = new AtomicInteger();
 	private AtomicInteger completedTasks = new AtomicInteger();
@@ -52,21 +52,21 @@ public abstract class AbstractResharding extends AbstractCommand<Void> implement
 
 	@Override
 	protected void doExecute() throws Exception {
-		
+
 		CatUtils.newFutureTaskTransaction(MONITOR_NAME, getName(), future());
-		
+
 		slotManager.refresh();
-		
+
 		doShardingTask();
 		allTaskSubmited();
 	}
-	
+
 
 	protected abstract void doShardingTask() throws ShardingException;
 
 	protected void notifyAliveServers(int slotId) {
-		
-		for(ClusterServer clusterServer: servers.allClusterServers()){
+
+		for (ClusterServer clusterServer : servers.allClusterServers()) {
 			clusterServer.notifySlotChange(slotId);
 		}
 	}
@@ -77,58 +77,58 @@ public abstract class AbstractResharding extends AbstractCommand<Void> implement
 	}
 
 	protected int getAliveTotal(Collection<? extends ClusterServer> aliveServers) {
-		
+
 		int result = 0;
-		for(ClusterServer server : aliveServers){
+		for (ClusterServer server : aliveServers) {
 			result += slotManager.getSlotsSizeByServerId(server.getServerId());
 		}
 		return result;
 	}
 
 	protected void executeTask(SlotMoveTask task) {
-		
+
 		totalTasks.incrementAndGet();
-		
+
 		CatUtils.newFutureTaskTransaction(MONITOR_NAME + "-" + getName(), task.toString(), task.future());
-		
+
 		task.execute(executors).addListener(new MoveListener());
 	}
 
-	public class MoveListener implements CommandFutureListener<Void>{
+	public class MoveListener implements CommandFutureListener<Void> {
 
 		@Override
 		public void operationComplete(CommandFuture<Void> commandFuture) throws Exception {
 
 			completedTasks.incrementAndGet();
 			checkTaskFinish();
-			
-			if(commandFuture.isSuccess()){
-				
+
+			if (commandFuture.isSuccess()) {
+
 				SlotMoveTask task = (SlotMoveTask) commandFuture.command();
 				notifyAliveServers(task.getSlot());
-			}else{
+			} else {
 				logger.error("[error]" + commandFuture.command(), commandFuture.cause());
 			}
 			//if fail leave it to leader redo
 		}
 	}
-	
+
 	protected void allTaskSubmited() {
-		
+
 		allTaskSubmited = true;
 		checkTaskFinish();
 	}
 
 	public void checkTaskFinish() {
-		
-		if(allTaskSubmited && completedTasks.get() >= totalTasks.get() && !future().isDone()){
+
+		if (allTaskSubmited && completedTasks.get() >= totalTasks.get() && !future().isDone()) {
 			logger.info("[checkTaskFinish][finish]");
 			future().setSuccess(null);
 		}
 	}
-	
+
 	@Override
-	protected void doReset(){
+	protected void doReset() {
 		throw new UnsupportedOperationException();
 	}
 }

@@ -14,35 +14,35 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author marsqing
- *
- *         May 16, 2016 6:46:15 PM
+ * <p>
+ * May 16, 2016 6:46:15 PM
  */
 public abstract class AbstractKeeperCommand<T> extends AbstractRedisCommand<T> {
-	
+
 	public static String GET_STATE = "getstate";
 
 	public static String SET_STATE = "setstate";
 
-	
+
 	public AbstractKeeperCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 		super(clientPool, scheduled);
 	}
 
-	public AbstractKeeperCommand(KeeperMeta keeperMeta, ScheduledExecutorService scheduled){
+	public AbstractKeeperCommand(KeeperMeta keeperMeta, ScheduledExecutorService scheduled) {
 		super(keeperMeta.getIp(), keeperMeta.getPort(), scheduled);
 	}
-	
+
 	@Override
 	public String getName() {
 		return "keeper";
 	}
-	
-	public static class KeeperGetStateCommand extends AbstractKeeperCommand<KeeperState>{
+
+	public static class KeeperGetStateCommand extends AbstractKeeperCommand<KeeperState> {
 
 		public KeeperGetStateCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 			super(clientPool, scheduled);
 		}
-		
+
 		public KeeperGetStateCommand(KeeperMeta keeperMeta, ScheduledExecutorService scheduled) {
 			super(keeperMeta, scheduled);
 		}
@@ -57,8 +57,8 @@ public abstract class AbstractKeeperCommand<T> extends AbstractRedisCommand<T> {
 			return new RequestStringParser(getName(), GET_STATE).format();
 		}
 	}
-	
-	public static class KeeperSetStateCommand extends AbstractKeeperCommand<String>{
+
+	public static class KeeperSetStateCommand extends AbstractKeeperCommand<String> {
 
 		private KeeperState state;
 		private Pair<String, Integer> masterAddress;
@@ -103,7 +103,7 @@ public abstract class AbstractKeeperCommand<T> extends AbstractRedisCommand<T> {
 
 		@Override
 		protected String format(Object payload) {
-			
+
 			return payloadToString(payload);
 		}
 
@@ -118,8 +118,8 @@ public abstract class AbstractKeeperCommand<T> extends AbstractRedisCommand<T> {
 //			).format();
 			return null;
 		}
-		
-		
+
+
 		@Override
 		public String toString() {
 			return String.format("(to:%s) %s %s %s %s %s", getClientPool().desc(), getName(), SET_STATE, state.toString(), masterAddress.getKey(), masterAddress.getValue());

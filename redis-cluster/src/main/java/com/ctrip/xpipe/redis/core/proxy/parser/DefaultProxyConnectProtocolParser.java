@@ -12,22 +12,22 @@ import com.ctrip.xpipe.redis.core.proxy.protocols.DefaultProxyConnectProtocol;
  */
 @SuppressWarnings("unchecked")
 public class DefaultProxyConnectProtocolParser extends AbstractProxyProtocolParser<ProxyConnectProtocol>
-        implements ProxyConnectProtocolParser {
+		implements ProxyConnectProtocolParser {
 
-    @Override
-    protected ProxyConnectProtocol newProxyProtocol(String protocol) {
-        ProxyConnectProtocol proxyConnectProtocol = new DefaultProxyConnectProtocol(this);
-        proxyConnectProtocol.setContent(protocol);
-        return proxyConnectProtocol;
-    }
+	@Override
+	protected ProxyConnectProtocol newProxyProtocol(String protocol) {
+		ProxyConnectProtocol proxyConnectProtocol = new DefaultProxyConnectProtocol(this);
+		proxyConnectProtocol.setContent(protocol);
+		return proxyConnectProtocol;
+	}
 
-    @Override
-    public void addProxyOptionParser(ProxyOptionParser parser) {
-        getParsers().add(parser);
-    }
+	@Override
+	public void addProxyOptionParser(ProxyOptionParser parser) {
+		getParsers().add(parser);
+	}
 
-    @Override
-    public void removeProxyOptionParser(ProxyOptionParser parser) {
-        getParsers().remove(parser);
-    }
+	@Override
+	public void removeProxyOptionParser(ProxyOptionParser parser) {
+		getParsers().remove(parser);
+	}
 }

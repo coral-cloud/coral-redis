@@ -14,28 +14,28 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultOutboundBufferMonitor implements OutboundBufferMonitor {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultOutboundBufferMonitor.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultOutboundBufferMonitor.class);
 
-    public final static long UNKNOWN_OUTBOUND_BUFFER = -1L;
+	public final static long UNKNOWN_OUTBOUND_BUFFER = -1L;
 
-    private Session session;
+	private Session session;
 
-    public DefaultOutboundBufferMonitor(Session session) {
-        this.session = session;
-    }
+	public DefaultOutboundBufferMonitor(Session session) {
+		this.session = session;
+	}
 
-    private long trackOutboundBuffer(Channel channel) {
-        if(!channel.isActive()) {
-            logger.warn("[trackOutboundBuffer] channel not active: {}", ChannelUtil.getDesc(channel));
-            return UNKNOWN_OUTBOUND_BUFFER;
-        }
-        return channel.unsafe().outboundBuffer().totalPendingWriteBytes();
-    }
+	private long trackOutboundBuffer(Channel channel) {
+		if (!channel.isActive()) {
+			logger.warn("[trackOutboundBuffer] channel not active: {}", ChannelUtil.getDesc(channel));
+			return UNKNOWN_OUTBOUND_BUFFER;
+		}
+		return channel.unsafe().outboundBuffer().totalPendingWriteBytes();
+	}
 
-    @Override
-    public long getOutboundBufferCumulation() {
-        return trackOutboundBuffer(session.getChannel());
-    }
+	@Override
+	public long getOutboundBufferCumulation() {
+		return trackOutboundBuffer(session.getChannel());
+	}
 
 
 }

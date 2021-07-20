@@ -18,25 +18,25 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
-public class DefaultNettyClient implements NettyClient{
-	
+public class DefaultNettyClient implements NettyClient {
+
 	private Logger logger = LoggerFactory.getLogger(DefaultNettyClient.class);
-	
+
 	protected Channel channel;
 	protected final AtomicReference<String> desc = new AtomicReference<>();
 	protected Queue<ByteBufReceiver> receivers = new ConcurrentLinkedQueue<>();
 	private AtomicInteger timeoutCounter = new AtomicInteger();
 
 	protected static int CLIENT_TIMEOUT_TTL = 3;
-	
+
 	public DefaultNettyClient(Channel channel) {
 		this.channel = channel;
 		this.desc.set(ChannelUtil.getDesc(channel));
 		channel.closeFuture().addListener(new ChannelFutureListener() {
-			
+
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				channelClosed(future.channel());
@@ -55,16 +55,16 @@ public class DefaultNettyClient implements NettyClient{
 		logger.debug("[sendRequest][begin]{}, {}", byteBufReceiver, this);
 
 		DefaultChannelPromise future = new DefaultChannelPromise(channel);
-		
+
 		future.addListener(new ChannelFutureListener() {
-			
+
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 
-				if(future.isSuccess()){
+				if (future.isSuccess()) {
 					logger.debug("[operationComplete][add receiver]{}, {}", byteBufReceiver, this);
 					receivers.offer(byteBufReceiver);
-				}else{
+				} else {
 					logger.error("[sendRequest][fail]" + channel, future.cause());
 					if (future.cause() instanceof ClosedChannelException) {
 						byteBufReceiver.clientClosed(DefaultNettyClient.this);
@@ -88,13 +88,13 @@ public class DefaultNettyClient implements NettyClient{
 	@Override
 	public void handleResponse(Channel channel, ByteBuf byteBuf) {
 		timeoutCounter.set(0);
-		
+
 		ByteBufReceiver byteBufReceiver = receivers.peek();
 
-		if(byteBufReceiver != null){
+		if (byteBufReceiver != null) {
 
 			ByteBufReceiver.RECEIVER_RESULT result = byteBufReceiver.receive(channel, byteBuf);
-			switch (result){
+			switch (result) {
 				case SUCCESS:
 					logger.debug("[handleResponse][remove receiver]");
 					receivers.poll();
@@ -113,18 +113,18 @@ public class DefaultNettyClient implements NettyClient{
 				default:
 					throw new IllegalStateException("unknown result:" + result);
 			}
-		}else{
+		} else {
 			logger.error("[handleResponse][no receiver][close client]{}, {}, {}", channel, byteBuf.readableBytes(), ByteBufUtils.readToString(byteBuf));
 			channel.close();
 		}
 	}
 
 	protected void channelClosed(Channel channel) {
-		
+
 		logger.info("[channelClosed]{}", channel);
-		while(!receivers.isEmpty()){
+		while (!receivers.isEmpty()) {
 			ByteBufReceiver byteBufReceiver = receivers.poll();
-			if(byteBufReceiver == null){
+			if (byteBufReceiver == null) {
 				break;
 			}
 			try {
@@ -139,7 +139,7 @@ public class DefaultNettyClient implements NettyClient{
 	public Channel channel() {
 		return channel;
 	}
-	
+
 	@Override
 	public String toString() {
 		return desc.get();

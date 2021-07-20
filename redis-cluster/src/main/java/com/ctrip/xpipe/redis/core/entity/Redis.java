@@ -5,65 +5,58 @@ import com.ctrip.xpipe.utils.ObjectUtils;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Jul 17, 2016
+ * <p>
+ * Jul 17, 2016
  */
 public interface Redis {
 
-    String getId();
+	String getId();
 
-    String getIp();
+	String getIp();
 
-    String getMaster();
+	String getMaster();
 
-    Long getOffset();
+	Long getOffset();
 
-    Integer getPort();
+	Integer getPort();
 
-    Redis setId(String id);
+	Redis setId(String id);
 
-    Redis setIp(String ip);
+	Redis setIp(String ip);
 
-    Redis setMaster(String master);
+	Redis setMaster(String master);
 
-    Redis setOffset(Long offset);
+	Redis setOffset(Long offset);
 
-    Redis setPort(Integer port);
+	Redis setPort(Integer port);
 
-    Redis setSurvive(Boolean survive);
+	Redis setSurvive(Boolean survive);
 
-    boolean isSurvive();
+	boolean isSurvive();
 
-    default boolean equalsWithIpPort(HostPort hostPort) {
+	default boolean equalsWithIpPort(HostPort hostPort) {
 
-        if (!ObjectUtils.equals(getIp(), hostPort.getHost())) {
-            return false;
-        }
+		if (!ObjectUtils.equals(getIp(), hostPort.getHost())) {
+			return false;
+		}
 
-        if (!ObjectUtils.equals(getPort(), hostPort.getPort())) {
-            return false;
-        }
-        return true;
-    }
+		return ObjectUtils.equals(getPort(), hostPort.getPort());
+	}
 
-    default boolean equalsWithIpPort(Redis redis) {
+	default boolean equalsWithIpPort(Redis redis) {
 
-        if (redis == null) {
-            return false;
-        }
+		if (redis == null) {
+			return false;
+		}
 
-        if (!ObjectUtils.equals(getIp(), redis.getIp())) {
-            return false;
-        }
+		if (!ObjectUtils.equals(getIp(), redis.getIp())) {
+			return false;
+		}
 
-        if (!ObjectUtils.equals(getPort(), redis.getPort())) {
-            return false;
-        }
+		return ObjectUtils.equals(getPort(), redis.getPort());
+	}
 
-        return true;
-    }
-
-    default String desc() {
-        return String.format("%s(%s:%d)", getClass().getSimpleName(), getIp(), getPort());
-    }
+	default String desc() {
+		return String.format("%s(%s:%d)", getClass().getSimpleName(), getIp(), getPort());
+	}
 }

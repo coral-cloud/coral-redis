@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.ctrip.xpipe.foundation;
 
@@ -28,7 +28,7 @@ public class DefaultFoundationService implements FoundationService {
 	private static AtomicBoolean logged = new AtomicBoolean(false);
 
 	private static String dataCenter = null;
-	
+
 	private String appId = System.getProperty("appId", "appid_xpipe");
 
 	public static void setDataCenter(String dataCenter) {
@@ -44,7 +44,7 @@ public class DefaultFoundationService implements FoundationService {
 	@Override
 	public String getDataCenter() {
 
-		if(!StringUtil.isEmpty(dataCenter)){
+		if (!StringUtil.isEmpty(dataCenter)) {
 			return dataCenter;
 		}
 		return config.get(DATA_CENTER_KEY, "jq");
@@ -54,7 +54,7 @@ public class DefaultFoundationService implements FoundationService {
 	public String getAppId() {
 		return appId;
 	}
-	
+
 	public void setAppId(String appId) {
 		this.appId = appId;
 	}

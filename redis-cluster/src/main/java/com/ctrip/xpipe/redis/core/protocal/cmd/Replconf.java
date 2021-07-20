@@ -10,17 +10,17 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
- *         2016年3月29日 下午2:51:47
+ * <p>
+ * 2016年3月29日 下午2:51:47
  */
 public class Replconf extends AbstractRedisCommand<Object> {
 
 	private ReplConfType replConfType;
-	
+
 	private String[] args;
 
 	public Replconf(SimpleObjectPool<NettyClient> clientPool, ReplConfType replConfType,
-			ScheduledExecutorService scheduled, String... args) {
+					ScheduledExecutorService scheduled, String... args) {
 		super(clientPool, scheduled);
 		this.replConfType = replConfType;
 		this.args = args;
@@ -42,10 +42,7 @@ public class Replconf extends AbstractRedisCommand<Object> {
 	@Override
 	protected boolean hasResponse() {
 
-		if (replConfType == ReplConfType.ACK) {
-			return false;
-		}
-		return true;
+		return replConfType != ReplConfType.ACK;
 	}
 
 	public enum ReplConfType {
@@ -79,9 +76,9 @@ public class Replconf extends AbstractRedisCommand<Object> {
 			for (int i = 0; i < args.length; i++) {
 				tmpArgs[i] = replConfType.toString() + " " + args[i];
 			}
-			
+
 			request = new RequestStringParser(logRead, logWrite, getName(), StringUtil.join(" ", tmpArgs));
-		}else{
+		} else {
 			request = new RequestStringParser(logRead, logWrite, getName(), replConfType.toString(),
 					StringUtil.join(" ", args));
 		}
@@ -91,10 +88,7 @@ public class Replconf extends AbstractRedisCommand<Object> {
 
 	@Override
 	protected boolean logRequest() {
-		if (replConfType == ReplConfType.ACK) {
-			return false;
-		}
-		return true;
+		return replConfType != ReplConfType.ACK;
 
 	}
 

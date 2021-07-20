@@ -5,11 +5,11 @@ import io.netty.channel.Channel;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 2, 2016
  */
 public interface ByteBufReadAction {
-	
+
 	void read(Channel channel, ByteBuf byteBuf) throws ByteBufReadActionException;
 
 }

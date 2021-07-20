@@ -14,15 +14,15 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Feb 20, 2017
  */
 public class DefaultKeeperStats extends AbstractStartStoppable implements KeeperStats {
 
 	private String shard;
-	
+
 	private AtomicLong fullSyncCount = new AtomicLong();
-	
+
 	private AtomicLong partialSyncCount = new AtomicLong();
 
 	private AtomicLong partialSyncErrorCount = new AtomicLong();
@@ -208,7 +208,7 @@ public class DefaultKeeperStats extends AbstractStartStoppable implements Keeper
 
 	@Override
 	protected void doStop() throws Exception {
-		if(future != null) {
+		if (future != null) {
 			future.cancel(true);
 		}
 	}

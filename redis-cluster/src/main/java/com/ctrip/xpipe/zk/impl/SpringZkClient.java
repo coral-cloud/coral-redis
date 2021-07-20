@@ -10,43 +10,43 @@ import javax.annotation.PreDestroy;
 
 /**
  * @author wenchao.meng
- *         <p>
- *         Jun 12, 2017
+ * <p>
+ * Jun 12, 2017
  */
-public class SpringZkClient implements ZkClient{
+public class SpringZkClient implements ZkClient {
 
-    private ZkConfig zkConfig;
-    private String zkAddress;
-    private CuratorFramework curatorFramework;
+	private ZkConfig zkConfig;
+	private String zkAddress;
+	private CuratorFramework curatorFramework;
 
-    public SpringZkClient(ZkConfig zkConfig, String zkAddress){
-        this.zkConfig = zkConfig;
-        this.zkAddress = zkAddress;
-    }
+	public SpringZkClient(ZkConfig zkConfig, String zkAddress) {
+		this.zkConfig = zkConfig;
+		this.zkAddress = zkAddress;
+	}
 
 
-    @PostConstruct
-    public void postContruct() throws InterruptedException {
-        curatorFramework = zkConfig.create(zkAddress);
-    }
+	@PostConstruct
+	public void postContruct() throws InterruptedException {
+		curatorFramework = zkConfig.create(zkAddress);
+	}
 
-    @Override
-    public CuratorFramework get() {
-        return curatorFramework;
-    }
+	@Override
+	public CuratorFramework get() {
+		return curatorFramework;
+	}
 
-    @Override
-    public void setZkAddress(String zkAddress) {
-        this.zkAddress = zkAddress;
-    }
+	@Override
+	public void setZkAddress(String zkAddress) {
+		this.zkAddress = zkAddress;
+	}
 
-    @Override
-    public String getZkAddress() {
-        return zkAddress;
-    }
+	@Override
+	public String getZkAddress() {
+		return zkAddress;
+	}
 
-    @PreDestroy
-    public void preDestroy(){
-        curatorFramework.close();
-    }
+	@PreDestroy
+	public void preDestroy() {
+		curatorFramework.close();
+	}
 }

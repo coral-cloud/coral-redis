@@ -19,11 +19,11 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 9, 2016
  */
-public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>{
-	
+public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T> {
+
 	public static String SENTINEL = "sentinel";
 
 	public AbstractSentinelCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
@@ -36,12 +36,12 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 		setInOutPayloadFactory(new InOutPayloadFactory.DirectByteBufInOutPayloadFactory());
 	}
 
-	public static class Sentinels extends AbstractSentinelCommand<List<Sentinel>>{
+	public static class Sentinels extends AbstractSentinelCommand<List<Sentinel>> {
 
 		private static final Logger logger = LoggerFactory.getLogger(Sentinels.class);
 
 		public static String SENTINELS = "sentinels";
-		
+
 		private String masterName;
 
 		public Sentinels(SimpleObjectPool<NettyClient> clientPool, String masterName, ScheduledExecutorService scheduled) {
@@ -56,31 +56,31 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 
 		@Override
 		protected List<Sentinel> format(Object payload) {
-			
-			if(!(payload instanceof Object[])){
+
+			if (!(payload instanceof Object[])) {
 				throw new IllegalStateException("expected Object[], but:" + payload + "," + payload.getClass());
 			}
-			return doFormat((Object[])payload);			
+			return doFormat((Object[]) payload);
 		}
 
 		private List<Sentinel> doFormat(Object[] payload) {
-			
+
 			List<Sentinel> sentinels = new LinkedList<>();
-			for(Object sentinel : payload){
-				if(!(sentinel instanceof Object[])){
+			for (Object sentinel : payload) {
+				if (!(sentinel instanceof Object[])) {
 					throw new IllegalStateException("expected Object[], but:" + sentinel + "," + sentinel.getClass());
 				}
-				sentinels.add(objectToSentinel((Object[])sentinel));
+				sentinels.add(objectToSentinel((Object[]) sentinel));
 			}
 			return sentinels;
 		}
 
 		private Sentinel objectToSentinel(Object[] sentinel) {
-			
-			if(sentinel.length < 6){
+
+			if (sentinel.length < 6) {
 				throw new IllegalStateException("expected arg len >=6, but:" + sentinel.length + "," + StringUtil.join(",", sentinel));
 			}
-			return new Sentinel(payloadToString(sentinel[1]), 
+			return new Sentinel(payloadToString(sentinel[1]),
 					payloadToString(sentinel[3]), payloadToInteger(sentinel[5]));
 		}
 
@@ -99,19 +99,19 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 			return logger;
 		}
 	}
-	
-	
+
+
 	public static class SentinelAdd extends AbstractSentinelCommand<String> {
 
 		private static final Logger logger = LoggerFactory.getLogger(SentinelAdd.class);
-		
+
 		public static String MONITOR = "monitor";
-		
+
 		private String masterIp;
 		private int masterPort;
 		private int quorum;
 		private String masterName;
-		
+
 		public SentinelAdd(SimpleObjectPool<NettyClient> clientPool, String masterName, String masterIp, int masterPort, int quorum, ScheduledExecutorService scheduled) {
 			super(clientPool, scheduled);
 			this.masterIp = masterIp;
@@ -137,7 +137,7 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 		public ByteBuf getRequest() {
 			return new RequestStringParser(SENTINEL, MONITOR, masterName, masterIp, String.valueOf(masterPort), String.valueOf(quorum)).format();
 		}
-		
+
 		@Override
 		public String toString() {
 			return String.format("%s %s %s %s %d %d", SENTINEL, MONITOR, masterName, masterIp, masterPort, quorum);
@@ -148,13 +148,13 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 			return logger;
 		}
 	}
-	
-	public static class SentinelRemove extends AbstractSentinelCommand<String>{
+
+	public static class SentinelRemove extends AbstractSentinelCommand<String> {
 
 		private static final Logger logger = LoggerFactory.getLogger(SentinelRemove.class);
 
 		public static String REMOVE = "remove";
-		
+
 		private String masterName;
 
 		public SentinelRemove(SimpleObjectPool<NettyClient> clientPool, String masterName, ScheduledExecutorService scheduled) {
@@ -176,7 +176,7 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 		public ByteBuf getRequest() {
 			return new RequestStringParser(SENTINEL, REMOVE, masterName).format();
 		}
-		
+
 		@Override
 		public String toString() {
 			return String.format("%s %s %s", SENTINEL, REMOVE, masterName);
@@ -205,19 +205,19 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 
 		@Override
 		public HostPort format(Object payload) {
-			if(!(payload instanceof Object[])){
+			if (!(payload instanceof Object[])) {
 				throw new IllegalStateException("expected Object[], but:" + payload + "," + payload.getClass());
 			}
-			return doFormat((Object[])payload);
+			return doFormat((Object[]) payload);
 		}
 
 		private HostPort doFormat(Object[] payload) {
-			if(payload.length < 6) {
+			if (payload.length < 6) {
 				throw new IllegalStateException("expected arg len >=6, but:" + payload.length + ","
 						+ StringUtil.join(",", payload));
 			}
 			String monitorNameFromSentinel = payloadToString(payload[1]);
-			if(!this.monitorName.equalsIgnoreCase(monitorNameFromSentinel)) {
+			if (!this.monitorName.equalsIgnoreCase(monitorNameFromSentinel)) {
 				throw new IllegalMonitorStateException("expected monitor name: " + monitorName + ", but is: "
 						+ monitorNameFromSentinel);
 			}
@@ -258,16 +258,16 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 
 		@Override
 		protected List<HostPort> format(Object payload) {
-			if(!(payload instanceof Object[])){
+			if (!(payload instanceof Object[])) {
 				throw new IllegalStateException("expected Object[], but:" + payload + "," + payload.getClass());
 			}
-			return doFormat((Object[])payload);
+			return doFormat((Object[]) payload);
 		}
 
 		private List<HostPort> doFormat(Object[] payload) {
 			List<HostPort> slaves = Lists.newArrayListWithExpectedSize(payload.length);
-			for(Object slaveObj : payload) {
-				if(!(slaveObj instanceof Object[])) {
+			for (Object slaveObj : payload) {
+				if (!(slaveObj instanceof Object[])) {
 					logger.error("[doFormat] unexpected response: {}", slaveObj);
 					continue;
 				}
@@ -283,7 +283,7 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 		}
 	}
 
-	public static class SentinelReset extends AbstractSentinelCommand<Long>{
+	public static class SentinelReset extends AbstractSentinelCommand<Long> {
 
 		private static final Logger logger = LoggerFactory.getLogger(SentinelRemove.class);
 
@@ -317,7 +317,7 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 		}
 	}
 
-	public static class SentinelMonitor extends AbstractSentinelCommand<String>{
+	public static class SentinelMonitor extends AbstractSentinelCommand<String> {
 
 		private static final Logger logger = LoggerFactory.getLogger(SentinelMonitor.class);
 
@@ -330,7 +330,7 @@ public abstract class AbstractSentinelCommand<T> extends AbstractRedisCommand<T>
 		private int quorum;
 
 		public SentinelMonitor(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled,
-							 String monitorName, HostPort master, int quorum) {
+							   String monitorName, HostPort master, int quorum) {
 			super(clientPool, scheduled);
 			this.monitorName = monitorName;
 			this.master = master;

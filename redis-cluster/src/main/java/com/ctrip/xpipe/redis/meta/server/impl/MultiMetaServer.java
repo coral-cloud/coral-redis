@@ -14,15 +14,15 @@ import java.util.concurrent.Executor;
 
 /**
  * @author wenchao.meng
- *
- *         Nov 30, 2016
+ * <p>
+ * Nov 30, 2016
  */
 public class MultiMetaServer implements InvocationHandler {
 
 	public static MetaServer newProxy(MetaServer dstServer, List<MetaServer> otherServers) {
 
 		return (MetaServer) Proxy.newProxyInstance(MultiMetaServer.class.getClassLoader(),
-				new Class[] { MetaServer.class }, new MultiMetaServer(dstServer, otherServers));
+				new Class[]{MetaServer.class}, new MultiMetaServer(dstServer, otherServers));
 
 	}
 

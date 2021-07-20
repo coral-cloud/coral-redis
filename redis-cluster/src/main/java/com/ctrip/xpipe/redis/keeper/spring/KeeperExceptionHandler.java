@@ -20,18 +20,18 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @ControllerAdvice
 public class KeeperExceptionHandler extends AbstractExceptionHandler {
 
-    @ExceptionHandler(RedisKeeperRuntimeException.class)
-    public ResponseEntity<Object> exception(HttpServletRequest request, RedisKeeperRuntimeException ex) {
-        Map<String, String> headers = ImmutableMap.of(KeeperContainerErrorParser.ERROR_HEADER_NAME, ex
-                .getErrorMessage().getErrorType().toString());
+	@ExceptionHandler(RedisKeeperRuntimeException.class)
+	public ResponseEntity<Object> exception(HttpServletRequest request, RedisKeeperRuntimeException ex) {
+		Map<String, String> headers = ImmutableMap.of(KeeperContainerErrorParser.ERROR_HEADER_NAME, ex
+				.getErrorMessage().getErrorType().toString());
 
-        return handleError(request, INTERNAL_SERVER_ERROR, ex, headers);
-    }
+		return handleError(request, INTERNAL_SERVER_ERROR, ex, headers);
+	}
 
-    @ExceptionHandler({HttpRequestMethodNotSupportedException.class, HttpMediaTypeException.class})
-    public ResponseEntity<Object> badRequest(HttpServletRequest request,
-                                             Throwable ex) {
-        return handleError(request, BAD_REQUEST, ex);
-    }
+	@ExceptionHandler({HttpRequestMethodNotSupportedException.class, HttpMediaTypeException.class})
+	public ResponseEntity<Object> badRequest(HttpServletRequest request,
+											 Throwable ex) {
+		return handleError(request, BAD_REQUEST, ex);
+	}
 
 }

@@ -6,31 +6,31 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 31, 2016
  */
-public abstract class AbstractExceptionLogTask implements Runnable{
-	
+public abstract class AbstractExceptionLogTask implements Runnable {
+
 	private Logger logger;
 
 	@Override
 	public void run() {
-		
-		try{
+
+		try {
 			doRun();
-		}catch(OutOfMemoryError e){
+		} catch (OutOfMemoryError e) {
 			e.printStackTrace();
 			getLogger().error("[run]", e);
-		}catch(Throwable th){
+		} catch (Throwable th) {
 			getLogger().error("[run]", th);
 		}
 	}
-	
+
 	protected abstract void doRun() throws Exception;
 
 	protected Logger getLogger() {
 		//won't be necessary to lock, as logger factory will guarantee the singleton in multi-thread
-		if(logger == null) {
+		if (logger == null) {
 			logger = LoggerFactory.getLogger(getClass());
 		}
 		return logger;

@@ -12,16 +12,16 @@ import com.ctrip.xpipe.utils.LeakyBucket;
  */
 public class DefaultKeeperResourceManager extends KeeperProxyResourceManager implements KeeperResourceManager {
 
-    private LeakyBucket leakyBucket;
+	private LeakyBucket leakyBucket;
 
-    public DefaultKeeperResourceManager(ProxyEndpointManager endpointManager, NextHopAlgorithm algorithm,
-                                        LeakyBucket leakyBucket) {
-        super(endpointManager, algorithm);
-        this.leakyBucket = leakyBucket;
-    }
+	public DefaultKeeperResourceManager(ProxyEndpointManager endpointManager, NextHopAlgorithm algorithm,
+										LeakyBucket leakyBucket) {
+		super(endpointManager, algorithm);
+		this.leakyBucket = leakyBucket;
+	}
 
-    @Override
-    public LeakyBucket getLeakyBucket() {
-        return leakyBucket;
-    }
+	@Override
+	public LeakyBucket getLeakyBucket() {
+		return leakyBucket;
+	}
 }

@@ -6,8 +6,8 @@ import java.util.Comparator;
 
 /**
  * @author wenchao.meng
- *
- *         Aug 22, 2016
+ * <p>
+ * Aug 22, 2016
  */
 public class OrderedComparator implements Comparator<Ordered> {
 

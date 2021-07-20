@@ -18,31 +18,31 @@ import java.util.function.Supplier;
  */
 public class DefaultMetaServerKeeperService extends AbstractMetaService implements MetaServerKeeperService {
 
-    private Supplier<String> metaServerAddress;
+	private Supplier<String> metaServerAddress;
 
-    public DefaultMetaServerKeeperService(Supplier<String> metaServerAddress) {
-        this.metaServerAddress = metaServerAddress;
-    }
+	public DefaultMetaServerKeeperService(Supplier<String> metaServerAddress) {
+		this.metaServerAddress = metaServerAddress;
+	}
 
-    public DefaultMetaServerKeeperService(int retryTimes, int retryIntervalMilli, Supplier<String> metaServerAddress) {
-        super(retryTimes, retryIntervalMilli);
-        this.metaServerAddress = metaServerAddress;
-    }
+	public DefaultMetaServerKeeperService(int retryTimes, int retryIntervalMilli, Supplier<String> metaServerAddress) {
+		super(retryTimes, retryIntervalMilli);
+		this.metaServerAddress = metaServerAddress;
+	}
 
-    @Override
-    protected List<String> getMetaServerList() {
-        return Lists.newArrayList(metaServerAddress.get());
-    }
+	@Override
+	protected List<String> getMetaServerList() {
+		return Lists.newArrayList(metaServerAddress.get());
+	}
 
-    @Override
-    public KeeperContainerTokenStatusResponse refreshKeeperContainerTokenStatus(KeeperContainerTokenStatusRequest request) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
-        HttpEntity<Object> entity = new HttpEntity<Object>(request, httpHeaders);
-        return restTemplate.exchange(META_SERVER_SERVICE.KEEPER_TOKEN_STATUS.getRealPath(metaServerAddress.get()),
-                        HttpMethod.POST,
-                        entity,
-                        KeeperContainerTokenStatusResponse.class).getBody();
+	@Override
+	public KeeperContainerTokenStatusResponse refreshKeeperContainerTokenStatus(KeeperContainerTokenStatusRequest request) {
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
+		HttpEntity<Object> entity = new HttpEntity<Object>(request, httpHeaders);
+		return restTemplate.exchange(META_SERVER_SERVICE.KEEPER_TOKEN_STATUS.getRealPath(metaServerAddress.get()),
+				HttpMethod.POST,
+				entity,
+				KeeperContainerTokenStatusResponse.class).getBody();
 
-    }
+	}
 }

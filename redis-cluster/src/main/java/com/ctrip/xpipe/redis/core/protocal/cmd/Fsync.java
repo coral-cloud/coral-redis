@@ -10,13 +10,13 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author marsqing
- *
- *         May 16, 2016 6:46:15 PM
+ * <p>
+ * May 16, 2016 6:46:15 PM
  */
 public class Fsync extends AbstractRedisCommand<String> {
-	
+
 	public static String SUCCESS_STRING = "CONTINUE";
-	
+
 	public Fsync(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled) {
 		super(clientPool, scheduled);
 	}
@@ -34,7 +34,7 @@ public class Fsync extends AbstractRedisCommand<String> {
 
 	@Override
 	protected String format(Object payload) {
-		
+
 		return payloadToString(payload);
 	}
 }

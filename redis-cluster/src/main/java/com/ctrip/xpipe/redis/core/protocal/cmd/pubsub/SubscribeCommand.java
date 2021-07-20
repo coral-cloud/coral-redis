@@ -16,29 +16,29 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class SubscribeCommand extends AbstractSubscribe {
 
-    private static final Logger logger = LoggerFactory.getLogger(SubscribeCommand.class);
+	private static final Logger logger = LoggerFactory.getLogger(SubscribeCommand.class);
 
-    @VisibleForTesting
-    public SubscribeCommand(String host, int port, ScheduledExecutorService scheduled, String... channel) {
-        super(host, port, scheduled, MESSAGE_TYPE.MESSAGE, channel);
-    }
+	@VisibleForTesting
+	public SubscribeCommand(String host, int port, ScheduledExecutorService scheduled, String... channel) {
+		super(host, port, scheduled, MESSAGE_TYPE.MESSAGE, channel);
+	}
 
-    @VisibleForTesting
-    public SubscribeCommand(Endpoint endpoint, ScheduledExecutorService scheduled, String... channel) {
-        super(endpoint.getHost(), endpoint.getPort(), scheduled, MESSAGE_TYPE.MESSAGE, channel);
-    }
+	@VisibleForTesting
+	public SubscribeCommand(Endpoint endpoint, ScheduledExecutorService scheduled, String... channel) {
+		super(endpoint.getHost(), endpoint.getPort(), scheduled, MESSAGE_TYPE.MESSAGE, channel);
+	}
 
-    public SubscribeCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, String... channel) {
-        super(clientPool, scheduled, MESSAGE_TYPE.MESSAGE, channel);
-    }
+	public SubscribeCommand(SimpleObjectPool<NettyClient> clientPool, ScheduledExecutorService scheduled, String... channel) {
+		super(clientPool, scheduled, MESSAGE_TYPE.MESSAGE, channel);
+	}
 
-    @Override
-    public String getName() {
-        return "subscribe";
-    }
+	@Override
+	public String getName() {
+		return "subscribe";
+	}
 
-    @Override
-    protected Logger getLogger() {
-        return logger;
-    }
+	@Override
+	protected Logger getLogger() {
+		return logger;
+	}
 }

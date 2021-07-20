@@ -29,10 +29,10 @@ import java.util.concurrent.*;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 11, 2016
  */
-public class BecomePrimaryAction extends AbstractChangePrimaryDcAction{
+public class BecomePrimaryAction extends AbstractChangePrimaryDcAction {
 
 	private NewMasterChooser newMasterChooser;
 	private OffsetWaiter offsetWaiter;
@@ -45,9 +45,9 @@ public class BecomePrimaryAction extends AbstractChangePrimaryDcAction{
 	}
 
 	protected PrimaryDcChangeMessage doChangePrimaryDc(String clusterId, String shardId, String newPrimaryDc, MasterInfo masterInfo) {
-		
+
 		doChangeMetaCache(clusterId, shardId, newPrimaryDc);
-		
+
 		executionLog.info(String.format("[chooseNewMaster][begin]"));
 		Pair<String, Integer> newMaster = chooseNewMaster(clusterId, shardId);
 		executionLog.info(String.format("[chooseNewMaster]%s:%d", newMaster.getKey(), newMaster.getValue()));
@@ -56,42 +56,41 @@ public class BecomePrimaryAction extends AbstractChangePrimaryDcAction{
 		offsetWaiter.tryWaitfor(new HostPort(newMaster.getKey(), newMaster.getValue()), masterInfo, executionLog);
 
 		List<RedisMeta> slaves = getAllSlaves(newMaster, dcMetaCache.getShardRedises(clusterId, shardId));
-		
+
 		makeRedisesOk(newMaster, slaves);
-		
+
 		makeKeepersOk(clusterId, shardId, newMaster);
-		
+
 		changeSentinel(clusterId, shardId, newMaster);
-		
+
 		return new PrimaryDcChangeMessage(executionLog.getLog(), newMaster.getKey(), newMaster.getValue());
 	}
 
 
-
 	@Override
 	protected void changeSentinel(String clusterId, String shardId, Pair<String, Integer> newMaster) {
-		
-		try{
+
+		try {
 			sentinelManager.addSentinel(clusterId, shardId, HostPort.fromPair(newMaster), executionLog);
-		}catch(Exception e){
+		} catch (Exception e) {
 			executionLog.error("[addSentinel][fail]" + e.getMessage());
 			logger.error("[addSentinel]" + clusterId + "," + shardId, e);
 		}
 	}
 
-	
+
 	@Override
 	protected void makeRedisesOk(Pair<String, Integer> newMaster, List<RedisMeta> slaves) {
-		
+
 		executionLog.info("[make redis master]" + newMaster);
-		
+
 		SimpleObjectPool<NettyClient> masterPool = keyedObjectPool.getKeyPool(new DefaultEndPoint(newMaster.getKey(), newMaster.getValue()));
 		Command<String> command = new DefaultSlaveOfCommand(masterPool, null, 0, scheduled);
 		try {
 			String result = command.execute().get();
 			executionLog.info("[make redis master]" + result);
 			RedisReadonly redisReadOnly = RedisReadonly.create(newMaster.getKey(), newMaster.getValue(), keyedObjectPool, scheduled);
-			if(!(redisReadOnly instanceof SlaveOfRedisReadOnly)){
+			if (!(redisReadOnly instanceof SlaveOfRedisReadOnly)) {
 				redisReadOnly.makeWritable();
 			}
 		} catch (Exception e) {
@@ -99,7 +98,7 @@ public class BecomePrimaryAction extends AbstractChangePrimaryDcAction{
 			executionLog.error("[make redis master fail]" + e.getMessage());
 			throw new MakeRedisMasterFailException("make redis master:" + newMaster, e);
 		}
-		
+
 		executionLog.info("[make slaves slaveof][begin]" + newMaster + "," + slaves);
 		Command<Void> slavesJob = new DefaultSlaveOfJob(slaves, newMaster.getKey(), newMaster.getValue(), keyedObjectPool, scheduled, executors);
 		try {
@@ -119,7 +118,7 @@ public class BecomePrimaryAction extends AbstractChangePrimaryDcAction{
 //		String desc = MetaUtils.toString(redises);
 //		executionLog.info("[chooseNewMaster][from]" + desc);
 		RedisMeta newMaster = newMasterChooser.choose(redises);
-		if(newMaster == null){
+		if (newMaster == null) {
 			throw ChooseNewMasterFailException.chooseNull(redises);
 		}
 		return new Pair<>(newMaster.getIp(), newMaster.getPort());
@@ -127,13 +126,13 @@ public class BecomePrimaryAction extends AbstractChangePrimaryDcAction{
 
 	@Override
 	protected List<RedisMeta> getAllSlaves(Pair<String, Integer> newMaster, List<RedisMeta> shardRedises) {
-		
+
 		List<RedisMeta> result = new LinkedList<>();
-		
+
 		Iterator<RedisMeta> iterator = shardRedises.iterator();
-		while(iterator.hasNext()){
+		while (iterator.hasNext()) {
 			RedisMeta current = iterator.next();
-			if(ObjectUtils.equals(current.getIp(), newMaster.getKey()) && ObjectUtils.equals(current.getPort(), newMaster.getValue())){
+			if (ObjectUtils.equals(current.getIp(), newMaster.getKey()) && ObjectUtils.equals(current.getPort(), newMaster.getValue())) {
 				continue;
 			}
 			result.add(current);

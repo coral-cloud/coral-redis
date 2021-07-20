@@ -14,17 +14,17 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Dec 12, 2016
  */
 @Component
-public class DefaultMultiDcService implements MultiDcService{
-	
+public class DefaultMultiDcService implements MultiDcService {
+
 	private static Logger logger = LoggerFactory.getLogger(DefaultMultiDcService.class);
 
 	@Autowired
 	private MetaServerMultiDcServiceManager metaServerMultiDcServiceManager;
-	
+
 	@Autowired
 	private MetaServerConfig metaServerConfig;
 
@@ -48,7 +48,7 @@ public class DefaultMultiDcService implements MultiDcService{
 	private MetaServerMultiDcService getMetaServerMultiDcService(String dcName) {
 		dcName = dcName.toLowerCase();
 		DcInfo dcInfo = metaServerConfig.getDcInofs().get(dcName);
-		if(dcInfo == null){
+		if (dcInfo == null) {
 			logger.error("[getMetaServerMultiDcService][dc info null]{}", dcName);
 			return null;
 		}

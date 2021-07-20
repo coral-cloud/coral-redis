@@ -7,14 +7,14 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jan 5, 2017
  */
-public class SizeControllableFile extends AbstractControllableFile{
-	
+public class SizeControllableFile extends AbstractControllableFile {
+
 	private FileSize fileSize;
 
-	public SizeControllableFile(File file, FileSize fileSize) throws IOException{
+	public SizeControllableFile(File file, FileSize fileSize) throws IOException {
 		super(file, 0);
 		this.fileSize = fileSize;
 	}

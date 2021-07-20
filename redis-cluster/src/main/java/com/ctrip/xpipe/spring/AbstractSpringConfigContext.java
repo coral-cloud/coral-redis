@@ -22,17 +22,17 @@ import java.util.concurrent.*;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 25, 2016
  */
 @ComponentScan("com.ctrip.xpipe.monitor")
-public abstract class AbstractSpringConfigContext implements ApplicationContextAware{
-	
+public abstract class AbstractSpringConfigContext implements ApplicationContextAware {
+
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	public static ApplicationContext applicationContext;
-	
-	static{
+
+	static {
 		Thread.setDefaultUncaughtExceptionHandler(new DefaultExceptionHandler());
 	}
 
@@ -65,30 +65,30 @@ public abstract class AbstractSpringConfigContext implements ApplicationContextA
 	public ExecutorService getGlobalExecutor() {
 
 		int corePoolSize = OsUtils.getMultiCpuOrMax(GLOBAL_THREAD_MULTI_CORE, GLOBAL_THREAD_MAX);
-		int maxPoolSize =  2 * OsUtils.getCpuCount();
+		int maxPoolSize = 2 * OsUtils.getCpuCount();
 		DefaultExecutorFactory executorFactory = new DefaultExecutorFactory(GLOBAL_EXECUTOR, corePoolSize, maxPoolSize,
 				new ThreadPoolExecutor.AbortPolicy());
 		return executorFactory.createExecutorService();
 	}
 
 	@Bean
-	public HandlerExceptionResolver getHandlerExceptionResolver(){
+	public HandlerExceptionResolver getHandlerExceptionResolver() {
 		return new ExceptionLoggerResolver();
 	}
-	
+
 	@Bean
-	public HandlerInterceptor  logApiIntercept(){
-		
+	public HandlerInterceptor logApiIntercept() {
+
 		return new LoggingHandlerInterceptor();
 	}
-	
-	
+
+
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		
+
 		AbstractSpringConfigContext.applicationContext = applicationContext;
 	}
-	
+
 	public static ApplicationContext getApplicationContext() {
 		return applicationContext;
 	}

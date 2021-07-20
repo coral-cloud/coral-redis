@@ -12,11 +12,11 @@ import com.ctrip.xpipe.redis.proxy.monitor.stats.TunnelStats;
  */
 public interface TunnelMonitor extends Startable, Stoppable {
 
-    SessionMonitor getFrontendSessionMonitor();
+	SessionMonitor getFrontendSessionMonitor();
 
-    SessionMonitor getBackendSessionMonitor();
+	SessionMonitor getBackendSessionMonitor();
 
-    TunnelStats getTunnelStats();
+	TunnelStats getTunnelStats();
 
-    void record(Tunnel tunnel);
+	void record(Tunnel tunnel);
 }

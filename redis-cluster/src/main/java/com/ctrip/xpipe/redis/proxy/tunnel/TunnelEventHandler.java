@@ -7,13 +7,13 @@ package com.ctrip.xpipe.redis.proxy.tunnel;
  */
 public interface TunnelEventHandler {
 
-    void onEstablished();
+	void onEstablished();
 
-    void onBackendClose();
+	void onBackendClose();
 
-    void onFrontendClose();
+	void onFrontendClose();
 
-    void onClosing();
+	void onClosing();
 
-    void onClosed();
+	void onClosed();
 }

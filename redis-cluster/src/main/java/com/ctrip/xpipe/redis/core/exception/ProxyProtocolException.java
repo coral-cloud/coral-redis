@@ -10,15 +10,15 @@ import com.ctrip.xpipe.exception.XpipeRuntimeException;
  */
 public class ProxyProtocolException extends XpipeRuntimeException {
 
-    public ProxyProtocolException(String message) {
-        super(message);
-    }
+	public ProxyProtocolException(String message) {
+		super(message);
+	}
 
-    public ProxyProtocolException(String message, Throwable th) {
-        super(message, th);
-    }
+	public ProxyProtocolException(String message, Throwable th) {
+		super(message, th);
+	}
 
-    public <T extends Enum<T>> ProxyProtocolException(ErrorMessage<T> errorMessage, Throwable th) {
-        super(errorMessage, th);
-    }
+	public <T extends Enum<T>> ProxyProtocolException(ErrorMessage<T> errorMessage, Throwable th) {
+		super(errorMessage, th);
+	}
 }

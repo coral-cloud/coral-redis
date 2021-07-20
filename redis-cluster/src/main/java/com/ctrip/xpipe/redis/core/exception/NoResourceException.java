@@ -9,15 +9,15 @@ import com.ctrip.xpipe.exception.XpipeRuntimeException;
  * May 31, 2018
  */
 public class NoResourceException extends XpipeRuntimeException {
-    public NoResourceException(String message) {
-        super(message);
-    }
+	public NoResourceException(String message) {
+		super(message);
+	}
 
-    public NoResourceException(String message, Throwable th) {
-        super(message, th);
-    }
+	public NoResourceException(String message, Throwable th) {
+		super(message, th);
+	}
 
-    public <T extends Enum<T>> NoResourceException(ErrorMessage<T> errorMessage, Throwable th) {
-        super(errorMessage, th);
-    }
+	public <T extends Enum<T>> NoResourceException(ErrorMessage<T> errorMessage, Throwable th) {
+		super(errorMessage, th);
+	}
 }

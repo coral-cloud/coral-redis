@@ -15,31 +15,31 @@ import java.net.InetSocketAddress;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 8, 2016
  */
-public class RedisKeeperServerStateActive extends AbstractRedisKeeperServerState{
-	
+public class RedisKeeperServerStateActive extends AbstractRedisKeeperServerState {
+
 	private PROMOTION_STATE promotionState = PROMOTION_STATE.NORMAL;
 
 	public RedisKeeperServerStateActive(RedisKeeperServer redisKeeperServer) {
 		super(redisKeeperServer);
 	}
-	
+
 	public RedisKeeperServerStateActive(RedisKeeperServer redisKeeperServer, Endpoint masterAddress) {
 		super(redisKeeperServer, masterAddress);
 	}
 
 	@Override
-	public void becomeBackup(Endpoint masterAddress){
-		
+	public void becomeBackup(Endpoint masterAddress) {
+
 		logger.info("[becomeBackup]{}", masterAddress);
 		doBecomeBackup(masterAddress);
 	}
 
 	@Override
 	public void becomeActive(Endpoint masterAddress) {
-		
+
 		setMasterAddress(masterAddress);
 	}
 
@@ -48,33 +48,33 @@ public class RedisKeeperServerStateActive extends AbstractRedisKeeperServerState
 
 		reconnectMaster();
 	}
-	
+
 	@Override
 	public void setPromotionState(PROMOTION_STATE promotionState, Object info) throws IOException {
-		
+
 		@SuppressWarnings("unused")
 		PROMOTION_STATE oldState = this.promotionState;
 		this.promotionState = promotionState;
-		
-		logger.info("[setKeeperServerState]{},{}" ,promotionState, info);
 
-		switch(promotionState){
+		logger.info("[setKeeperServerState]{},{}", promotionState, info);
+
+		switch (promotionState) {
 			case NORMAL:
 				break;
 			case BEGIN_PROMOTE_SLAVE:
 				redisKeeperServer.stopAndDisposeMaster();
 				break;
 			case SLAVE_PROMTED:
-				
+
 				Endpoint newMasterAddress = null;
-				if(info instanceof SlavePromotionInfo){
+				if (info instanceof SlavePromotionInfo) {
 					SlavePromotionInfo promotionInfo = (SlavePromotionInfo) info;
 					RedisMeta newMaster = masterChanged(promotionInfo.getKeeperOffset(), promotionInfo.getNewMasterEndpoint()
-								, promotionInfo.getNewMasterRunid(), promotionInfo.getNewMasterReplOffset());
+							, promotionInfo.getNewMasterRunid(), promotionInfo.getNewMasterReplOffset());
 					newMasterAddress = new DefaultEndPoint(newMaster.getIp(), newMaster.getPort());
-				}else if (info instanceof InetSocketAddress){
+				} else if (info instanceof InetSocketAddress) {
 					newMasterAddress = new DefaultEndPoint((InetSocketAddress) info);
-				}else{
+				} else {
 					throw new IllegalStateException("unknown info:" + info);
 				}
 				this.promotionState = PROMOTION_STATE.REPLICATION_META_EXCHANGED;
@@ -86,31 +86,31 @@ public class RedisKeeperServerStateActive extends AbstractRedisKeeperServerState
 				throw new IllegalStateException("unkonow state:" + promotionState);
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public RedisMeta masterChanged(long keeperOffset, DefaultEndPoint newMasterEndpoint, String newMasterRunid, long newMasterReplOffset) throws IOException {
-		
+
 		ReplicationStore replicationStore = redisKeeperServer.getReplicationStore();
 		replicationStore.getMetaStore().masterChanged(keeperOffset, newMasterEndpoint, newMasterRunid, newMasterReplOffset);
-		
+
 		RedisMeta redisMeta = new RedisMeta("");
 		redisMeta.setIp(newMasterEndpoint.getHost());
 		redisMeta.setPort(newMasterEndpoint.getPort());
-		
+
 		return redisMeta;
 	}
 
 	@Override
-	public boolean psync(RedisClient redisClient, String []args) {
+	public boolean psync(RedisClient redisClient, String[] args) {
 		return true;
 	}
-	
+
 	@Override
 	protected void reconnectMaster() {
-		
-		if(promotionState == PROMOTION_STATE.NORMAL || promotionState == PROMOTION_STATE.REPLICATION_META_EXCHANGED){
+
+		if (promotionState == PROMOTION_STATE.NORMAL || promotionState == PROMOTION_STATE.REPLICATION_META_EXCHANGED) {
 			super.reconnectMaster();
-		}else{
+		} else {
 			logger.warn("[reconnectMaster][can  not reconnect][promotioning...]{}, {}", promotionState, this.redisKeeperServer);
 		}
 	}

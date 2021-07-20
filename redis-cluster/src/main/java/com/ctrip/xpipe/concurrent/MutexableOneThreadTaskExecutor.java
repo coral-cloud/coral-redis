@@ -18,84 +18,84 @@ import java.util.concurrent.TimeUnit;
  */
 public class MutexableOneThreadTaskExecutor extends OneThreadTaskExecutor {
 
-    private ScheduledExecutorService scheduled;
+	private ScheduledExecutorService scheduled;
 
-    public MutexableOneThreadTaskExecutor(Executor executors, ScheduledExecutorService scheduled) {
-        super(executors);
-        this.scheduled = scheduled;
-    }
+	public MutexableOneThreadTaskExecutor(Executor executors, ScheduledExecutorService scheduled) {
+		super(executors);
+		this.scheduled = scheduled;
+	}
 
-    @Override
-    public void executeCommand(Command<?> command) {
-        if (command instanceof RequestResponseCommand) {
-            super.executeCommand(command);
-        } else {
-            throw new IllegalArgumentException("Only timeout enabled command is allowed");
-        }
-    }
+	@Override
+	public void executeCommand(Command<?> command) {
+		if (command instanceof RequestResponseCommand) {
+			super.executeCommand(command);
+		} else {
+			throw new IllegalArgumentException("Only timeout enabled command is allowed");
+		}
+	}
 
 
-    @SuppressWarnings("unchecked")
-    public void clearAndExecuteCommand(RequestResponseCommand<?> command) {
-        logger.info("[clearAndExecuteCommand] {}", command);
-        clear();
-        super.executeCommand(command);
-    }
+	@SuppressWarnings("unchecked")
+	public void clearAndExecuteCommand(RequestResponseCommand<?> command) {
+		logger.info("[clearAndExecuteCommand] {}", command);
+		clear();
+		super.executeCommand(command);
+	}
 
-    protected Command<?> retryCommand(Command<?> command) {
-        return command;
-    }
+	protected Command<?> retryCommand(Command<?> command) {
+		return command;
+	}
 
-    private void clear() {
-        List<Command<?>> commands = null;
-        synchronized (this) {
-            commands = Lists.newArrayList(tasks);
-            tasks.clear();
-        }
-        waitForCurrentTask();
-        if (commands.isEmpty()) {
-            return;
-        }
-        commands.forEach(task -> {
-            try {
-                if (!task.future().isDone()) {
-                    synchronized (this) {
-                        if (!task.future().isDone()) {
-                            logger.warn("[CLEAR] {}", task.getName());
-                            task.future().setFailure(new CommandNotExecuteException("[OneThreadExecutor][drop]"));
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                logger.error("[clear][cancel queued commands]", e);
-            }
-        });
-    }
+	private void clear() {
+		List<Command<?>> commands = null;
+		synchronized (this) {
+			commands = Lists.newArrayList(tasks);
+			tasks.clear();
+		}
+		waitForCurrentTask();
+		if (commands.isEmpty()) {
+			return;
+		}
+		commands.forEach(task -> {
+			try {
+				if (!task.future().isDone()) {
+					synchronized (this) {
+						if (!task.future().isDone()) {
+							logger.warn("[CLEAR] {}", task.getName());
+							task.future().setFailure(new CommandNotExecuteException("[OneThreadExecutor][drop]"));
+						}
+					}
+				}
+			} catch (Exception e) {
+				logger.error("[clear][cancel queued commands]", e);
+			}
+		});
+	}
 
-    private void waitForCurrentTask() {
-        RequestResponseCommand<?> current = (RequestResponseCommand<?>) getCurrentCommand();
-        if (current != null && !current.future().isDone()) {
-            scheduled.schedule(new Runnable() {
-                @Override
-                public void run() {
-                    cancelLongTermRunningTask(current);
-                }
-            }, current.getCommandTimeoutMilli(), TimeUnit.MILLISECONDS);
-        }
-    }
+	private void waitForCurrentTask() {
+		RequestResponseCommand<?> current = (RequestResponseCommand<?>) getCurrentCommand();
+		if (current != null && !current.future().isDone()) {
+			scheduled.schedule(new Runnable() {
+				@Override
+				public void run() {
+					cancelLongTermRunningTask(current);
+				}
+			}, current.getCommandTimeoutMilli(), TimeUnit.MILLISECONDS);
+		}
+	}
 
-    private void cancelLongTermRunningTask(RequestResponseCommand<?> command) {
-        if (command != null && !command.future().isDone()) {
-            try {
-                synchronized (this) {
-                    if (!command.future().isDone()) {
-                        command.future().setFailure(new CommandTimeoutException("[OneThreadExecutor][too long time][cancel running command]"));
-                    }
-                }
-            } catch (Exception e) {
-                logger.error("[clear][cancel running commands]", e);
-            }
-        }
-    }
+	private void cancelLongTermRunningTask(RequestResponseCommand<?> command) {
+		if (command != null && !command.future().isDone()) {
+			try {
+				synchronized (this) {
+					if (!command.future().isDone()) {
+						command.future().setFailure(new CommandTimeoutException("[OneThreadExecutor][too long time][cancel running command]"));
+					}
+				}
+			} catch (Exception e) {
+				logger.error("[clear][cancel running commands]", e);
+			}
+		}
+	}
 
 }

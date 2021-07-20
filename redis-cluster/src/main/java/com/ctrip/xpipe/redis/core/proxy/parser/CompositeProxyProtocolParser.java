@@ -16,54 +16,54 @@ import static com.ctrip.xpipe.redis.core.proxy.parser.AbstractProxyOptionParser.
  */
 public class CompositeProxyProtocolParser implements ProxyProtocolParser {
 
-    private ProxyProtocolParser parser;
+	private ProxyProtocolParser parser;
 
-    private SimpleStringParser simpleStringParser = new SimpleStringParser();
+	private SimpleStringParser simpleStringParser = new SimpleStringParser();
 
-    @Override
-    public ByteBuf format() {
-        throw new UnsupportedOperationException("CompositeProxyProtocolParser not support format");
-    }
+	@Override
+	public ByteBuf format() {
+		throw new UnsupportedOperationException("CompositeProxyProtocolParser not support format");
+	}
 
-    @Override
-    public <T extends ProxyProtocol> T read(final String protocol) {
-        String proto = removeKeyWord(protocol);
-        String[] allOption = proto.split(LINE_SPLITTER);
-        for(String option : allOption) {
-            boolean responsible = PROXY_OPTION.parse(option.trim()).hasResponse();
-            if(responsible) {
-                parser = new DefaultProxyReqResProtocolParser();
-            } else {
-                parser = new DefaultProxyConnectProtocolParser();
-            }
-        }
-        if(parser != null) {
-            return parser.read(protocol);
-        }
-        return null;
-    }
+	@Override
+	public <T extends ProxyProtocol> T read(final String protocol) {
+		String proto = removeKeyWord(protocol);
+		String[] allOption = proto.split(LINE_SPLITTER);
+		for (String option : allOption) {
+			boolean responsible = PROXY_OPTION.parse(option.trim()).hasResponse();
+			if (responsible) {
+				parser = new DefaultProxyReqResProtocolParser();
+			} else {
+				parser = new DefaultProxyConnectProtocolParser();
+			}
+		}
+		if (parser != null) {
+			return parser.read(protocol);
+		}
+		return null;
+	}
 
-    @Override
-    public <T extends ProxyProtocol> T read(ByteBuf byteBuf) {
-        RedisClientProtocol<String> redisClientProtocol = simpleStringParser.read(byteBuf);
-        if(redisClientProtocol == null) {
-            return null;
-        } else {
-            resetSimpleStringParser();
-        }
-        return read(redisClientProtocol.getPayload());
-    }
+	@Override
+	public <T extends ProxyProtocol> T read(ByteBuf byteBuf) {
+		RedisClientProtocol<String> redisClientProtocol = simpleStringParser.read(byteBuf);
+		if (redisClientProtocol == null) {
+			return null;
+		} else {
+			resetSimpleStringParser();
+		}
+		return read(redisClientProtocol.getPayload());
+	}
 
-    private void resetSimpleStringParser() {
-        simpleStringParser = new SimpleStringParser();
-    }
+	private void resetSimpleStringParser() {
+		simpleStringParser = new SimpleStringParser();
+	}
 
-    @Override
-    public ProxyOptionParser getProxyOptionParser(PROXY_OPTION option) {
-        return option.getProxyOptionParser();
-    }
+	@Override
+	public ProxyOptionParser getProxyOptionParser(PROXY_OPTION option) {
+		return option.getProxyOptionParser();
+	}
 
-    private String removeKeyWord(String protocol) {
-        return protocol.substring(ProxyProtocol.KEY_WORD.length());
-    }
+	private String removeKeyWord(String protocol) {
+		return protocol.substring(ProxyProtocol.KEY_WORD.length());
+	}
 }

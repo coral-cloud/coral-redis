@@ -12,20 +12,20 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class KeyedOneThreadMutexableTaskExecutor<K> extends KeyedOneThreadTaskExecutor<K> {
 
-    private ScheduledExecutorService scheduled;
+	private ScheduledExecutorService scheduled;
 
-    public KeyedOneThreadMutexableTaskExecutor(Executor executors, ScheduledExecutorService scheduled) {
-        super(executors);
-        this.scheduled = scheduled;
-    }
+	public KeyedOneThreadMutexableTaskExecutor(Executor executors, ScheduledExecutorService scheduled) {
+		super(executors);
+		this.scheduled = scheduled;
+	}
 
-    protected MutexableOneThreadTaskExecutor createTaskExecutor() {
-        return new MutexableOneThreadTaskExecutor(executors, scheduled);
-    }
+	protected MutexableOneThreadTaskExecutor createTaskExecutor() {
+		return new MutexableOneThreadTaskExecutor(executors, scheduled);
+	}
 
-    public void clearAndExecute(K key, RequestResponseCommand<?> command){
+	public void clearAndExecute(K key, RequestResponseCommand<?> command) {
 
-        MutexableOneThreadTaskExecutor oneThreadTaskExecutor = (MutexableOneThreadTaskExecutor) getOrCreate(key);
-        oneThreadTaskExecutor.clearAndExecuteCommand(command);
-    }
+		MutexableOneThreadTaskExecutor oneThreadTaskExecutor = (MutexableOneThreadTaskExecutor) getOrCreate(key);
+		oneThreadTaskExecutor.clearAndExecuteCommand(command);
+	}
 }

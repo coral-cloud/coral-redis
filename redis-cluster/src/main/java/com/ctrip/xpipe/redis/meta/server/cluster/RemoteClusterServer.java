@@ -4,10 +4,10 @@ import com.ctrip.xpipe.api.lifecycle.Lifecycle;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 25, 2016
  */
-public interface RemoteClusterServer extends ClusterServer, Lifecycle{
-	
+public interface RemoteClusterServer extends ClusterServer, Lifecycle {
+
 	int getCurrentServerId();
 }

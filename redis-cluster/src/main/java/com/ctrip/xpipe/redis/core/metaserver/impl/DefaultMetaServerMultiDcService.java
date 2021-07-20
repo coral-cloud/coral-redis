@@ -9,20 +9,20 @@ import java.util.List;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Nov 3, 2016
  */
-public class DefaultMetaServerMultiDcService extends AbstractMetaService implements MetaServerMultiDcService{
+public class DefaultMetaServerMultiDcService extends AbstractMetaService implements MetaServerMultiDcService {
 
-	private String  upstreamchangePath;
-	private String  upstreamPeerPath;
-	private String  metaServerAddress;
+	private String upstreamchangePath;
+	private String upstreamPeerPath;
+	private String metaServerAddress;
 	private String peerMasterPath;
-	
+
 	public DefaultMetaServerMultiDcService(String metaServerAddress) {
 		this(metaServerAddress, DEFAULT_RETRY_TIMES, DEFAULT_RETRY_INTERVAL_MILLI);
 	}
-	
+
 	public DefaultMetaServerMultiDcService(String metaServerAddress, int retryTimes, int retryIntervalMilli) {
 		super(retryTimes, retryIntervalMilli);
 		this.metaServerAddress = metaServerAddress;
@@ -33,7 +33,7 @@ public class DefaultMetaServerMultiDcService extends AbstractMetaService impleme
 
 	@Override
 	public void upstreamChange(String clusterId, String shardId, String ip, int port) {
-		
+
 		restTemplate.put(upstreamchangePath, null, clusterId, shardId, ip, port);
 	}
 
@@ -49,16 +49,16 @@ public class DefaultMetaServerMultiDcService extends AbstractMetaService impleme
 
 	@Override
 	protected List<String> getMetaServerList() {
-		
+
 		List<String> result = new ArrayList<>();
 		result.add(metaServerAddress);
 		return result;
 	}
-	
+
 	@Override
 	public String toString() {
-		
+
 		return String.format("%s[%s]", getClass().getSimpleName(), metaServerAddress);
 	}
-	
+
 }

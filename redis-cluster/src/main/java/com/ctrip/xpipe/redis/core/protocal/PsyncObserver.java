@@ -6,11 +6,11 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年3月29日 下午3:51:09
  */
 public interface PsyncObserver {
-	
+
 	/**
 	 * get FULLSYNC response
 	 */
@@ -20,6 +20,7 @@ public interface PsyncObserver {
 
 	/**
 	 * get rdb length
+	 *
 	 * @param fileSize
 	 * @param offset
 	 * @throws IOException
@@ -28,6 +29,6 @@ public interface PsyncObserver {
 
 
 	void endWriteRdb();
-	
+
 	void onContinue(String requestReplId, String responseReplId);
 }

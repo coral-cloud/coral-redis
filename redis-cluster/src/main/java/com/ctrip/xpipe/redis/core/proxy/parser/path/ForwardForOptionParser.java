@@ -15,24 +15,24 @@ import java.net.SocketAddress;
  */
 public class ForwardForOptionParser extends AbstractProxyOptionParser implements ProxyForwardForParser {
 
-    @Override
-    public void append(InetSocketAddress address) {
-        String ipAndPort = ChannelUtil.getSimpleIpport(address);
-        if(originOptionString == null || originOptionString.isEmpty()) {
-            originOptionString = option().name();
-        }
-        output = originOptionString + " " + ipAndPort;
-    }
+	@Override
+	public void append(InetSocketAddress address) {
+		String ipAndPort = ChannelUtil.getSimpleIpport(address);
+		if (originOptionString == null || originOptionString.isEmpty()) {
+			originOptionString = option().name();
+		}
+		output = originOptionString + " " + ipAndPort;
+	}
 
-    @Override
-    public String output() {
-        return output;
-    }
+	@Override
+	public String output() {
+		return output;
+	}
 
-    @Override
-    public PROXY_OPTION option() {
-        return PROXY_OPTION.FORWARD_FOR;
-    }
+	@Override
+	public PROXY_OPTION option() {
+		return PROXY_OPTION.FORWARD_FOR;
+	}
 
 
 }

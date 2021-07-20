@@ -20,41 +20,41 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jun 13, 2016
  */
 public class ServicesUtil {
-	
+
 	private static Logger logger = LoggerFactory.getLogger(ServicesUtil.class);
-	
+
 	private static Map<Class<?>, Object> allServices = new ConcurrentHashMap<>();
-	
-	public static Config getConfigService(){
+
+	public static Config getConfigService() {
 		return load(Config.class);
 	}
-	
-	
-	public static FoundationService getFoundationService(){
-		
+
+
+	public static FoundationService getFoundationService() {
+
 		return load(FoundationService.class);
 	}
 
-	public static LogoutHandler getLogoutHandler(){
+	public static LogoutHandler getLogoutHandler() {
 		return load(LogoutHandler.class);
 	}
 
-	public static UserInfoHolder getUserInfoHolder(){
+	public static UserInfoHolder getUserInfoHolder() {
 		return load(UserInfoHolder.class);
 	}
 
-	public static UserInfo getUserInfo(){
+	public static UserInfo getUserInfo() {
 		return load(UserInfo.class);
 	}
-	
-	public static MetricProxy getMetricProxy(){
+
+	public static MetricProxy getMetricProxy() {
 		return load(MetricProxy.class);
 	}
-	
+
 	public static OuterClientService getOuterClientService() {
 		return load(OuterClientService.class);
 	}
@@ -63,7 +63,9 @@ public class ServicesUtil {
 		return load(DcMapper.class);
 	}
 
-	public static Organization getOrganizationService() {return load(Organization.class);}
+	public static Organization getOrganizationService() {
+		return load(Organization.class);
+	}
 
 	public static EmailService getEmailService() {
 		return load(EmailService.class);
@@ -71,26 +73,26 @@ public class ServicesUtil {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends Ordered> T load(Class<T> clazz) {
-		
+
 		T result = (T) allServices.get(clazz);
-		
-		if(result == null){
+
+		if (result == null) {
 			synchronized (clazz) {
-				
+
 				result = (T) allServices.get(clazz);
-				
-				if(result == null){
-					
+
+				if (result == null) {
+
 					ServiceLoader<T> services = ServiceLoader.load(clazz);
 					List<T> sortServices = new LinkedList<>();
-					for(T service : services){
+					for (T service : services) {
 						logger.info("[load]{}, {}", service.getClass(), service);
 						sortServices.add(service);
 					}
-					
+
 					Collections.sort(sortServices, new OrderedComparator());
-					
-					if(sortServices.size() == 0){
+
+					if (sortServices.size() == 0) {
 						throw new IllegalStateException("service not found:" + clazz.getClass().getSimpleName() + ", "
 								+ "if you work in ctrip, add ctrip-service project in your classpath, otherwise implement your own service");
 					}

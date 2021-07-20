@@ -5,10 +5,10 @@ import com.ctrip.xpipe.redis.keeper.RedisSlave;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * 2016年4月26日 上午10:51:52
  */
-public class LFHandler extends AbstractCommandHandler{
+public class LFHandler extends AbstractCommandHandler {
 
 	@Override
 	public String[] getCommands() {
@@ -17,10 +17,10 @@ public class LFHandler extends AbstractCommandHandler{
 
 	@Override
 	protected void doHandle(String[] args, RedisClient redisClient) {
-		
-		if(redisClient instanceof RedisSlave){
-			
-			if(logger.isDebugEnabled()){
+
+		if (redisClient instanceof RedisSlave) {
+
+			if (logger.isDebugEnabled()) {
 				logger.debug("[doHandle][\\n get]" + redisClient);
 			}
 			RedisSlave redisSlave = (RedisSlave) redisClient;

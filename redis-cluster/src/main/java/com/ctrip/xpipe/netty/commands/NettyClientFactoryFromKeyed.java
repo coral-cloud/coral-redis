@@ -11,42 +11,42 @@ import org.apache.commons.pool2.PooledObjectFactory;
  */
 public class NettyClientFactoryFromKeyed implements PooledObjectFactory<NettyClient> {
 
-    private Endpoint key;
+	private Endpoint key;
 
-    private NettyKeyedPoolClientFactory keyedPoolClientFactory;
+	private NettyKeyedPoolClientFactory keyedPoolClientFactory;
 
-    public NettyClientFactoryFromKeyed(Endpoint key, NettyKeyedPoolClientFactory keyedPoolClientFactory) {
-        this.key = key;
-        this.keyedPoolClientFactory = keyedPoolClientFactory;
-    }
+	public NettyClientFactoryFromKeyed(Endpoint key, NettyKeyedPoolClientFactory keyedPoolClientFactory) {
+		this.key = key;
+		this.keyedPoolClientFactory = keyedPoolClientFactory;
+	}
 
-    @Override
-    public PooledObject<NettyClient> makeObject() throws Exception {
-        return keyedPoolClientFactory.makeObject(key);
-    }
+	@Override
+	public PooledObject<NettyClient> makeObject() throws Exception {
+		return keyedPoolClientFactory.makeObject(key);
+	}
 
-    @Override
-    public void destroyObject(PooledObject<NettyClient> p) throws Exception {
-        keyedPoolClientFactory.destroyObject(key, p);
-    }
+	@Override
+	public void destroyObject(PooledObject<NettyClient> p) throws Exception {
+		keyedPoolClientFactory.destroyObject(key, p);
+	}
 
-    @Override
-    public boolean validateObject(PooledObject<NettyClient> p) {
-        return keyedPoolClientFactory.validateObject(key, p);
-    }
+	@Override
+	public boolean validateObject(PooledObject<NettyClient> p) {
+		return keyedPoolClientFactory.validateObject(key, p);
+	}
 
-    @Override
-    public void activateObject(PooledObject<NettyClient> p) throws Exception {
-        keyedPoolClientFactory.activateObject(key, p);
-    }
+	@Override
+	public void activateObject(PooledObject<NettyClient> p) throws Exception {
+		keyedPoolClientFactory.activateObject(key, p);
+	}
 
-    @Override
-    public void passivateObject(PooledObject<NettyClient> p) throws Exception {
-        keyedPoolClientFactory.passivateObject(key, p);
-    }
+	@Override
+	public void passivateObject(PooledObject<NettyClient> p) throws Exception {
+		keyedPoolClientFactory.passivateObject(key, p);
+	}
 
-    @Override
-    public String toString() {
-        return key.toString();
-    }
+	@Override
+	public String toString() {
+		return key.toString();
+	}
 }

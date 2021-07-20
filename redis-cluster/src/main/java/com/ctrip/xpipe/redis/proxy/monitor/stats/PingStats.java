@@ -12,7 +12,7 @@ import com.ctrip.xpipe.redis.core.proxy.monitor.PingStatsResult;
  */
 public interface PingStats extends Startable, Stoppable {
 
-    Endpoint getEndpoint();
+	Endpoint getEndpoint();
 
-    PingStatsResult getPingStatsResult();
+	PingStatsResult getPingStatsResult();
 }

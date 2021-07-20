@@ -12,8 +12,8 @@ import java.net.SocketAddress;
 
 /**
  * @author marsqing
- *
- *         Jul 28, 2016 2:59:57 PM
+ * <p>
+ * Jul 28, 2016 2:59:57 PM
  */
 public class ChannelUtil {
 
@@ -46,44 +46,44 @@ public class ChannelUtil {
 	}
 
 	public static String getSimpleIpport(SocketAddress remoteAddr) {
-		
-		if(remoteAddr == null){
+
+		if (remoteAddr == null) {
 			return null;
 		}
-		
-		if(remoteAddr instanceof InetSocketAddress){
-			
+
+		if (remoteAddr instanceof InetSocketAddress) {
+
 			InetSocketAddress addr = (InetSocketAddress) remoteAddr;
 			return String.format("%s:%d", addr.getAddress().getHostAddress(), addr.getPort());
 		}
 		return remoteAddr.toString();
 	}
 
-	public static String getDesc(Channel channel){
-		
-		if(channel == null){
+	public static String getDesc(Channel channel) {
+
+		if (channel == null) {
 			return null;
 		}
 		return String.format("L(%s)->R(%s)", getSimpleIpport(channel.localAddress()), getSimpleIpport(channel.remoteAddress()));
-		
+
 	}
 
 	public static void closeChannelAutoRead(Channel channel) {
-		if(channel == null || !channel.config().isAutoRead()) {
+		if (channel == null || !channel.config().isAutoRead()) {
 			return;
 		}
 		channel.config().setAutoRead(false);
 	}
 
 	public static void openChannelAutoRead(Channel channel) {
-		if(channel == null || channel.config().isAutoRead()) {
+		if (channel == null || channel.config().isAutoRead()) {
 			return;
 		}
 		channel.config().setAutoRead(true);
 	}
 
 	public static void triggerChannelAutoRead(Channel channel) {
-		if(channel == null || channel.config().isAutoRead()) {
+		if (channel == null || channel.config().isAutoRead()) {
 			return;
 		}
 		openChannelAutoRead(channel);

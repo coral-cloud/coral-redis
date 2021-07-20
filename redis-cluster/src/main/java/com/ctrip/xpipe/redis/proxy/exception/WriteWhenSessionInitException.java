@@ -10,15 +10,15 @@ import com.ctrip.xpipe.exception.XpipeRuntimeException;
  */
 public class WriteWhenSessionInitException extends XpipeRuntimeException {
 
-    public WriteWhenSessionInitException(String message) {
-        super(message);
-    }
+	public WriteWhenSessionInitException(String message) {
+		super(message);
+	}
 
-    public WriteWhenSessionInitException(String message, Throwable th) {
-        super(message, th);
-    }
+	public WriteWhenSessionInitException(String message, Throwable th) {
+		super(message, th);
+	}
 
-    public <T extends Enum<T>> WriteWhenSessionInitException(ErrorMessage<T> errorMessage, Throwable th) {
-        super(errorMessage, th);
-    }
+	public <T extends Enum<T>> WriteWhenSessionInitException(ErrorMessage<T> errorMessage, Throwable th) {
+		super(errorMessage, th);
+	}
 }

@@ -7,22 +7,22 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Aug 25, 2016
  */
-public interface RdbDumper extends Command<Void>{
+public interface RdbDumper extends Command<Void> {
 
 	void tryFullSync(RedisSlave redisSlave) throws IOException;
 
 	DumpedRdbStore prepareRdbStore() throws IOException;
 
 	void beginReceiveRdbData(long masterOffset);
-	
+
 	void dumpFinished();
 
 	void dumpFail(Throwable th);
-	
+
 	void exception(Throwable th);
-	
+
 
 }

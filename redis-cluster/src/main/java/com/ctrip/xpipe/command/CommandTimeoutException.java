@@ -4,15 +4,15 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author wenchao.meng
- *
+ * <p>
  * Jul 1, 2016
  */
-public class CommandTimeoutException extends TimeoutException{
+public class CommandTimeoutException extends TimeoutException {
 
 	private static final long serialVersionUID = 1L;
-	
-	public CommandTimeoutException(String message){
+
+	public CommandTimeoutException(String message) {
 		super(message);
 	}
-	
+
 }

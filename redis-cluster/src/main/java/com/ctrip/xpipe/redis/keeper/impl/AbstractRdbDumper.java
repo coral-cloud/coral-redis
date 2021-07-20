@@ -13,8 +13,8 @@ import java.io.IOException;
 
 /**
  * @author wenchao.meng
- *
- *         Aug 25, 2016
+ * <p>
+ * Aug 25, 2016
  */
 public abstract class AbstractRdbDumper extends AbstractCommand<Void> implements RdbDumper {
 
@@ -46,7 +46,6 @@ public abstract class AbstractRdbDumper extends AbstractCommand<Void> implements
 			case NORMAL:
 				// clear dumper
 				redisKeeperServer.clearRdbDumper(this);
-				;
 				break;
 			case WAIT_DUMPPING:
 				break;
@@ -91,22 +90,22 @@ public abstract class AbstractRdbDumper extends AbstractCommand<Void> implements
 
 		switch (rdbDumpState) {
 
-		case DUMPING:
-			FullSyncListener fullSyncListener = new DefaultFullSyncListener(redisSlave);
-			if (!redisKeeperServer.getReplicationStore().fullSyncIfPossible(fullSyncListener)) {
-				throw new IllegalStateException("[tryFullSync][rdb dumping, but can not full synn]");
-			}
-			break;
-		case FAIL:
-		case NORMAL:
-			getLogger().warn("[tryFullSync]{}", redisSlave);
-			redisKeeperServer.clearRdbDumper(this);
-			redisKeeperServer.fullSyncToSlave(redisSlave);
-			break;
-		case WAIT_DUMPPING:
-			getLogger().info("[tryFullSync][make slave waiting]{}", redisSlave);
-			redisSlave.waitForRdbDumping();
-			break;
+			case DUMPING:
+				FullSyncListener fullSyncListener = new DefaultFullSyncListener(redisSlave);
+				if (!redisKeeperServer.getReplicationStore().fullSyncIfPossible(fullSyncListener)) {
+					throw new IllegalStateException("[tryFullSync][rdb dumping, but can not full synn]");
+				}
+				break;
+			case FAIL:
+			case NORMAL:
+				getLogger().warn("[tryFullSync]{}", redisSlave);
+				redisKeeperServer.clearRdbDumper(this);
+				redisKeeperServer.fullSyncToSlave(redisSlave);
+				break;
+			case WAIT_DUMPPING:
+				getLogger().info("[tryFullSync][make slave waiting]{}", redisSlave);
+				redisSlave.waitForRdbDumping();
+				break;
 		}
 	}
 

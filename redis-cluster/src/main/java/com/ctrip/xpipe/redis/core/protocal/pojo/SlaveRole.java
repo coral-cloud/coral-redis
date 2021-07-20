@@ -9,8 +9,8 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * @author wenchao.meng
- *
- *         Sep 16, 2016
+ * <p>
+ * Sep 16, 2016
  */
 public class SlaveRole extends AbstractRole {
 
@@ -29,7 +29,7 @@ public class SlaveRole extends AbstractRole {
 	}
 
 	public SlaveRole(SERVER_ROLE serverRole, String masterHost, int masterPort, MASTER_STATE masterState,
-			long masterOffset) {
+					 long masterOffset) {
 		this.serverRole = serverRole;
 		this.masterHost = masterHost;
 		this.masterPort = masterPort;
@@ -55,8 +55,8 @@ public class SlaveRole extends AbstractRole {
 
 	@Override
 	public ByteBuf format() {
-		Object[] tmp = new Object[] { serverRole.toString(), masterHost, masterPort, masterState.getDesc(),
-				masterOffset };
+		Object[] tmp = new Object[]{serverRole.toString(), masterHost, masterPort, masterState.getDesc(),
+				masterOffset};
 		return new ArrayParser(tmp).format();
 	}
 
@@ -79,10 +79,7 @@ public class SlaveRole extends AbstractRole {
 		if (!(ObjectUtils.equals(masterState, other.masterState))) {
 			return false;
 		}
-		if (!(ObjectUtils.equals(masterPort, other.masterPort))) {
-			return false;
-		}
-		return true;
+		return ObjectUtils.equals(masterPort, other.masterPort);
 	}
 
 	@Override

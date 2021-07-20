@@ -11,17 +11,16 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 
  * @author wenchao.meng
- *
+ * <p>
  * Jun 12, 2016
  */
-public class CreatedComponentRedistry extends AbstractComponentRegistry implements ComponentRegistry{
-	
+public class CreatedComponentRedistry extends AbstractComponentRegistry implements ComponentRegistry {
+
 	private Map<String, Object> components = new ConcurrentHashMap<>();
-	
+
 	private NameCreater nameCreator = new DefaultNameCreator();
-	
+
 	@Override
 	public String doAdd(Object component) throws Exception {
 
@@ -34,40 +33,40 @@ public class CreatedComponentRedistry extends AbstractComponentRegistry implemen
 		return nameCreator.getName(component);
 	}
 
-	
+
 	@Override
 	protected Object doRemoveOfName(String name) {
 		return components.remove(name);
 	}
-	
+
 	@Override
 	public boolean doRemove(Object component) throws Exception {
-		
+
 		String name = null;
-		for(Entry<String, Object> entry : components.entrySet()){
-			if(entry.getValue() == component){
+		for (Entry<String, Object> entry : components.entrySet()) {
+			if (entry.getValue() == component) {
 				name = entry.getKey();
 				break;
 			}
 		}
-		
-		if(name == null){
+
+		if (name == null) {
 			logger.info("[doRemove][can not find component]{}", component);
 			return false;
 		}
-		
-		logger.info("[doRemove]{}, {}" , name, component);
+
+		logger.info("[doRemove]{}, {}", name, component);
 		components.remove(name);
-		
-		if(component instanceof Lifecycle){
+
+		if (component instanceof Lifecycle) {
 			Lifecycle lifecycle = (Lifecycle) component;
-			
-			if(lifecycle.getLifecycleState() != null){
-				if(lifecycle.getLifecycleState().canStop()){
+
+			if (lifecycle.getLifecycleState() != null) {
+				if (lifecycle.getLifecycleState().canStop()) {
 					lifecycle.stop();
 				}
-				
-				if(lifecycle.getLifecycleState().canDispose()){
+
+				if (lifecycle.getLifecycleState().canDispose()) {
 					lifecycle.dispose();
 				}
 			}
@@ -84,10 +83,10 @@ public class CreatedComponentRedistry extends AbstractComponentRegistry implemen
 	@SuppressWarnings("unchecked")
 	@Override
 	protected <T> Map<String, T> doGetComponents(Class<T> clazz) {
-		
+
 		Map<String, T> result = new HashMap<>();
-		for(Entry<String, Object> entry : components.entrySet()){
-			if(clazz.isAssignableFrom(entry.getValue().getClass())){
+		for (Entry<String, Object> entry : components.entrySet()) {
+			if (clazz.isAssignableFrom(entry.getValue().getClass())) {
 				result.put(entry.getKey(), (T) entry.getValue());
 			}
 		}
@@ -96,38 +95,38 @@ public class CreatedComponentRedistry extends AbstractComponentRegistry implemen
 
 	@Override
 	protected void doAdd(String name, Object component) throws Exception {
-	
-		if(component instanceof Lifecycle){
-			
+
+		if (component instanceof Lifecycle) {
+
 			Lifecycle lifecycle = (Lifecycle) component;
-			if(lifecycle.getLifecycleState() != null){
-				if(getLifecycleState().isInitializing() || getLifecycleState().isInitialized()){
-					if(lifecycle.getLifecycleState().canInitialize()){
+			if (lifecycle.getLifecycleState() != null) {
+				if (getLifecycleState().isInitializing() || getLifecycleState().isInitialized()) {
+					if (lifecycle.getLifecycleState().canInitialize()) {
 						lifecycle.initialize();
 					}
 				}
-				
-				if(getLifecycleState().isStarting() || getLifecycleState().isStarted()){
-					if(lifecycle.getLifecycleState().canStart()){
+
+				if (getLifecycleState().isStarting() || getLifecycleState().isStarted()) {
+					if (lifecycle.getLifecycleState().canStart()) {
 						lifecycle.start();
 					}
 				}
-				
-				if(getLifecycleState().isStopping() || getLifecycleState().isPositivelyStopped()){
-					if(lifecycle.getLifecycleState().canStop()){
+
+				if (getLifecycleState().isStopping() || getLifecycleState().isPositivelyStopped()) {
+					if (lifecycle.getLifecycleState().canStop()) {
 						lifecycle.stop();
 					}
 				}
-				
-				if(getLifecycleState().isDisposing() || getLifecycleState().isPositivelyDisposed()){
-					if(lifecycle.getLifecycleState().canDispose()){
+
+				if (getLifecycleState().isDisposing() || getLifecycleState().isPositivelyDisposed()) {
+					if (lifecycle.getLifecycleState().canDispose()) {
 						lifecycle.dispose();
 					}
 				}
 
 			}
 		}
-		
+
 		components.put(name, component);
 	}
 
@@ -138,12 +137,12 @@ public class CreatedComponentRedistry extends AbstractComponentRegistry implemen
 
 	@Override
 	public List<Lifecycle> lifecycleCallable() {
-		
+
 		List<Lifecycle> result = new LinkedList<>();
-		
-		for(Entry<String, Object> entry : components.entrySet()){
-			if(entry.getValue() instanceof Lifecycle){
-				result.add((Lifecycle)entry.getValue());
+
+		for (Entry<String, Object> entry : components.entrySet()) {
+			if (entry.getValue() instanceof Lifecycle) {
+				result.add((Lifecycle) entry.getValue());
 			}
 		}
 		return sort(result);
@@ -153,5 +152,5 @@ public class CreatedComponentRedistry extends AbstractComponentRegistry implemen
 	public void cleanComponents() {
 		components.clear();
 	}
-	
+
 }

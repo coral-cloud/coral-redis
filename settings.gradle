@@ -4,4 +4,4 @@ include 'redis-common'
 include 'redis-storage'
 include 'redis-client'
 include 'redis-server'
-
+include 'redis-cluster'

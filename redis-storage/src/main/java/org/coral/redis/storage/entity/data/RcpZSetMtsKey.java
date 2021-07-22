@@ -1,4 +1,4 @@
-package org.coral.redis.storage.entity;
+package org.coral.redis.storage.entity.data;
 
 import org.coral.redis.storage.protostuff.ObjectUtils;
 import org.slf4j.Logger;

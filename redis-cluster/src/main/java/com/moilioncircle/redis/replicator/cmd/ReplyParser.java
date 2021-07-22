@@ -171,7 +171,8 @@ public class ReplyParser {
                     }
                     break;
                 default:
-                    throw new AssertionError("expect [$,:,*,+,-] but: " + (char) c);
+                	break;
+                    //throw new AssertionError("expect [$,:,*,+,-] but: " + (char) c);
 
             }
         }

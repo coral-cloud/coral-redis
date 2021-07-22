@@ -1,4 +1,4 @@
-package org.coral.redis.storage.entity;
+package org.coral.redis.storage.entity.data;
 
 /**
  * meta info

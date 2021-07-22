@@ -1,7 +1,7 @@
 package org.coral.redis.storage.test;
 
 import org.coral.redis.storage.StorageProxyZSet;
-import org.coral.redis.storage.entity.RcpZSetRow;
+import org.coral.redis.storage.entity.data.RcpZSetRow;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;

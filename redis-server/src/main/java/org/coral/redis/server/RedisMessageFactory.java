@@ -3,7 +3,7 @@ package org.coral.redis.server;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.redis.*;
-import org.coral.redis.storage.entity.RcpZSetRow;
+import org.coral.redis.storage.entity.data.RcpZSetRow;
 import org.coral.redis.storage.utils.ByteUtils;
 
 import java.util.ArrayList;

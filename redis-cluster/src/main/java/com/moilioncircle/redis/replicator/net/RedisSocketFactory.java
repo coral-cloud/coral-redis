@@ -78,6 +78,7 @@ public class RedisSocketFactory extends SocketFactory {
 
     public Socket createSocket(String host, int port, int timeout) throws IOException {
         Socket socket = new Socket();
+//		socket.bind(new InetSocketAddress(16399));
         build(socket);
         socket.connect(new InetSocketAddress(host, port), timeout);
         if (configuration.isSsl()) {

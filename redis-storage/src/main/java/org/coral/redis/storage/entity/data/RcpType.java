@@ -1,4 +1,4 @@
-package org.coral.redis.storage.entity.type;
+package org.coral.redis.storage.entity.data;
 
 /**
  * @author wuhao

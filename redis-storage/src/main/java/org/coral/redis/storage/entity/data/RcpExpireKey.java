@@ -1,4 +1,4 @@
-package org.coral.redis.storage.entity;
+package org.coral.redis.storage.entity.data;
 
 /**
  * 简单字符串

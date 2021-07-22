@@ -1,6 +1,6 @@
 dependencies {
   compile project(":redis-server");
   compile group: 'redis.clients', name: 'jedis', version: jredis_version
-
+  testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.2'
 
 }

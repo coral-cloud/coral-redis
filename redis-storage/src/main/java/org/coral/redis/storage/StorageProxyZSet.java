@@ -1,7 +1,7 @@
 package org.coral.redis.storage;
 
-import org.coral.redis.storage.entity.RcpMetaKey;
-import org.coral.redis.storage.entity.RcpZSetRow;
+import org.coral.redis.storage.entity.data.RcpMetaKey;
+import org.coral.redis.storage.entity.data.RcpZSetRow;
 
 import java.util.List;
 import java.util.Map;

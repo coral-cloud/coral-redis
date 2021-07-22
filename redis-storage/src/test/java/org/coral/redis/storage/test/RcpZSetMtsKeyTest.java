@@ -1,6 +1,6 @@
 package org.coral.redis.storage.test;
 
-import org.coral.redis.storage.entity.RcpZSetMtsKey;
+import org.coral.redis.storage.entity.data.RcpZSetMtsKey;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;

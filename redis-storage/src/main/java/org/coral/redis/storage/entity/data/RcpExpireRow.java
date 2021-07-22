@@ -1,6 +1,4 @@
-package org.coral.redis.storage.entity;
-
-import org.coral.redis.storage.entity.type.RcpType;
+package org.coral.redis.storage.entity.data;
 
 /**
  * RcpStringRow

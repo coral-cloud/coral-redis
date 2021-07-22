@@ -1,8 +1,8 @@
 package org.coral.redis.storage;
 
-import org.coral.redis.storage.entity.RcpStringData;
-import org.coral.redis.storage.entity.RcpStringKey;
-import org.coral.redis.storage.entity.RcpStringRow;
+import org.coral.redis.storage.entity.data.RcpStringData;
+import org.coral.redis.storage.entity.data.RcpStringKey;
+import org.coral.redis.storage.entity.data.RcpStringRow;
 import org.coral.redis.storage.impl.StorageDbFactory;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;

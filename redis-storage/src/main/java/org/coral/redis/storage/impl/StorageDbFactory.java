@@ -9,6 +9,7 @@ public class StorageDbFactory {
 	private static final String DB_ZSET_PATH = "./rocksdb/dbzset/";
 	private static final String DB_SET_PATH = "./rocksdb/dbset/";
 	private static final String EXPIRE_PATH = "./rocksdb/expire/";
+	private static final String META_PATH = "./rocksdb/meta/";
 
 	private static class DbStringInit {
 		private static StorageDb DB = new StorageRocksDbImpl(DB_STRING_PATH);
@@ -28,6 +29,10 @@ public class StorageDbFactory {
 		private static StorageDb DB = new StorageRocksDbImpl(EXPIRE_PATH);
 	}
 
+	private static class MetaDbInit {
+		private static StorageDb DB = new StorageRocksDbImpl(META_PATH);
+	}
+
 	public static StorageDb getStringDb() {
 		return DbStringInit.DB;
 	}
@@ -43,5 +48,10 @@ public class StorageDbFactory {
 	public static StorageDb getExpireDb() {
 
 		return ExpireDbInit.DB;
+	}
+
+	public static StorageDb getMetaDb() {
+
+		return MetaDbInit.DB;
 	}
 }

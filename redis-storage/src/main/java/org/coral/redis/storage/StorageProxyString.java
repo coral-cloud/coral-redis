@@ -1,10 +1,10 @@
 package org.coral.redis.storage;
 
-import org.coral.redis.storage.entity.RcpExpireRow;
-import org.coral.redis.storage.entity.RcpStringData;
-import org.coral.redis.storage.entity.RcpStringKey;
-import org.coral.redis.storage.entity.RcpStringRow;
-import org.coral.redis.storage.entity.type.RcpType;
+import org.coral.redis.storage.entity.data.RcpExpireRow;
+import org.coral.redis.storage.entity.data.RcpStringData;
+import org.coral.redis.storage.entity.data.RcpStringKey;
+import org.coral.redis.storage.entity.data.RcpStringRow;
+import org.coral.redis.storage.entity.data.RcpType;
 
 public class StorageProxyString {
 	/**

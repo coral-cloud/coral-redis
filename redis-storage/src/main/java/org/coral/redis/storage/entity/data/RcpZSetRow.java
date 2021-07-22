@@ -1,4 +1,4 @@
-package org.coral.redis.storage.entity;
+package org.coral.redis.storage.entity.data;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package org.coral.redis.storage;
 
-import org.coral.redis.storage.entity.*;
+import org.coral.redis.storage.entity.data.*;
 import org.coral.redis.storage.impl.StorageDbFactory;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;

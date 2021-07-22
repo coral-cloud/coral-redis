@@ -14,6 +14,8 @@ public class CommandSign {
 	public static final String LPUSH = "LPUSH";
 	public static final String LPOP = "LPOP";
 
+	public static final String CLUSTER = "CLUSTER";
+
 	public static final String P_EX = "EX";
 	public static final String P_PX = "PX";
 	public static final String P_NX = "NX";

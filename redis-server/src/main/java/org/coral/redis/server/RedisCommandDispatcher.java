@@ -2,6 +2,7 @@ package org.coral.redis.server;
 
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.redis.*;
+import org.coral.redis.server.handler.ClusterHandler;
 import org.coral.redis.server.handler.StringHandler;
 import org.coral.redis.server.handler.ZSetHandler;
 import org.coral.redis.uils.RedisMsgUtils;
@@ -34,6 +35,8 @@ public class RedisCommandDispatcher {
 				return ZSetHandler.processZAdd(msg);
 			case CommandSign.ZRANGE:
 				return ZSetHandler.processZRange(msg);
+			case CommandSign.CLUSTER:
+				return ClusterHandler.processCluster(msg);
 			case CommandSign.PING:
 				return RedisMessageFactory.buildPONG();
 			case CommandSign.PONG:

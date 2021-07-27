@@ -1,6 +1,6 @@
 package org.coral.redis.storage.test;
 
-import org.coral.redis.storage.StorageProxyZSet;
+import org.coral.redis.storage.RcpProxyZSet;
 import org.coral.redis.storage.entity.data.RcpZSetRow;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +23,8 @@ public class StorageProxyZSetTest {
 		data.put("234".getBytes(StandardCharsets.UTF_8), 7d);
 		data.put("1324".getBytes(StandardCharsets.UTF_8), 6d);
 		data.put("1234".getBytes(StandardCharsets.UTF_8), 9d);
-		StorageProxyZSet.zadd(key, data);
-		List<RcpZSetRow> rcpZSetRows = StorageProxyZSet.zrange(key, 0, 6);
+		RcpProxyZSet.zadd(key, data);
+		List<RcpZSetRow> rcpZSetRows = RcpProxyZSet.zrange(key, 0, 6);
 		for (RcpZSetRow rcpZSetRow : rcpZSetRows) {
 			System.out.println(rcpZSetRow.getRcpZSetStmKey().getScore() + ":"
 					+ new String(rcpZSetRow.getRcpZSetStmKey().getMember()));

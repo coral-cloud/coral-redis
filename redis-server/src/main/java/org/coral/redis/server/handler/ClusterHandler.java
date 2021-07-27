@@ -7,7 +7,6 @@ import org.coral.redis.entity.ClusterInfo;
 import org.coral.redis.entity.ServerNode;
 import org.coral.redis.perfmon.RedisCounters;
 import org.coral.redis.server.RedisMessageFactory;
-import org.coral.redis.storage.StorageProxyString;
 import org.coral.redis.uils.RedisMsgUtils;
 import org.helium.perfmon.Stopwatch;
 

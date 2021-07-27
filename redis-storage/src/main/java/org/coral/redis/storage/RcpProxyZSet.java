@@ -2,11 +2,12 @@ package org.coral.redis.storage;
 
 import org.coral.redis.storage.entity.data.RcpMetaKey;
 import org.coral.redis.storage.entity.data.RcpZSetRow;
+import org.coral.redis.storage.storage.impl.RcpZSetDb;
 
 import java.util.List;
 import java.util.Map;
 
-public class StorageProxyZSet {
+public class RcpProxyZSet {
 
 	/**
 	 * zadd
@@ -18,7 +19,7 @@ public class StorageProxyZSet {
 	public static boolean zadd(byte[] key, Map<byte[], Double> scoreMembers) {
 		List<RcpZSetRow> rcpZSetRows = RcpZSetRow.build(key, scoreMembers, 0, 0);
 		for (RcpZSetRow rcpZSetRow : rcpZSetRows) {
-			StorageClientZSet.getInstance().zadd(rcpZSetRow);
+			RcpZSetDb.getInstance().zadd(rcpZSetRow);
 		}
 		return true;
 	}
@@ -30,7 +31,7 @@ public class StorageProxyZSet {
 	 */
 	public static List<RcpZSetRow> zrange(byte[] key, int start, int stop) {
 		RcpMetaKey rcpMetaKey = RcpMetaKey.build(key);
-		List<RcpZSetRow> rcpZSetRows = StorageClientZSet.getInstance().zrange(rcpMetaKey, start, stop);
+		List<RcpZSetRow> rcpZSetRows = RcpZSetDb.getInstance().zrange(rcpMetaKey, start, stop);
 		return rcpZSetRows;
 	}
 }

@@ -1,4 +1,4 @@
-package org.coral.redis.storage.impl;
+package org.coral.redis.storage.storage;
 
 import org.rocksdb.RocksDB;
 

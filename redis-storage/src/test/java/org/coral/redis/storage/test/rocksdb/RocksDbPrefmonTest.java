@@ -1,6 +1,6 @@
 package org.coral.redis.storage.test.rocksdb;
 
-import org.coral.redis.storage.StorageProxyString;
+import org.coral.redis.storage.RcpProxyString;
 import org.rocksdb.RocksDBException;
 
 import java.nio.charset.StandardCharsets;
@@ -18,12 +18,12 @@ public class RocksDbPrefmonTest {
 
 		long cur = System.currentTimeMillis();
 		for (int i = 0; i < count; i++) {
-			StorageProxyString.set((i + "").getBytes(StandardCharsets.UTF_8), new byte[dataSize], 0);
+			RcpProxyString.set((i + "").getBytes(StandardCharsets.UTF_8), new byte[dataSize], 0);
 		}
 		System.out.println("set " + (System.currentTimeMillis() - cur));
 		cur = System.currentTimeMillis();
 		for (int i = 0; i < count; i++) {
-			StorageProxyString.get((i + "").getBytes(StandardCharsets.UTF_8));
+			RcpProxyString.get((i + "").getBytes(StandardCharsets.UTF_8));
 		}
 		System.out.println("get " + (System.currentTimeMillis() - cur));
 	}

@@ -1,6 +1,6 @@
 package org.coral.redis.storage.test;
 
-import org.coral.redis.storage.StorageProxyString;
+import org.coral.redis.storage.RcpProxyString;
 import org.coral.redis.storage.expire.RcpStorageExpireTask;
 import org.junit.jupiter.api.Test;
 
@@ -21,8 +21,8 @@ public class StorageProxyStringTest {
 		byte[] key = "testKey".getBytes(StandardCharsets.UTF_8);
 		byte[] value = "testValue".getBytes(StandardCharsets.UTF_8);
 		byte[] valueNull = null;
-		StorageProxyString.set(key, value, 0);
-		byte[] valueRet = StorageProxyString.get(key);
+		RcpProxyString.set(key, value, 0);
+		byte[] valueRet = RcpProxyString.get(key);
 		if (valueRet != null) {
 			System.out.println(new String(valueRet));
 		}
@@ -36,14 +36,14 @@ public class StorageProxyStringTest {
 		byte[] key = "testKey".getBytes(StandardCharsets.UTF_8);
 		byte[] value = "testValue".getBytes(StandardCharsets.UTF_8);
 		byte[] valueNull = null;
-		StorageProxyString.set(key, value, 2);
-		byte[] valueRet = StorageProxyString.get(key);
+		RcpProxyString.set(key, value, 2);
+		byte[] valueRet = RcpProxyString.get(key);
 		if (valueRet != null) {
 			System.out.println(new String(valueRet));
 		}
 		assertArrayEquals(value, valueRet);
 		Thread.sleep(3000);
-		valueRet = StorageProxyString.get(key);
+		valueRet = RcpProxyString.get(key);
 		assertArrayEquals(valueNull, valueRet);
 	}
 }

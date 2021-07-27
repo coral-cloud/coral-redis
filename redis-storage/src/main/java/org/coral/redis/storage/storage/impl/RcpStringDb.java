@@ -1,11 +1,12 @@
-package org.coral.redis.storage;
+package org.coral.redis.storage.storage.impl;
 
 import org.coral.redis.storage.entity.data.RcpStringData;
 import org.coral.redis.storage.entity.data.RcpStringKey;
 import org.coral.redis.storage.entity.data.RcpStringRow;
-import org.coral.redis.storage.impl.StorageDbFactory;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;
+import org.coral.redis.storage.storage.RocksDbConstants;
+import org.coral.redis.storage.storage.RocksDbFactory;
 import org.helium.perfmon.Stopwatch;
 import org.rocksdb.RocksDB;
 import org.slf4j.Logger;
@@ -15,15 +16,26 @@ import org.slf4j.LoggerFactory;
  * @author wuhao
  * @createTime 2021-06-24 18:25:00
  */
-public class StorageClientString extends StorageClient {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StorageClientString.class);
+public class RcpStringDb extends RcpBaseDb {
+	private static final Logger LOGGER = LoggerFactory.getLogger(RcpStringDb.class);
 
-	private static class StorageClientStringInit {
-		private static StorageClientString DB = new StorageClientString();
+	private RocksDB rocksDB = null;
+
+	public RcpStringDb() {
+		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbConstants.DB_STRING_PATH);
 	}
 
-	public static StorageClientString getInstance() {
-		return StorageClientString.StorageClientStringInit.DB;
+	@Override
+	public RocksDB getRocksDB() {
+		return rocksDB;
+	}
+
+	private static class StorageClientStringInit {
+		private static RcpStringDb DB = new RcpStringDb();
+	}
+
+	public static RcpStringDb getInstance() {
+		return RcpStringDb.StorageClientStringInit.DB;
 	}
 
 	/**
@@ -35,7 +47,7 @@ public class StorageClientString extends StorageClient {
 	public boolean set(RcpStringRow rcpStringRow) {
 		Stopwatch stopwatch = StorageCounters.getInstance("set-string").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getStringDb().getRocksDB();
+
 			rocksDB.put(rcpStringRow.getRcpStringKey().getKey(), rcpStringRow.getRcpStringData().getBytes());
 			stopwatch.end();
 		} catch (Exception e) {
@@ -56,7 +68,6 @@ public class StorageClientString extends StorageClient {
 	public RcpStringData get(RcpStringKey rcpStringKey) {
 		Stopwatch stopwatch = StorageCounters.getInstance("get-string").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getStringDb().getRocksDB();
 			byte[] content = rocksDB.get(rcpStringKey.getKey());
 			if (content == null) {
 				stopwatch.end();
@@ -85,7 +96,6 @@ public class StorageClientString extends StorageClient {
 	public void delete(RcpStringKey rcpKey) {
 		Stopwatch stopwatch = StorageCounters.getInstance("delete-string").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getStringDb().getRocksDB();
 			rocksDB.delete(rcpKey.getKey());
 			stopwatch.end();
 		} catch (Exception e) {

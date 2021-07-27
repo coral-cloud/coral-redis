@@ -1,5 +1,7 @@
-package org.coral.redis.storage;
+package org.coral.redis.storage.storage.impl;
 
+
+import org.coral.redis.storage.storage.StorageDb;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -8,7 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author wuhao
  * @createTime 2021-06-24 14:41:00
  */
-public class StorageClient {
+public abstract class RcpBaseDb implements StorageDb {
 
 	private static int LOCK_NUMBER = 128;
 	private static ReadWriteLock[] LOCKS = new ReadWriteLock[LOCK_NUMBER];
@@ -28,6 +30,5 @@ public class StorageClient {
 	public ReadWriteLock getLock(String value) {
 		return LOCKS[Math.abs(value.hashCode() % LOCK_NUMBER)];
 	}
-
 
 }

@@ -5,8 +5,10 @@ import org.coral.redis.storage.entity.data.RcpStringData;
 import org.coral.redis.storage.entity.data.RcpStringKey;
 import org.coral.redis.storage.entity.data.RcpStringRow;
 import org.coral.redis.storage.entity.data.RcpType;
+import org.coral.redis.storage.storage.impl.RcpExpireDb;
+import org.coral.redis.storage.storage.impl.RcpStringDb;
 
-public class StorageProxyString {
+public class RcpProxyString {
 	/**
 	 * 设置过期处理
 	 *
@@ -19,11 +21,11 @@ public class StorageProxyString {
 		//设置过期
 		if (expire > 0) {
 			RcpExpireRow expireRow = RcpExpireRow.build(key, expire, RcpType.STRING);
-			StorageClientExpire.getInstance().set(expireRow);
+			RcpExpireDb.getInstance().set(expireRow);
 		}
 		//设置存储
 		RcpStringRow rcpStringRow = RcpStringRow.build(key, content, expire);
-		StorageClientString.getInstance().set(rcpStringRow);
+		RcpStringDb.getInstance().set(rcpStringRow);
 		return true;
 	}
 
@@ -34,7 +36,7 @@ public class StorageProxyString {
 	 * @return
 	 */
 	public static byte[] get(byte[] key) {
-		RcpStringData rcpStringData = StorageClientString.getInstance().get(RcpStringKey.build(key));
+		RcpStringData rcpStringData = RcpStringDb.getInstance().get(RcpStringKey.build(key));
 		if (rcpStringData == null) {
 			return null;
 		}

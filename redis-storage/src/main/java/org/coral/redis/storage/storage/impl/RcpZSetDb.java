@@ -1,9 +1,10 @@
-package org.coral.redis.storage;
+package org.coral.redis.storage.storage.impl;
 
 import org.coral.redis.storage.entity.data.*;
-import org.coral.redis.storage.impl.StorageDbFactory;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;
+import org.coral.redis.storage.storage.RocksDbConstants;
+import org.coral.redis.storage.storage.RocksDbFactory;
 import org.helium.perfmon.Stopwatch;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksIterator;
@@ -17,15 +18,26 @@ import java.util.List;
  * @author wuhao
  * @createTime 2021-06-24 18:25:00
  */
-public class StorageClientZSet extends StorageClient {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StorageClientZSet.class);
+public class RcpZSetDb extends RcpBaseDb {
+	private static final Logger LOGGER = LoggerFactory.getLogger(RcpZSetDb.class);
 
-	private static class StorageClientStringInit {
-		private static StorageClientZSet DB = new StorageClientZSet();
+	private RocksDB rocksDB = null;
+
+	public RcpZSetDb() {
+		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbConstants.DB_ZSET_PATH);
 	}
 
-	public static StorageClientZSet getInstance() {
-		return StorageClientZSet.StorageClientStringInit.DB;
+	@Override
+	public RocksDB getRocksDB() {
+		return rocksDB;
+	}
+
+	private static class StorageClientStringInit {
+		private static RcpZSetDb DB = new RcpZSetDb();
+	}
+
+	public static RcpZSetDb getInstance() {
+		return RcpZSetDb.StorageClientStringInit.DB;
 	}
 
 	/**
@@ -37,12 +49,11 @@ public class StorageClientZSet extends StorageClient {
 	public boolean zadd(RcpZSetRow rcpZSetRow) {
 		Stopwatch stopwatch = StorageCounters.getInstance("zset-zadd").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getZSetDb().getRocksDB();
 			RcpMetaKey rcpMetaKey = rcpZSetRow.getRcpMetaKey();
 			RcpMetaData rcpMetaData = rcpZSetRow.getRcpMetaData();
 			byte[] contentMeta = rocksDB.get(rcpMetaKey.getKey());
 			if (contentMeta != null) {
-				rcpMetaData = (RcpMetaData) ObjectUtils.toObject(contentMeta, RcpMetaData.class);
+				rcpMetaData = ObjectUtils.toObject(contentMeta, RcpMetaData.class);
 			}
 			byte[] contentScore = rocksDB.get(rcpZSetRow.getRcpZSetMtsKey().getKey());
 			if (contentScore == null) {
@@ -74,12 +85,11 @@ public class StorageClientZSet extends StorageClient {
 		Stopwatch stopwatch = StorageCounters.getInstance("get-string").getTx().begin();
 		List<RcpZSetRow> list = new ArrayList<>();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getZSetDb().getRocksDB();
 			byte[] contentMeta = rocksDB.get(rcpMetaKey.getKey());
 			if (contentMeta == null) {
 				return list;
 			}
-			RcpMetaData rcpMetaData = (RcpMetaData) ObjectUtils.toObject(contentMeta, RcpMetaData.class);
+			RcpMetaData rcpMetaData = ObjectUtils.toObject(contentMeta, RcpMetaData.class);
 			RocksIterator rocksIterator = rocksDB.newIterator();
 			RcpZSetStmKey stmKey = RcpZSetStmKey.build(rcpMetaKey.getKey(), 0, 0, null);
 			long stopIndex = stop;
@@ -122,7 +132,6 @@ public class StorageClientZSet extends StorageClient {
 	public void delete(RcpStringKey rcpKey) {
 		Stopwatch stopwatch = StorageCounters.getInstance("delete-string").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getStringDb().getRocksDB();
 			rocksDB.delete(rcpKey.getKey());
 			stopwatch.end();
 		} catch (Exception e) {

@@ -1,4 +1,4 @@
-package org.coral.redis.storage.impl;
+package org.coral.redis.storage.storage;
 
 /**
  * 参考：
@@ -8,12 +8,12 @@ package org.coral.redis.storage.impl;
  * @author wuhao
  * @createTime 2021-07-20 16:34:00
  */
-public class StorageConfig {
+public class RocksDbConfig {
 	private static class StorageConfigInit {
-		private static StorageConfig storageConfig = new StorageConfig();
+		private static RocksDbConfig storageConfig = new RocksDbConfig();
 	}
 
-	public static StorageConfig getInstance() {
+	public static RocksDbConfig getInstance() {
 		return StorageConfigInit.storageConfig;
 	}
 
@@ -172,6 +172,7 @@ public class StorageConfig {
 		this.level0StopWritesTrigger = level0StopWritesTrigger;
 	}
 }
+
 /**
  * level0 512M
  * level1 512M

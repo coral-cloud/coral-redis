@@ -1,11 +1,10 @@
 package org.coral.redis.storage.expire;
 
-import org.coral.redis.storage.StorageClientExpire;
-import org.coral.redis.storage.StorageClientString;
+import org.coral.redis.storage.storage.impl.RcpExpireDb;
+import org.coral.redis.storage.storage.impl.RcpStringDb;
 import org.coral.redis.storage.entity.data.RcpExpireData;
 import org.coral.redis.storage.entity.data.RcpExpireKey;
 import org.coral.redis.storage.entity.data.RcpStringKey;
-import org.coral.redis.storage.impl.StorageDbFactory;
 import org.coral.redis.storage.protostuff.ObjectUtils;
 import org.rocksdb.RocksIterator;
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ public class RcpStorageExpireTask implements Runnable {
 	 */
 	public void expireKeys() throws InterruptedException {
 		try {
-			RocksIterator rocksIterator = StorageDbFactory.getExpireDb().getRocksDB().newIterator();
+			RocksIterator rocksIterator = RcpExpireDb.getInstance().getRocksDB().newIterator();
 			rocksIterator.seekToFirst();
 			while (rocksIterator.isValid()) {
 				byte[] expireKey = rocksIterator.key();
@@ -46,8 +45,8 @@ public class RcpStorageExpireTask implements Runnable {
 
 					LOGGER.info("delete expire key:{} time stamp:{}", rcpKey.getKeyString(), rcpData.getTime());
 					deleteData(rcpKey, rcpData);
-					if (StorageClientExpire.getInstance().get(rcpKey) != null) {
-						StorageClientExpire.getInstance().delete(rcpKey);
+					if (RcpExpireDb.getInstance().get(rcpKey) != null) {
+						RcpExpireDb.getInstance().delete(rcpKey);
 					}
 				}
 			}
@@ -70,8 +69,8 @@ public class RcpStorageExpireTask implements Runnable {
 		switch (rcpExpireData.getRcpType()) {
 			case STRING:
 				RcpStringKey rcpStringKey = RcpStringKey.build(rcpKey.getKey());
-				if (StorageClientString.getInstance().get(rcpStringKey) != null) {
-					StorageClientString.getInstance().delete(rcpStringKey);
+				if (RcpStringDb.getInstance().get(rcpStringKey) != null) {
+					RcpStringDb.getInstance().delete(rcpStringKey);
 				}
 				break;
 			case ZSET:

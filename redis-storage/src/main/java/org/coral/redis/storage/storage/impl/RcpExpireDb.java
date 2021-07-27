@@ -1,11 +1,12 @@
-package org.coral.redis.storage;
+package org.coral.redis.storage.storage.impl;
 
 import org.coral.redis.storage.entity.data.RcpExpireData;
 import org.coral.redis.storage.entity.data.RcpExpireKey;
 import org.coral.redis.storage.entity.data.RcpExpireRow;
-import org.coral.redis.storage.impl.StorageDbFactory;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;
+import org.coral.redis.storage.storage.RocksDbConstants;
+import org.coral.redis.storage.storage.RocksDbFactory;
 import org.helium.perfmon.Stopwatch;
 import org.rocksdb.RocksDB;
 import org.slf4j.Logger;
@@ -15,14 +16,25 @@ import org.slf4j.LoggerFactory;
  * @author wuhao
  * @createTime 2021-06-24 18:25:00
  */
-public class StorageClientExpire extends StorageClient {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StorageClientExpire.class);
+public class RcpExpireDb extends RcpBaseDb {
+	private static final Logger LOGGER = LoggerFactory.getLogger(RcpExpireDb.class);
 
-	private static class StorageClientExpireInit {
-		private static StorageClientExpire DB = new StorageClientExpire();
+	private RocksDB rocksDB = null;
+
+	@Override
+	public RocksDB getRocksDB() {
+		return rocksDB;
 	}
 
-	public static StorageClientExpire getInstance() {
+	public RcpExpireDb() {
+		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbConstants.EXPIRE_PATH);
+	}
+
+	private static class StorageClientExpireInit {
+		private static RcpExpireDb DB = new RcpExpireDb();
+	}
+
+	public static RcpExpireDb getInstance() {
 		return StorageClientExpireInit.DB;
 	}
 
@@ -35,7 +47,6 @@ public class StorageClientExpire extends StorageClient {
 	public boolean set(RcpExpireRow rcpRow) {
 		Stopwatch stopwatch = StorageCounters.getInstance("set-expire").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getExpireDb().getRocksDB();
 			rocksDB.put(rcpRow.getRcpExpireKey().getKey(), rcpRow.getRcpExpireData().getBytes());
 			stopwatch.end();
 		} catch (Exception e) {
@@ -56,7 +67,6 @@ public class StorageClientExpire extends StorageClient {
 	public RcpExpireData get(RcpExpireKey rcpKey) {
 		Stopwatch stopwatch = StorageCounters.getInstance("get-expire").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getExpireDb().getRocksDB();
 			byte[] content = rocksDB.get(rcpKey.getKey());
 			if (content == null) {
 				stopwatch.end();
@@ -81,7 +91,6 @@ public class StorageClientExpire extends StorageClient {
 	public void delete(RcpExpireKey rcpKey) {
 		Stopwatch stopwatch = StorageCounters.getInstance("delete-expire").getTx().begin();
 		try {
-			RocksDB rocksDB = StorageDbFactory.getExpireDb().getRocksDB();
 			rocksDB.delete(rcpKey.getKey());
 			stopwatch.end();
 		} catch (Exception e) {

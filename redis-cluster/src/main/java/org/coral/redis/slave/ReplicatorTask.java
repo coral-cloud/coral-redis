@@ -9,8 +9,8 @@ import com.moilioncircle.redis.replicator.event.EventListener;
 import com.moilioncircle.redis.replicator.event.PostRdbSyncEvent;
 import com.moilioncircle.redis.replicator.event.PreRdbSyncEvent;
 import com.moilioncircle.redis.replicator.rdb.datatype.KeyStringValueString;
-import org.coral.redis.storage.StorageProxyMeta;
-import org.coral.redis.storage.StorageProxyString;
+import org.coral.redis.storage.RcpProxyMeta;
+import org.coral.redis.storage.RcpProxyString;
 import org.coral.redis.storage.entity.meta.ServerMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class ReplicatorTask implements Runnable {
 							PreRdbSyncEvent preRdbSyncEvent = (PreRdbSyncEvent) event;
 							Event.Context context = preRdbSyncEvent.getContext();
 							LOGGER.info("Syn Start PreRdbSyncEvent:{}-{}", context.getOffsets().getV1(), context.getOffsets().getV2());
-							ServerMetaData serverMetaData = StorageProxyMeta.getServerMeta();
+							ServerMetaData serverMetaData = RcpProxyMeta.getServerMeta();
 							LOGGER.info("serverMetaData offset:{}", serverMetaData.getOffset());
 						} else if (event instanceof PostRdbSyncEvent) {
 							//同步结束
@@ -65,7 +65,7 @@ public class ReplicatorTask implements Runnable {
 							if (kvSyn.getExpiredValue() != null) {
 								expire = kvSyn.getExpiredValue();
 							}
-							StorageProxyString.set(kvSyn.getKey(), kvSyn.getValue(), expire);
+							RcpProxyString.set(kvSyn.getKey(), kvSyn.getValue(), expire);
 							LOGGER.info("kvSyn:{}-{}", new String(kvSyn.getKey()), new String(kvSyn.getValue()));
 						} else if (event instanceof SetCommand) {
 							//实时同步
@@ -74,7 +74,7 @@ public class ReplicatorTask implements Runnable {
 							if (setSyn.getExpiredValue() != null) {
 								expire = setSyn.getExpiredValue();
 							}
-							StorageProxyString.set(setSyn.getKey(), setSyn.getValue(), expire);
+							RcpProxyString.set(setSyn.getKey(), setSyn.getValue(), expire);
 							LOGGER.info("setSyn:{}-{}", new String(setSyn.getKey()), new String(setSyn.getValue()));
 						}
 						processEvent(replicator);
@@ -97,7 +97,7 @@ public class ReplicatorTask implements Runnable {
 	 */
 	public Configuration getReplicatorConfiguration() {
 		Configuration configuration = Configuration.defaultSetting().setRetries(1);
-		ServerMetaData serverMetaData = StorageProxyMeta.getServerMeta();
+		ServerMetaData serverMetaData = RcpProxyMeta.getServerMeta();
 		configuration.addOffset(serverMetaData.getOffset());
 		configuration.setReplId(serverMetaData.getReplId());
 		LOGGER.info("getReplicatorConfiguration set replid:{} offset:{}", serverMetaData.getReplId(), serverMetaData.getOffset());
@@ -113,9 +113,9 @@ public class ReplicatorTask implements Runnable {
 	public void processEvent(Replicator replicator) {
 		Configuration configuration = replicator.getConfiguration();
 		LOGGER.info("processEvent,repl: {}, offset: {}", configuration.getReplId(), configuration.getReplOffset());
-		ServerMetaData serverMetaData = StorageProxyMeta.getServerMeta();
+		ServerMetaData serverMetaData = RcpProxyMeta.getServerMeta();
 		serverMetaData.setOffset(configuration.getReplOffset());
 		serverMetaData.setReplId(configuration.getReplId());
-		StorageProxyMeta.setServerMeta(serverMetaData);
+		RcpProxyMeta.setServerMeta(serverMetaData);
 	}
 }

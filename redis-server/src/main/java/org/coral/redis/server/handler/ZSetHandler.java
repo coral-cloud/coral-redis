@@ -5,7 +5,7 @@ import io.netty.handler.codec.redis.RedisMessage;
 import org.coral.redis.perfmon.RedisCounters;
 import org.coral.redis.server.CommandSign;
 import org.coral.redis.server.RedisMessageFactory;
-import org.coral.redis.storage.StorageProxyZSet;
+import org.coral.redis.storage.RcpProxyZSet;
 import org.coral.redis.storage.entity.data.RcpZSetRow;
 import org.coral.redis.uils.RedisMsgUtils;
 import org.helium.perfmon.Stopwatch;
@@ -39,7 +39,7 @@ public class ZSetHandler {
 				String value = RedisMsgUtils.getString(message.children().get(i + 1));
 				hashMap.put(value.getBytes(), score);
 			}
-			StorageProxyZSet.zadd(keyStr.getBytes(), hashMap);
+			RcpProxyZSet.zadd(keyStr.getBytes(), hashMap);
 
 			return RedisMessageFactory.buildNum(hashMap.size());
 		} catch (Exception e) {
@@ -64,7 +64,7 @@ public class ZSetHandler {
 		}
 		int start = Integer.parseInt(startStr);
 		int stop = Integer.parseInt(stopStr);
-		List<RcpZSetRow> rcpZSetRows = StorageProxyZSet.zrange(keyStr.getBytes(), start, stop);
+		List<RcpZSetRow> rcpZSetRows = RcpProxyZSet.zrange(keyStr.getBytes(), start, stop);
 		stopwatch.end();
 		return RedisMessageFactory.buildZSetArrayData(rcpZSetRows, withScores);
 	}

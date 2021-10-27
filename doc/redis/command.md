@@ -204,7 +204,7 @@ SHUTDOWN                    |                 |                                |
 SLAVEOF                    |                 |                                |
 SLOWLOG                    |                 |                                |
 SYNC                    |                 |                                |
-TIME                    |                 |                                |
+TIME                      |                 |                                |
 
 ## 12.Cluster(集群)
 命令                           | 描述            | 示例                            |  备注

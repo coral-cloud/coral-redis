@@ -1,57 +1,59 @@
-////只需要修改 autoPush/imageTag
-//buildscript {
-//  project.ext {
-//    //打包镜像名称
-//    imagesTag = "10.3.4.111:5000/" + "redis-test"
-//
-//  }
-//  repositories {
-//    mavenLocal()
-//    mavenCentral()
-//    maven {
-//      url "http://repo.rongcloud.net/repository/maven-public/"
-//    }
-//  }
-//  dependencies {
-//    classpath 'se.transmode.gradle:gradle-docker:1.2'
-//  }
-//}
-//apply plugin: 'docker'
-//
-//jar {
-//  manifest {
-//  }
-//  enabled = true
-//
-//}
-//
-////打包可运行jar包
-//task buildRunJar(type: Copy, dependsOn: build) {
-//  from configurations.runtime
-//  from 'src/main/resources'
-//  into 'build/libs' // 目标位置
-//}
-//
-////构建docker镜像
-//task buildDocker(type: Docker, dependsOn: buildRunJar) {
-//  push = "true"
-//  tag = imagesTag
-//  applicationName = jar.baseName
-//  dockerfile = file('src/main/docker/Dockerfile')
-//  doFirst {
-//    copy {
-//      from 'build/libs'
-//      into stageDir
-//    }
-//  }
-//}
-//
+//只需要修改 autoPush/imageTag
+buildscript {
+  project.ext {
+    //打包镜像名称
+    imagesTag = "10.3.4.111:5000/" + "redis-test"
+
+  }
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+      url "http://repo.rongcloud.net/repository/maven-public/"
+    }
+  }
+  dependencies {
+    classpath 'se.transmode.gradle:gradle-docker:1.2'
+  }
+}
+apply plugin: 'docker'
+
+jar {
+  manifest {
+  }
+  enabled = true
+
+}
+
+//打包可运行jar包
+task buildRunJar(type: Copy, dependsOn: build) {
+  from configurations.runtime
+  from 'src/main/resources'
+  into 'build/libs' // 目标位置
+}
+
+//构建docker镜像
+task buildDocker(type: Docker, dependsOn: buildRunJar) {
+  push = "true"
+  tag = imagesTag
+  applicationName = jar.baseName
+  dockerfile = file('src/main/docker/Dockerfile')
+  doFirst {
+    copy {
+      from 'build/libs'
+      into stageDir
+    }
+  }
+}
+
 
 
 dependencies {
   compile group: 'io.github.helium-cloud', name: 'helium-monitor', version: helium_version
   compile group: 'io.github.helium-cloud', name: 'helium-logging', version: helium_version
   compile group: 'redis.clients', name: 'jedis', version: jredis_version
+// https://mvnrepository.com/artifact/com.alibaba/fastjson
+  compile group: 'com.alibaba', name: 'fastjson', version: '1.2.78'
 
   testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.2'
 

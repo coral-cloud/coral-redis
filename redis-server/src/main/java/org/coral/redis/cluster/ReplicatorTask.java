@@ -1,4 +1,4 @@
-package org.coral.redis.slave;
+package org.coral.redis.cluster;
 
 import com.moilioncircle.redis.replicator.Configuration;
 import com.moilioncircle.redis.replicator.RedisReplicator;

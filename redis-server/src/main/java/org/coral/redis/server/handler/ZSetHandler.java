@@ -3,7 +3,7 @@ package org.coral.redis.server.handler;
 import io.netty.handler.codec.redis.ArrayRedisMessage;
 import io.netty.handler.codec.redis.RedisMessage;
 import org.coral.redis.perfmon.RedisCounters;
-import org.coral.redis.server.CommandSign;
+import org.coral.redis.type.CommandSign;
 import org.coral.redis.server.RedisMessageFactory;
 import org.coral.redis.storage.RcpProxyZSet;
 import org.coral.redis.storage.entity.data.RcpZSetRow;

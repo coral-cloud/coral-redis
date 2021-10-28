@@ -1,4 +1,4 @@
-package org.coral.redis.entity;
+package org.coral.redis.type;
 
 /**
  * @author wuhao

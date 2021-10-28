@@ -1,4 +1,4 @@
-package org.coral.redis.server;
+package org.coral.redis.type;
 
 /**
  * @author wuhao
@@ -15,6 +15,9 @@ public class CommandSign {
 	public static final String LPOP = "LPOP";
 
 	public static final String CLUSTER = "CLUSTER";
+
+	public static final String REPLCONF = "REPLCONF";
+	public static final String PSYNC = "PSYNC";
 
 	public static final String P_EX = "EX";
 	public static final String P_PX = "PX";

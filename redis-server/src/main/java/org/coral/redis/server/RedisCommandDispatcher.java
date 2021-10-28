@@ -2,9 +2,8 @@ package org.coral.redis.server;
 
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.redis.*;
-import org.coral.redis.server.handler.ClusterHandler;
-import org.coral.redis.server.handler.StringHandler;
-import org.coral.redis.server.handler.ZSetHandler;
+import org.coral.redis.server.handler.*;
+import org.coral.redis.type.CommandSign;
 import org.coral.redis.uils.RedisMsgUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +40,11 @@ public class RedisCommandDispatcher {
 				return RedisMessageFactory.buildPONG();
 			case CommandSign.PONG:
 				return RedisMessageFactory.buildPING();
+
+			case CommandSign.REPLCONF:
+				return ReplConfHandler.processReplConf(msg);
+			case CommandSign.PSYNC:
+				return PSynHandler.processPSyn(msg);
 			default:
 				return RedisMessageFactory.buildError();
 

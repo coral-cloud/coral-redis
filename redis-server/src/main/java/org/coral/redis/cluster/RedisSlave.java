@@ -1,4 +1,4 @@
-package org.coral.redis.slave;
+package org.coral.redis.cluster;
 
 import java.io.IOException;
 

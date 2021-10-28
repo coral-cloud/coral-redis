@@ -4,7 +4,7 @@ import io.netty.handler.codec.redis.ArrayRedisMessage;
 import io.netty.handler.codec.redis.FullBulkStringRedisMessage;
 import io.netty.handler.codec.redis.RedisMessage;
 import io.netty.util.CharsetUtil;
-import org.coral.redis.server.CommandSign;
+import org.coral.redis.type.CommandSign;
 import org.coral.redis.storage.utils.ByteUtils;
 import org.helium.util.StringUtils;
 

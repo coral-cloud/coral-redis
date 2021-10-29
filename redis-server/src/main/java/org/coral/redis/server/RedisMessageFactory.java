@@ -29,8 +29,18 @@ public class RedisMessageFactory {
 		return redisMessage;
 	}
 
+
+	public static RedisMessage buildSimple(String data) {
+		RedisMessage redisMessage = new SimpleStringRedisMessage(data);
+		return redisMessage;
+	}
+
 	public static RedisMessage buildNum(int num) {
 		RedisMessage redisMessage = new IntegerRedisMessage(num);
+		return redisMessage;
+	}
+	public static RedisMessage buildError() {
+		RedisMessage redisMessage = new SimpleStringRedisMessage("Error");
 		return redisMessage;
 	}
 
@@ -73,8 +83,4 @@ public class RedisMessageFactory {
 		return arrayRedisMessage;
 	}
 
-	public static RedisMessage buildError() {
-		RedisMessage redisMessage = new SimpleStringRedisMessage("Error");
-		return redisMessage;
-	}
 }

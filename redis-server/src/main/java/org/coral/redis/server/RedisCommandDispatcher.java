@@ -2,11 +2,15 @@ package org.coral.redis.server;
 
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.redis.*;
+import org.coral.redis.command.RedisCommand;
 import org.coral.redis.server.handler.*;
 import org.coral.redis.type.CommandSign;
 import org.coral.redis.uils.RedisMsgUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author wuhao
@@ -20,35 +24,21 @@ public class RedisCommandDispatcher {
 	 * @param msg
 	 * @return
 	 */
-	public RedisMessage processCommand(RedisMessage msg) {
-		String command = getCommand(msg);
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("RedisCommandDispatcher:{}", command);
-		}
-		switch (command) {
-			case CommandSign.GET:
-				return StringHandler.processGet(msg);
-			case CommandSign.SET:
-				return StringHandler.processSet(msg);
-			case CommandSign.ZADD:
-				return ZSetHandler.processZAdd(msg);
-			case CommandSign.ZRANGE:
-				return ZSetHandler.processZRange(msg);
-			case CommandSign.CLUSTER:
-				return ClusterHandler.processCluster(msg);
-			case CommandSign.PING:
-				return RedisMessageFactory.buildPONG();
-			case CommandSign.PONG:
-				return RedisMessageFactory.buildPING();
+	public List<RedisMessage> processCommand(RedisMessage msg) {
+		try {
+			String command = getCommand(msg);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("RedisCommandDispatcher:{}", command);
+			}
+			RedisCommand redisCmd = RedisCommand.getSupportCmd(command);
+			if (redisCmd != null && redisCmd.getCmdHander() != null) {
+				return redisCmd.getCmdHander().process(command, msg);
 
-			case CommandSign.REPLCONF:
-				return ReplConfHandler.processReplConf(msg);
-			case CommandSign.PSYNC:
-				return PSynHandler.processPSyn(msg);
-			default:
-				return RedisMessageFactory.buildError();
-
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		return Arrays.asList(RedisMessageFactory.buildError());
 
 	}
 

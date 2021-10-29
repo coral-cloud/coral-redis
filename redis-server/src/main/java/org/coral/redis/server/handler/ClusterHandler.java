@@ -10,15 +10,19 @@ import org.coral.redis.server.RedisMessageFactory;
 import org.coral.redis.uils.RedisMsgUtils;
 import org.helium.perfmon.Stopwatch;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author wuhao
  * @description: ClusterHandler
  * @createTime 2021/07/22 23:01:00
  */
 
-public class ClusterHandler {
-	public static RedisMessage processCluster(RedisMessage msgReq) {
-		Stopwatch stopwatch = RedisCounters.getInstance("get").getTx().begin();
+public class ClusterHandler implements CommandHandler {
+
+	@Override
+	public List<RedisMessage> process(String command,RedisMessage msgReq) throws Exception {
 		ArrayRedisMessage message = (ArrayRedisMessage) msgReq;
 		String operator = RedisMsgUtils.getString(message.children().get(1)).toUpperCase();
 		String retMsg = "";
@@ -36,6 +40,7 @@ public class ClusterHandler {
 				retMsg = "not support:" + operator;
 				break;
 		}
-		return RedisMessageFactory.buildData((retMsg).getBytes());
+		RedisMessage redisMessage = RedisMessageFactory.buildData((retMsg).getBytes());
+		return Arrays.asList(redisMessage);
 	}
 }

@@ -34,9 +34,12 @@ public class RedisServerHandler extends ChannelDuplexHandler {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
 		RedisMessage msgReq = (RedisMessage) msg;
-		RedisMessage msgRes = redisCommandDispatcher.processCommand(msgReq);
+		List<RedisMessage> redisMessages = redisCommandDispatcher.processCommand(msgReq);
 		ReferenceCountUtil.release(msgReq);
-		ctx.writeAndFlush(msgRes);
+		for (RedisMessage msgRes : redisMessages) {
+			ctx.writeAndFlush(msgRes);
+		}
+
 	}
 
 	@Override

@@ -10,6 +10,8 @@ import org.coral.redis.uils.RedisMsgUtils;
 import org.helium.perfmon.Stopwatch;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author wuhao
@@ -17,14 +19,13 @@ import java.io.IOException;
  * @createTime 2021/10/28 22:35:00
  */
 
-public class PSynHandler {
-	public static RedisMessage processPSyn(RedisMessage msgReq) {
-		Stopwatch stopwatch = RedisCounters.getInstance("psyn").getTx().begin();
-		try {
-			return RedisMessageFactory.buildData(RdbDataStorage.getData());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return RedisMessageFactory.buildError();
+public class PSynHandler implements CommandHandler {
+	String DEFAULT = "FULLRESYNC db72e13d181ffb0d9cc7384c175a2371a530248b 1";
+
+	@Override
+	public List<RedisMessage> process(String command, RedisMessage msgReq) throws Exception {
+		RedisMessage redisSync = RedisMessageFactory.buildSimple(DEFAULT);
+		RedisMessage redisMessageData = RedisMessageFactory.buildData(RdbDataStorage.getData());
+		return Arrays.asList(redisSync, redisMessageData);
 	}
 }

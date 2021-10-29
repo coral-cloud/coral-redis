@@ -12,6 +12,7 @@ import org.helium.perfmon.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
  * @author wuhao
  * @createTime 2021-06-25 16:29:00
  */
-public class ZSetHandler {
+public class ZSetHandler implements CommandHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ZSetHandler.class);
 	/**
 	 * processZAdd
@@ -27,7 +28,7 @@ public class ZSetHandler {
 	 * @param msgReq
 	 * @return
 	 */
-	public static RedisMessage processZAdd(RedisMessage msgReq) {
+	public static List<RedisMessage>  processZAdd(RedisMessage msgReq) {
 
 		try {
 			ArrayRedisMessage message = (ArrayRedisMessage) msgReq;
@@ -41,15 +42,15 @@ public class ZSetHandler {
 			}
 			RcpProxyZSet.zadd(keyStr.getBytes(), hashMap);
 
-			return RedisMessageFactory.buildNum(hashMap.size());
+			return Arrays.asList(RedisMessageFactory.buildNum(hashMap.size()));
 		} catch (Exception e) {
 			LOGGER.error("processZAdd:", e.getMessage());
 		}
-		return RedisMessageFactory.buildError();
+		return Arrays.asList(RedisMessageFactory.buildError());
 	}
 
 
-	public static RedisMessage processZRange(RedisMessage msgReq) {
+	public static List<RedisMessage> processZRange(RedisMessage msgReq) {
 		Stopwatch stopwatch = RedisCounters.getInstance("zrange").getTx().begin();
 		ArrayRedisMessage message = (ArrayRedisMessage) msgReq;
 		String keyStr = RedisMsgUtils.getString(message.children().get(1));
@@ -66,7 +67,17 @@ public class ZSetHandler {
 		int stop = Integer.parseInt(stopStr);
 		List<RcpZSetRow> rcpZSetRows = RcpProxyZSet.zrange(keyStr.getBytes(), start, stop);
 		stopwatch.end();
-		return RedisMessageFactory.buildZSetArrayData(rcpZSetRows, withScores);
+		return Arrays.asList(RedisMessageFactory.buildZSetArrayData(rcpZSetRows, withScores));
 	}
 
+	@Override
+	public List<RedisMessage> process(String command, RedisMessage msgReq) throws Exception {
+		if (command.equals("zadd")) {
+			return processZAdd(msgReq);
+		}
+		if (command.equals("zrange")) {
+			return processZRange(msgReq);
+		}
+		return null;
+	}
 }

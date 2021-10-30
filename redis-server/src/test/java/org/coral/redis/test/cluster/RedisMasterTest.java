@@ -1,6 +1,7 @@
 package org.coral.redis.test.cluster;
 
 import org.coral.redis.service.RedisService;
+import org.coral.redis.storage.storage.RocksDbPathConfig;
 
 import java.io.IOException;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
  */
 public class RedisMasterTest {
 	public static void main(String[] args) throws IOException {
+		RocksDbPathConfig.getInstance().setBasePath("./master");
 		RedisService.run(6389);
 
 	}

@@ -335,10 +335,10 @@ public enum RedisCommand {
 	}
 
 	public static RedisCommand getSupportCmd(String command) {
-		return supportCommandMap.get(command);
+		return supportCommandMap.get(command.toLowerCase());
 	}
 
 	public static RedisCommand getCmd(String command) {
-		return commandMap.get(command);
+		return commandMap.get(command.toLowerCase());
 	}
 }

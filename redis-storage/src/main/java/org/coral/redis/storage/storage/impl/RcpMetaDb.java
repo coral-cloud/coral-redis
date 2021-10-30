@@ -4,7 +4,7 @@ import org.coral.redis.storage.entity.meta.MetaKey;
 import org.coral.redis.storage.entity.meta.ServerMetaData;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;
-import org.coral.redis.storage.storage.RocksDbConstants;
+import org.coral.redis.storage.storage.RocksDbPathConfig;
 import org.coral.redis.storage.storage.RocksDbFactory;
 import org.coral.redis.storage.utils.ByteUtils;
 import org.helium.perfmon.Stopwatch;
@@ -23,7 +23,7 @@ public class RcpMetaDb extends RcpBaseDb {
 	private RocksDB rocksDB = null;
 
 	public RcpMetaDb() {
-		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbConstants.META_PATH);
+		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbPathConfig.getInstance().getMetaDb());
 	}
 
 	@Override

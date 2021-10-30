@@ -43,10 +43,10 @@ public class StringHandler implements CommandHandler {
 
 	@Override
 	public List<RedisMessage> process(String command, RedisMessage msgReq) throws Exception {
-		if (command.equals("set")) {
+		if (command.equalsIgnoreCase("set")) {
 			return processSet(msgReq);
 		}
-		if (command.equals("get")) {
+		if (command.equalsIgnoreCase("get")) {
 			return processGet(msgReq);
 		}
 		return null;

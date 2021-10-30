@@ -2,6 +2,7 @@ package org.coral.redis.test.cluster;
 
 import org.coral.redis.cluster.RedisSlave;
 import org.coral.redis.service.RedisService;
+import org.coral.redis.storage.storage.RocksDbPathConfig;
 
 import java.io.IOException;
 
@@ -13,6 +14,7 @@ public class RedisSlaveTest {
 	public static void main(String[] args) throws IOException {
 		RedisSlave redisSlave = new RedisSlave();
 		RedisService.run(6399);
+		RocksDbPathConfig.getInstance().setBasePath("./slave");
 		redisSlave.start("127.0.0.1", 6389);
 
 	}

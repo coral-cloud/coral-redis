@@ -5,7 +5,7 @@ import org.coral.redis.storage.entity.data.RcpStringKey;
 import org.coral.redis.storage.entity.data.RcpStringRow;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;
-import org.coral.redis.storage.storage.RocksDbConstants;
+import org.coral.redis.storage.storage.RocksDbPathConfig;
 import org.coral.redis.storage.storage.RocksDbFactory;
 import org.helium.perfmon.Stopwatch;
 import org.rocksdb.RocksDB;
@@ -22,7 +22,7 @@ public class RcpStringDb extends RcpBaseDb {
 	private RocksDB rocksDB = null;
 
 	public RcpStringDb() {
-		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbConstants.DB_STRING_PATH);
+		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbPathConfig.getInstance().getStringDb());
 	}
 
 	@Override

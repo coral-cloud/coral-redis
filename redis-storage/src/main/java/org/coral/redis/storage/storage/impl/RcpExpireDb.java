@@ -5,7 +5,7 @@ import org.coral.redis.storage.entity.data.RcpExpireKey;
 import org.coral.redis.storage.entity.data.RcpExpireRow;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;
-import org.coral.redis.storage.storage.RocksDbConstants;
+import org.coral.redis.storage.storage.RocksDbPathConfig;
 import org.coral.redis.storage.storage.RocksDbFactory;
 import org.helium.perfmon.Stopwatch;
 import org.rocksdb.RocksDB;
@@ -27,7 +27,7 @@ public class RcpExpireDb extends RcpBaseDb {
 	}
 
 	public RcpExpireDb() {
-		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbConstants.EXPIRE_PATH);
+		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbPathConfig.getInstance().getExpireDb());
 	}
 
 	private static class StorageClientExpireInit {

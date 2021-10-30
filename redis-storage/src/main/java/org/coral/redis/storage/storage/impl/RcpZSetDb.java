@@ -3,7 +3,7 @@ package org.coral.redis.storage.storage.impl;
 import org.coral.redis.storage.entity.data.*;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;
-import org.coral.redis.storage.storage.RocksDbConstants;
+import org.coral.redis.storage.storage.RocksDbPathConfig;
 import org.coral.redis.storage.storage.RocksDbFactory;
 import org.helium.perfmon.Stopwatch;
 import org.rocksdb.RocksDB;
@@ -24,7 +24,7 @@ public class RcpZSetDb extends RcpBaseDb {
 	private RocksDB rocksDB = null;
 
 	public RcpZSetDb() {
-		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbConstants.DB_ZSET_PATH);
+		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbPathConfig.getInstance().getZsetDb());
 	}
 
 	@Override

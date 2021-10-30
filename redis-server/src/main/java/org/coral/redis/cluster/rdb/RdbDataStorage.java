@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class RdbDataStorage {
 	public static byte[] getData() throws IOException {
-		return getData(UUID.randomUUID().toString());
+		return getData("0007");
 	}
 	public static byte[] getData(String version) throws IOException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

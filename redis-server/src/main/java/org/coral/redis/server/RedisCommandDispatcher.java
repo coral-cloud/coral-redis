@@ -1,5 +1,6 @@
 package org.coral.redis.server;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.redis.*;
 import org.coral.redis.command.RedisCommand;
@@ -24,7 +25,7 @@ public class RedisCommandDispatcher {
 	 * @param msg
 	 * @return
 	 */
-	public List<RedisMessage> processCommand(RedisMessage msg) {
+	public List<RedisMessage> processCommand(ChannelHandlerContext ctx, RedisMessage msg) {
 		try {
 			String command = getCommand(msg);
 			if (LOGGER.isDebugEnabled()) {
@@ -32,7 +33,7 @@ public class RedisCommandDispatcher {
 			}
 			RedisCommand redisCmd = RedisCommand.getSupportCmd(command);
 			if (redisCmd != null && redisCmd.getCmdHander() != null) {
-				return redisCmd.getCmdHander().process(command, msg);
+				return redisCmd.getCmdHander().process(ctx, command, msg);
 
 			}
 		} catch (Exception e) {

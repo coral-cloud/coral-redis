@@ -1,20 +1,17 @@
 package org.coral.redis.storage.storage;
 
+
 /**
- *
  * @author wuhao
  * @createTime 2021-07-27 11:38:00
  */
 public class RocksDbPathConfig {
-	private String basePath = "./";
-	private String stringDb = "rocksdb/dbstring/";
-	private String hashDb = "rocksdb/dbhash/";
-	private String listDb = "rocksdb/dblist/";
-	private String setDb = "rocksdb/dbset/";
-	private String zsetDb = "rocksdb/dbzset/";
-	private String expireDb = "rocksdb/expire/";
-	private String metaDb = "rocksdb/meta/";
-	private String binlogDb = "rocksdb/binlog/";
+	private String basePath = "";
+	private String dataDb = "/rocksdb/db/";
+	private String expireDb = "/rocksdb/expire/";
+	private String metaDb = "/rocksdb/meta/";
+	private String binlogDb = "/rocksdb/binlog/";
+
 
 	public static RocksDbPathConfig instance = new RocksDbPathConfig();
 
@@ -31,34 +28,36 @@ public class RocksDbPathConfig {
 	}
 
 	public String getStringDb() {
-		return basePath + stringDb;
+		return getBasePath() + dataDb;
 	}
 
 	public String getHashDb() {
-		return basePath + hashDb;
+		return getStringDb();
 	}
 
 	public String getListDb() {
-		return basePath + listDb;
+		return getStringDb();
 	}
 
 	public String getSetDb() {
-		return basePath + setDb;
+		return getStringDb();
 	}
 
 	public String getZsetDb() {
-		return basePath + zsetDb;
+		return getStringDb();
 	}
 
 	public String getExpireDb() {
-		return basePath + expireDb;
+		return getBasePath() + expireDb;
 	}
 
 	public String getMetaDb() {
-		return basePath + metaDb;
+		return getBasePath() + metaDb;
 	}
 
 	public String getBinlogDb() {
-		return basePath + binlogDb;
+		return getBasePath() + binlogDb;
 	}
+
+
 }

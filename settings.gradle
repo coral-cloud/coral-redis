@@ -1,7 +1,4 @@
-rootProject.name = 'rcpredis'
-//helium-common
-include 'redis-common'
+rootProject.name = 'letterdb'
 include 'redis-storage'
 include 'redis-client'
 include 'redis-server'
-include 'redis-cluster'

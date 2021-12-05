@@ -1,5 +1,6 @@
 package org.coral.redis.server.handler;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.redis.RedisMessage;
 
 import java.io.IOException;
@@ -19,5 +20,5 @@ public interface CommandHandler {
 	 * @return
 	 * @throws Exception
 	 */
-	List<RedisMessage> process(String command, RedisMessage msgReq) throws Exception;
+	List<RedisMessage> process(ChannelHandlerContext ctx, String command, RedisMessage msgReq) throws Exception;
 }

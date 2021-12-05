@@ -1,5 +1,6 @@
 package org.coral.redis.server.handler;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.redis.ArrayRedisMessage;
 import io.netty.handler.codec.redis.RedisMessage;
 import org.coral.redis.perfmon.RedisCounters;
@@ -71,7 +72,7 @@ public class ZSetHandler implements CommandHandler {
 	}
 
 	@Override
-	public List<RedisMessage> process(String command, RedisMessage msgReq) throws Exception {
+	public List<RedisMessage> process(ChannelHandlerContext ctx, String command, RedisMessage msgReq) throws Exception {
 		if (command.equals("zadd")) {
 			return processZAdd(msgReq);
 		}

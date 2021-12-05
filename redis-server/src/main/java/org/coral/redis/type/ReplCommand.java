@@ -10,4 +10,5 @@ public class ReplCommand {
 	public static final String LISTENING_PORT = "listening-port";
 	public static final String IP_ADDRESS = "ip-address";
 	public static final String CAPA = "capa";
+	public static final String ACK = "ack";
 }

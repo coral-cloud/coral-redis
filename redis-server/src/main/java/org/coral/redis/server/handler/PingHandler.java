@@ -1,5 +1,6 @@
 package org.coral.redis.server.handler;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.redis.RedisMessage;
 import org.coral.redis.server.RedisMessageFactory;
 
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class PingHandler implements CommandHandler {
 	@Override
-	public List<RedisMessage> process(String command, RedisMessage msgReq) throws Exception {
+	public List<RedisMessage> process(ChannelHandlerContext ctx, String command, RedisMessage msgReq) throws Exception {
 		if (command.equalsIgnoreCase("PING")) {
 			return Arrays.asList(RedisMessageFactory.buildPONG());
 		} else {

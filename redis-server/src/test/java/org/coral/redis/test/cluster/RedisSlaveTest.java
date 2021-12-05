@@ -14,7 +14,7 @@ public class RedisSlaveTest {
 	public static void main(String[] args) throws IOException {
 		RedisSlave redisSlave = new RedisSlave();
 		RedisService.run(6399);
-		RocksDbPathConfig.getInstance().setBasePath("./slave");
+		RocksDbPathConfig.getInstance().setBasePath("/tmp/slave");
 		redisSlave.start("127.0.0.1", 6389);
 
 	}

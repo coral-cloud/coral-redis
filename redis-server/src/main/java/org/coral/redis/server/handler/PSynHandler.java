@@ -5,7 +5,14 @@ import io.netty.handler.codec.redis.ArrayRedisMessage;
 import io.netty.handler.codec.redis.RedisMessage;
 import org.coral.redis.cluster.rdb.RdbDataStorage;
 import org.coral.redis.server.RedisMessageFactory;
+import org.coral.redis.storage.entity.data.RcpStringData;
+import org.coral.redis.storage.entity.data.RcpType;
+import org.coral.redis.storage.expire.RcpStorageExpireTask;
+import org.coral.redis.storage.expire.RcpStorageSynTask;
+import org.coral.redis.storage.protostuff.ObjectUtils;
 import org.coral.redis.uils.IdUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,16 +24,37 @@ import java.util.List;
  */
 
 public class PSynHandler implements CommandHandler {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PSynHandler.class);
+
 
 	@Override
 	public List<RedisMessage> process(ChannelHandlerContext ctx, String command, RedisMessage msgReq) throws Exception {
 		RedisMessage redisSync = RedisMessageFactory.buildSimple(getRespCommand());
 		RedisMessage redisMessageData = RedisMessageFactory.buildData(RdbDataStorage.getData());
 
-		Thread thread = new Thread(new SynTask(ctx));
-		thread.start();
+		synData(ctx);
 
 		return Arrays.asList(redisSync, redisMessageData);
+	}
+
+	public void synData(ChannelHandlerContext ctx) {
+		RcpStorageSynTask.start(0, (key, value) -> {
+
+			if (value.getRcpType() == RcpType.STRING){
+
+				RedisMessage redisMessageCmd = RedisMessageFactory.buildData("set".getBytes());
+				RedisMessage redisMessageKey = RedisMessageFactory.buildData(key.getKey());
+				RcpStringData rcpStringData = ObjectUtils.toObject(value.getContent(), RcpStringData.class);
+				RedisMessage redisMessageValue = RedisMessageFactory.buildData(rcpStringData.getContent());
+				ArrayRedisMessage redisMessage = new ArrayRedisMessage(Arrays.asList(redisMessageCmd, redisMessageKey, redisMessageValue));
+				ctx.writeAndFlush(redisMessage);
+				if (LOGGER.isInfoEnabled()){
+					LOGGER.info("synData: key: {}, value: {}", new String(key.getKey()), new String(rcpStringData.getContent()));
+				}
+			}
+
+
+		});
 	}
 
 	public String getRespCommand() {
@@ -35,32 +63,4 @@ public class PSynHandler implements CommandHandler {
 	}
 
 
-	public static class SynTask implements Runnable {
-		private ChannelHandlerContext ctx;
-
-		public SynTask(ChannelHandlerContext ctx) {
-			this.ctx = ctx;
-		}
-
-		@Override
-		public void run() {
-			for (int i = 0; i < 10000; i++) {
-				try {
-					Thread.sleep(1000);
-					synData(ctx, i + "");
-					System.out.println("syn " + i);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	public static void synData(ChannelHandlerContext ctx, String key) {
-		RedisMessage redisMessageCmd = RedisMessageFactory.buildData("set".getBytes());
-		RedisMessage redisMessageKey = RedisMessageFactory.buildData(key.getBytes());
-		RedisMessage redisMessageValue = RedisMessageFactory.buildData(key.getBytes());
-		ArrayRedisMessage redisMessage = new ArrayRedisMessage(Arrays.asList(redisMessageCmd, redisMessageKey, redisMessageValue));
-		ctx.writeAndFlush(redisMessage);
-	}
 }

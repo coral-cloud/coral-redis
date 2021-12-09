@@ -1,8 +1,6 @@
 package org.coral.redis.storage.storage.impl;
 
-import org.coral.redis.storage.entity.data.RcpStringData;
-import org.coral.redis.storage.entity.data.RcpStringKey;
-import org.coral.redis.storage.entity.data.RcpStringRow;
+import org.coral.redis.storage.entity.data.*;
 import org.coral.redis.storage.perfmon.StorageCounters;
 import org.coral.redis.storage.protostuff.ObjectUtils;
 import org.coral.redis.storage.storage.RocksDbPathConfig;
@@ -41,17 +39,17 @@ public class RcpStringDb extends RcpBaseDb {
 	/**
 	 * set
 	 *
-	 * @param rcpStringRow
+	 * @param row
 	 * @return
 	 */
-	public boolean set(RcpStringRow rcpStringRow) {
+	public boolean set(RcpStringRow row) {
 		Stopwatch stopwatch = StorageCounters.getInstance("set-string").getTx().begin();
 		try {
-
-			rocksDB.put(rcpStringRow.getRcpStringKey().getKey(), rcpStringRow.getRcpStringData().getBytes());
+			byte[] content = RcpContent.encode(RcpType.STRING, row.getRcpStringData().getBytes());
+			rocksDB.put(row.getRcpStringKey().getKey(), content);
 			stopwatch.end();
 		} catch (Exception e) {
-			LOGGER.error("set exception:{}", rcpStringRow.getRcpStringKey().getKeyString(), e);
+			LOGGER.error("set exception:{}", row.getRcpStringKey().getKeyString(), e);
 			stopwatch.fail(e.getMessage());
 			return false;
 		}
@@ -73,7 +71,11 @@ public class RcpStringDb extends RcpBaseDb {
 				stopwatch.end();
 				return null;
 			}
-			RcpStringData rcpStringData = (RcpStringData) ObjectUtils.toObject(content, RcpStringData.class);
+			RcpContent rcpContent = RcpContent.decode(content);
+			if (rcpContent.getRcpType() != RcpType.STRING) {
+				return null;
+			}
+			RcpStringData rcpStringData = ObjectUtils.toObject(rcpContent.getContent(), RcpStringData.class);
 			stopwatch.end();
 			//快速过期
 			if (rcpStringData.isExpire()) {

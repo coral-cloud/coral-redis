@@ -54,7 +54,7 @@ public class RcpStorageExpireTask implements Runnable {
 		} catch (Exception e) {
 			LOGGER.error("StorageExpireTask Expire Exception:{}", e.getMessage());
 		} finally {
-			Thread.sleep(30000);
+			Thread.sleep(1000);
 		}
 	}
 

@@ -56,7 +56,7 @@ public class RocksDbPathConfig {
 	}
 
 	public String getBinlogDb() {
-		return getBasePath() + binlogDb;
+		return getStringDb();
 	}
 
 

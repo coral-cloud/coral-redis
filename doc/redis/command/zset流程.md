@@ -1,5 +1,6 @@
-## zset信令
+## 1.zset信令
 
+### 1.2. zadd zrange
 ```
 *6
 $4
@@ -140,7 +141,7 @@ $2
 
 ```
 
-### zrange withscores
+### 1.2 zrange withscores
 ```
 *5
 $6

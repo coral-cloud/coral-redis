@@ -1,4 +1,5 @@
-## cluster info
+## 1.cluster基础信息
+### 1.1.cluster info
 ```
 *2
 $7
@@ -21,7 +22,7 @@ cluster_stats_messages_sent:0
 cluster_stats_messages_received:0
 ```
 
-## cluster nodes
+### 1.2.cluster nodes
 ```
 *2
 $7
@@ -35,7 +36,7 @@ $102
 184833235217c242457768709178276ee67b1852 127.0.0.1:7005@17005 myself,master - 0 0 1 connected 0-16383
 ```
 
-## cluster help
+## 1.3.cluster help
 ```
 *2
 $7
@@ -71,7 +72,7 @@ help
 +    start, end, master and replicas IP addresses, ports and ids
 ```
 
-## cluster myid
+## 1.4.cluster myid
 ```
 *2
 $7
@@ -84,3 +85,6 @@ myid
 $40
 184833235217c242457768709178276ee67b1852
 ```
+
+## 2.cluster落点同步
+

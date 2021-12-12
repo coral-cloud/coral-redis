@@ -1,8 +1,10 @@
 package org.coral.redis.storage.expire;
 
-import org.coral.redis.storage.entity.data.*;
-import org.coral.redis.storage.protostuff.ObjectUtils;
+import org.coral.redis.storage.entity.data.RcpContent;
+import org.coral.redis.storage.entity.data.RcpExpireKey;
+import org.coral.redis.storage.entity.data.RcpKey;
 import org.coral.redis.storage.storage.impl.RcpBinlogDb;
+import org.helium.util.StringUtils;
 import org.rocksdb.RocksIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,15 +12,22 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
+/**
+ * @author wuhao
+ * @description: CommandHandler
+ * @createTime 2021/10/29 22:16:00
+ */
+
+
 public class RcpStorageSynTask implements Runnable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RcpStorageSynTask.class);
 
 	private AtomicBoolean runSyn = new AtomicBoolean(true);
-	private long start = 0;
+	private byte[] index;
 	private BiConsumer<RcpKey, RcpContent> synFun = null;
 
-	public RcpStorageSynTask(long start, BiConsumer<RcpKey, RcpContent> synFun) {
-		this.start = start;
+	public RcpStorageSynTask(byte[] index, BiConsumer<RcpKey, RcpContent> synFun) {
+		this.index = index;
 		this.synFun = synFun;
 	}
 
@@ -37,13 +46,11 @@ public class RcpStorageSynTask implements Runnable {
 	public void sysTask() throws InterruptedException {
 		try {
 			RocksIterator rocksIterator = RcpBinlogDb.getInstance().getRocksDB().newIterator();
-			if (start < 1) {
+			if (index == null || index.length < 1) {
 				rocksIterator.seekToFirst();
 			} else {
-				//TODO 增量同步
-				rocksIterator.seek("".getBytes());
+				rocksIterator.seek(index);
 			}
-
 			while (rocksIterator.isValid()) {
 				byte[] keyBytes = rocksIterator.key();
 				byte[] valueBytes = rocksIterator.value();
@@ -65,8 +72,8 @@ public class RcpStorageSynTask implements Runnable {
 	}
 
 
-	public static void start(long start, BiConsumer<RcpKey, RcpContent> synFun) {
-		Thread thread = new Thread(new RcpStorageSynTask(start, synFun));
+	public static void start(byte[] index, BiConsumer<RcpKey, RcpContent> synFun) {
+		Thread thread = new Thread(new RcpStorageSynTask(index, synFun));
 		thread.setDaemon(true);
 		thread.start();
 	}

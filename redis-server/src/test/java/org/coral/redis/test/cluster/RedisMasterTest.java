@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public class RedisMasterTest {
 	public static void main(String[] args) throws IOException {
-		RocksDbPathConfig.getInstance().setBasePath("/tmp/master");
+		RocksDbPathConfig.getInstance().setBasePath("/Users/wuhao/data/code/coral-learning/coral-redis/master");
 		RedisService.run(6389);
 
 	}

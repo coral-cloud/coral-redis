@@ -115,25 +115,25 @@ SSCAN                        |                 |                                
 
 ## 6.SortedSet（有序集合）
 
-命令                           | 描述            | 示例                            |  备注
-------------                  |--------------   |----------                      |  -----
-ZADD                       |                 |                                |
-ZCARD                       |                 |                                |
-ZCOUNT                       |                 |                                |
-ZINCRBY                       |                 |                                |
-ZRANGE                       |                 |                                |
-ZRANGEBYSCORE                       |                 |                                |
-ZRANK                       |                 |                                |
-ZREM                       |                 |                                |
-ZREMRANGEBYRANK                       |                 |                                |
-ZREMRANGEBYSCORE                       |                 |                                |
-ZREVRANGE                       |                 |                                |
-ZREVRANGEBYSCORE                       |                 |                                |
-ZREVRANK                       |                 |                                |
-ZSCORE                       |                 |                                |
-ZUNIONSTORE                       |                 |                                |
-ZINTERSTORE                       |                 |                                |
-ZSCAN                       |                 |                                |
+命令                           | 描述                       | 示例                            |  备注
+------------                  |-----------------          |----------                      |  -----
+ZADD                          |                           |                                |
+ZCARD                         |                 |                                |
+ZCOUNT                        |                 |                                |
+ZINCRBY                       |                             |                                |
+ZRANGE                        | 有序集合按(索引)score递增(小—>大) | ZRANGE salary 1 2 WITHSCORES                  | ZRANGE key start stop [WITHSCORES]
+ZRANGEBYSCORE                 | 有序集合按(分数)score递增(小->大) | ZRANGEBYSCORE salary -inf +inf WITHSCORES     | ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]
+ZRANK                         | 有序集合中member排名(小-大)      | ZRANK salary tom   (0开始计数)                 | ZRANK key member
+ZREM                          |                 |                                |
+ZREMRANGEBYRANK               |                 |                                |
+ZREMRANGEBYSCORE              |                 |                                |
+ZREVRANGE                     |                 |                                |
+ZREVRANGEBYSCORE              | 有序集合按score递减(大->小) | ZREVRANGEBYSCORE salary 10000 2000            | ZREVRANGEBYSCORE key max min [WITHSCORES] [LIMIT offset count]
+ZREVRANK                      |                 |                                |
+ZSCORE                        |                 |                                |
+ZUNIONSTORE                   |                 |                                |
+ZINTERSTORE                   |                 |                                |
+ZSCAN                         |                 |                                |
 
 ## 7.Pub/Sub（发布/订阅）
 

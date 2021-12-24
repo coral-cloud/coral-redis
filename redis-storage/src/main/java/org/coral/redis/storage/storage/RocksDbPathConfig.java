@@ -27,24 +27,28 @@ public class RocksDbPathConfig {
 		return basePath;
 	}
 
-	public String getStringDb() {
+	public String getDataDb() {
 		return getBasePath() + dataDb;
 	}
 
+	public String getStringDb() {
+		return getDataDb();
+	}
+
 	public String getHashDb() {
-		return getStringDb();
+		return getDataDb();
 	}
 
 	public String getListDb() {
-		return getStringDb();
+		return getDataDb();
 	}
 
 	public String getSetDb() {
-		return getStringDb();
+		return getDataDb();
 	}
 
-	public String getZsetDb() {
-		return getStringDb();
+	public String getZSetDb() {
+		return getDataDb();
 	}
 
 	public String getExpireDb() {
@@ -56,7 +60,7 @@ public class RocksDbPathConfig {
 	}
 
 	public String getBinlogDb() {
-		return getStringDb();
+		return getBasePath() + binlogDb;
 	}
 
 

@@ -24,7 +24,7 @@ public class RcpZSetDb extends RcpBaseDb {
 	private RocksDB rocksDB = null;
 
 	public RcpZSetDb() {
-		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbPathConfig.getInstance().getZsetDb());
+		this.rocksDB = RocksDbFactory.getRocksDB(RocksDbPathConfig.getInstance().getZSetDb());
 	}
 
 	@Override

@@ -4,16 +4,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.redis.ArrayRedisMessage;
 import io.netty.handler.codec.redis.RedisMessage;
 import org.coral.redis.cluster.rdb.RdbDataStorage;
+import org.coral.redis.manager.AliveProcessTask;
 import org.coral.redis.manager.NodeManager;
 import org.coral.redis.server.RedisMessageFactory;
 import org.coral.redis.storage.entity.data.RcpStringData;
 import org.coral.redis.storage.entity.data.RcpType;
-import org.coral.redis.storage.expire.RcpStorageExpireTask;
 import org.coral.redis.storage.expire.RcpStorageSynTask;
 import org.coral.redis.storage.protostuff.ObjectUtils;
-import org.coral.redis.uils.IdUtils;
 import org.coral.redis.uils.RedisMsgUtils;
-import org.helium.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,56 +28,22 @@ import java.util.List;
 public class PSynHandler implements CommandHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PSynHandler.class);
 
-
 	@Override
 	public List<RedisMessage> process(ChannelHandlerContext ctx, String command, RedisMessage msgReq) throws Exception {
-		;
-		if (!(msgReq instanceof ArrayRedisMessage)){
+
+		if (!(msgReq instanceof ArrayRedisMessage)) {
 			return Arrays.asList(RedisMessageFactory.buildError());
 		}
 		ArrayRedisMessage req = (ArrayRedisMessage) msgReq;
-		String uid  = "";
-		if (req.children().size() > 2){
-			uid = RedisMsgUtils.getString(req.children().get(1));;
+		String uid = "";
+		if (req.children().size() > 2) {
+			uid = RedisMsgUtils.getString(req.children().get(1));
 		}
-		byte[] index = NodeManager.getIndex(uid);
+		uid = NodeManager.getUid(uid);
+		startSyn(uid, ctx);
+		AliveProcessTask.addTask(uid, ctx);
 
-		synData(ctx, uid);
-
-		return (index != null) ? synAddData() : synFullData(uid);
-	}
-
-	private List<RedisMessage> synFullData(String uid) throws IOException {
-		RedisMessage redisSync = RedisMessageFactory.buildSimple(getFullResp(uid));
-		RedisMessage redisMessageData = RedisMessageFactory.buildData(RdbDataStorage.getData());
-		return Arrays.asList(redisSync, redisMessageData);
-
-	}
-	private List<RedisMessage> synAddData(){
-		RedisMessage redisSync = RedisMessageFactory.buildSimple(getAddResp());
-		return Arrays.asList(redisSync);
-	}
-
-	public void synData(ChannelHandlerContext ctx,  String uid) {
-		byte[] index = NodeManager.getIndex(uid);
-		RcpStorageSynTask.start(index, (key, value) -> {
-
-			if (value.getRcpType() == RcpType.STRING) {
-
-				RedisMessage redisMessageCmd = RedisMessageFactory.buildData("set".getBytes());
-				RedisMessage redisMessageKey = RedisMessageFactory.buildData(key.getKey());
-				RcpStringData rcpStringData = ObjectUtils.toObject(value.getContent(), RcpStringData.class);
-				RedisMessage redisMessageValue = RedisMessageFactory.buildData(rcpStringData.getContent());
-				ArrayRedisMessage redisMessage = new ArrayRedisMessage(Arrays.asList(redisMessageCmd, redisMessageKey, redisMessageValue));
-				ctx.writeAndFlush(redisMessage);
-				NodeManager.setIndex(uid, key.getKey());
-				if (LOGGER.isInfoEnabled()) {
-					LOGGER.info("synData: key: {}, value: {}", new String(key.getKey()), new String(rcpStringData.getContent()));
-				}
-			}
-
-
-		});
+		return (NodeManager.getIndex(uid) != null) ? synAddData() : synFullData(uid);
 	}
 
 	/**
@@ -88,16 +52,68 @@ public class PSynHandler implements CommandHandler {
 	 * @param uid
 	 * @return
 	 */
-	private String getFullResp(String uid) {
+	private List<RedisMessage> synFullData(String uid) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		sb.append("FULLRESYNC ").append(uid).append(" 1");
-		return sb.toString();
+		RedisMessage redisSync = RedisMessageFactory.buildSimple(sb.toString());
+		RedisMessage redisMessageData = RedisMessageFactory.buildData(RdbDataStorage.getData());
+		return Arrays.asList(redisSync, redisMessageData);
+
 	}
 
-	private String getAddResp(){
-		return "CONTINUE";
+	/**
+	 * @return
+	 */
+	private List<RedisMessage> synAddData() {
+		RedisMessage redisSync = RedisMessageFactory.buildSimple("CONTINUE");
+		return Arrays.asList(redisSync);
 	}
 
+
+	/**
+	 *
+	 * @param uid
+	 * @param ctx
+	 */
+	public static void startSyn(String uid, ChannelHandlerContext ctx) {
+		byte[] index = NodeManager.getIndex(uid);
+		RcpStorageSynTask rcpStorageSynTask = RcpStorageSynTask.start(index, (key, value) -> {
+
+			if (value.getRcpType() == RcpType.STRING) {
+				try {
+					if (!ctx.channel().isWritable()) {
+						stopSyn(uid);
+					}
+					RedisMessage redisMessageCmd = RedisMessageFactory.buildData("set".getBytes());
+					RedisMessage redisMessageKey = RedisMessageFactory.buildData(key.getKey());
+					RcpStringData rcpStringData = ObjectUtils.toObject(value.getContent(), RcpStringData.class);
+					RedisMessage redisMessageValue = RedisMessageFactory.buildData(rcpStringData.getContent());
+					ArrayRedisMessage redisMessage = new ArrayRedisMessage(Arrays.asList(redisMessageCmd, redisMessageKey, redisMessageValue));
+					ctx.writeAndFlush(redisMessage);
+					if (LOGGER.isInfoEnabled()) {
+						LOGGER.info("synData: key: {}, value: {}", new String(key.getKey()), new String(rcpStringData.getContent()));
+					}
+					NodeManager.setIndex(uid, key.getKey());
+				} catch (Exception e) {
+					LOGGER.error("synData Exception:{}:{}", uid, ctx.channel().remoteAddress(), e);
+					stopSyn(uid);
+				}
+			}
+		});
+		NodeManager.setTask(uid, rcpStorageSynTask);
+	}
+
+	/**
+	 * 关闭同步
+	 *
+	 * @param uid
+	 */
+	public static void stopSyn(String uid) {
+		RcpStorageSynTask rcpStorageSynTask = NodeManager.getTask(uid);
+		if (rcpStorageSynTask != null) {
+			rcpStorageSynTask.stopTask();
+		}
+	}
 
 
 }

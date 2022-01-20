@@ -14,6 +14,7 @@ import java.util.function.BiConsumer;
 
 /**
  * @author wuhao
+ *
  * @description: CommandHandler
  * @createTime 2021/10/29 22:16:00
  */
@@ -33,11 +34,15 @@ public class RcpStorageSynTask implements Runnable {
 
 	@Override
 	public void run() {
-		try {
-			sysTask();
-		} catch (InterruptedException e) {
-			LOGGER.error("sysTask Exception", e);
+
+		while (runSyn.get()){
+			try {
+				sysTask();
+			} catch (Exception e){
+				LOGGER.error("sysTask Exception", e);
+			}
 		}
+
 	}
 
 	/**
@@ -71,10 +76,18 @@ public class RcpStorageSynTask implements Runnable {
 		}
 	}
 
+	public void stopTask(){
+		runSyn.set(false);
+	}
 
-	public static void start(byte[] index, BiConsumer<RcpKey, RcpContent> synFun) {
-		Thread thread = new Thread(new RcpStorageSynTask(index, synFun));
+	public static RcpStorageSynTask start(byte[] index, BiConsumer<RcpKey, RcpContent> synFun) {
+		RcpStorageSynTask rcpStorageSynTask = new RcpStorageSynTask(index, synFun);
+		Thread thread = new Thread(rcpStorageSynTask);
 		thread.setDaemon(true);
 		thread.start();
+		return rcpStorageSynTask;
+	}
+	public static void stop(RcpStorageSynTask storageSynTask) {
+		storageSynTask.stopTask();
 	}
 }

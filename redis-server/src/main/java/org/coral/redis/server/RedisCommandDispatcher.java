@@ -28,8 +28,8 @@ public class RedisCommandDispatcher {
 	public List<RedisMessage> processCommand(ChannelHandlerContext ctx, RedisMessage msg) {
 		try {
 			String command = getCommand(msg);
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("RedisCommandDispatcher:{}", command);
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info("processCommand:{}", command);
 			}
 			RedisCommand redisCmd = RedisCommand.getSupportCmd(command);
 			if (redisCmd != null && redisCmd.getCmdHander() != null) {

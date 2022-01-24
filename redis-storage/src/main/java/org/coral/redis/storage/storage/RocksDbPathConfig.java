@@ -10,7 +10,7 @@ public class RocksDbPathConfig {
 	private String dataDb = "/rocksdb/db/";
 	private String expireDb = "/rocksdb/expire/";
 	private String metaDb = "/rocksdb/meta/";
-	private String binlogDb = "/rocksdb/binlog/";
+//	private String binlogDb = "/rocksdb/binlog/";
 
 
 	public static RocksDbPathConfig instance = new RocksDbPathConfig();
@@ -60,7 +60,7 @@ public class RocksDbPathConfig {
 	}
 
 	public String getBinlogDb() {
-		return getBasePath() + binlogDb;
+		return getDataDb();
 	}
 
 

@@ -1,10 +1,9 @@
-package org.coral.redis.storage.expire;
+package org.coral.redis.cluster.handler;
 
 import org.coral.redis.storage.entity.data.RcpContent;
 import org.coral.redis.storage.entity.data.RcpExpireKey;
 import org.coral.redis.storage.entity.data.RcpKey;
 import org.coral.redis.storage.storage.impl.RcpBinlogDb;
-import org.helium.util.StringUtils;
 import org.rocksdb.RocksIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,20 +13,18 @@ import java.util.function.BiConsumer;
 
 /**
  * @author wuhao
- *
  * @description: CommandHandler
  * @createTime 2021/10/29 22:16:00
  */
 
-
-public class RcpStorageSynTask implements Runnable {
-	private static final Logger LOGGER = LoggerFactory.getLogger(RcpStorageSynTask.class);
+public class RcpSynStorageHandler implements Runnable {
+	private static final Logger LOGGER = LoggerFactory.getLogger(RcpSynStorageHandler.class);
 
 	private AtomicBoolean runSyn = new AtomicBoolean(true);
 	private byte[] index;
 	private BiConsumer<RcpKey, RcpContent> synFun = null;
 
-	public RcpStorageSynTask(byte[] index, BiConsumer<RcpKey, RcpContent> synFun) {
+	public RcpSynStorageHandler(byte[] index, BiConsumer<RcpKey, RcpContent> synFun) {
 		this.index = index;
 		this.synFun = synFun;
 	}
@@ -35,10 +32,10 @@ public class RcpStorageSynTask implements Runnable {
 	@Override
 	public void run() {
 
-		while (runSyn.get()){
+		while (runSyn.get()) {
 			try {
 				sysTask();
-			} catch (Exception e){
+			} catch (Exception e) {
 				LOGGER.error("sysTask Exception", e);
 			}
 		}
@@ -55,6 +52,9 @@ public class RcpStorageSynTask implements Runnable {
 				rocksIterator.seekToFirst();
 			} else {
 				rocksIterator.seek(index);
+				if (rocksIterator.isValid()) {
+					rocksIterator.next();
+				}
 			}
 			while (rocksIterator.isValid()) {
 				byte[] keyBytes = rocksIterator.key();
@@ -76,18 +76,16 @@ public class RcpStorageSynTask implements Runnable {
 		}
 	}
 
-	public void stopTask(){
+	public void stopTask() {
 		runSyn.set(false);
 	}
 
-	public static RcpStorageSynTask start(byte[] index, BiConsumer<RcpKey, RcpContent> synFun) {
-		RcpStorageSynTask rcpStorageSynTask = new RcpStorageSynTask(index, synFun);
-		Thread thread = new Thread(rcpStorageSynTask);
-		thread.setDaemon(true);
-		thread.start();
-		return rcpStorageSynTask;
+	public byte[] getIndex() {
+		return index;
 	}
-	public static void stop(RcpStorageSynTask storageSynTask) {
-		storageSynTask.stopTask();
+
+	public void setIndex(byte[] index) {
+		this.index = index;
 	}
+
 }

@@ -1,4 +1,4 @@
-package org.coral.redis.manager;
+package org.coral.redis.task;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.redis.RedisMessage;
@@ -9,18 +9,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author wuhao
- * @description: manager
- * @createTime 2021/12/11 13:01:00
+ * @description: SlaveProcessManager
+ * @createTime 2021/12/14 23:46:00
  */
 
-public class AliveProcessTask {
+public class RcpRealTimeTask {
+	private BlockingQueue<RedisMessage> blockingQueue = new ArrayBlockingQueue<RedisMessage>(100);
+
 	private static final int MAX_NODE = 1024;
 	private static AtomicBoolean runAlive = new AtomicBoolean(false);
 	private static final Logger LOGGER = LoggerFactory.getLogger(AliveProcessTask.class);
@@ -35,6 +35,12 @@ public class AliveProcessTask {
 	};
 
 	public static void addTask(String key, ChannelHandlerContext ctx) {
+		if (runAlive.compareAndSet(false, true)) {
+			run();
+		}
+		aliveMap.put(key, ctx);
+	}
+	public static void addMsg(String key, ChannelHandlerContext ctx) {
 		if (runAlive.compareAndSet(false, true)) {
 			run();
 		}
@@ -58,11 +64,12 @@ public class AliveProcessTask {
 					PSynHandler.stopSyn(key);
 					aliveMap.remove(key);
 				}
-				LOGGER.info("ping : {}", key);
+				if (LOGGER.isDebugEnabled()){
+					LOGGER.info("ping : {}", key);
+				}
+
 
 			}
 		}, 10, 10, TimeUnit.SECONDS);
 	}
-
-
 }

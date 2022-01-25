@@ -1,5 +1,7 @@
 package org.coral.redis.cluster;
 
+import org.coral.redis.cluster.slave.ReplicatorTask;
+
 import java.io.IOException;
 
 /**

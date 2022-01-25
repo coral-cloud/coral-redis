@@ -41,6 +41,10 @@ public class NodeContextManager {
 		CONTEXT_MAP.put(uid, nodeContext);
 	}
 
+	public static void removeContext(String uid) {
+		CONTEXT_MAP.remove(uid);
+	}
+
 	public static void updateIndex(String uid, byte[] index) {
 		NodeContext nodeContext = getContext(uid);
 		nodeContext.setIndex(index);

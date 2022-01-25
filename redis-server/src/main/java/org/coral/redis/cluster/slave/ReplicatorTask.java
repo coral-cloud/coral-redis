@@ -1,4 +1,4 @@
-package org.coral.redis.cluster;
+package org.coral.redis.cluster.slave;
 
 import com.moilioncircle.redis.replicator.Configuration;
 import com.moilioncircle.redis.replicator.RedisReplicator;
@@ -9,6 +9,7 @@ import com.moilioncircle.redis.replicator.event.EventListener;
 import com.moilioncircle.redis.replicator.event.PostRdbSyncEvent;
 import com.moilioncircle.redis.replicator.event.PreRdbSyncEvent;
 import com.moilioncircle.redis.replicator.rdb.datatype.KeyStringValueString;
+import org.coral.redis.cluster.RedisSlave;
 import org.coral.redis.storage.RcpProxyMeta;
 import org.coral.redis.storage.RcpProxyString;
 import org.coral.redis.storage.entity.meta.ServerMetaData;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
+ *
  * @author wuhao
  * @createTime 2021-07-22 09:55:00
  */

@@ -2,19 +2,18 @@ package org.coral.redis.cluster.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.redis.RedisMessage;
-import org.coral.redis.server.RedisMessageFactory;
-import org.coral.redis.server.handler.PSynHandler;
-import org.coral.redis.task.AliveProcessTask;
+import org.coral.redis.manager.RcpSynManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 
 /**
- *
  * @author wuhao
  * @description: RcpSynRealTimeHandler
  * @createTime 2021/12/14 23:46:00
@@ -23,55 +22,79 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RcpSynRealTimeHandler {
 	private BlockingQueue<RedisMessage> blockingQueue = new ArrayBlockingQueue<RedisMessage>(100);
 
-	private static final int MAX_NODE = 1024;
-	private static AtomicBoolean runAlive = new AtomicBoolean(false);
-	private static final Logger LOGGER = LoggerFactory.getLogger(AliveProcessTask.class);
+	private final int MAX_NODE = 1024;
+	private AtomicBoolean runAlive = new AtomicBoolean(false);
 
-	private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
+	private final Logger LOGGER = LoggerFactory.getLogger(RcpSynRealTimeHandler.class);
 
-	private static LinkedHashMap<String, ChannelHandlerContext> aliveMap = new LinkedHashMap<String, ChannelHandlerContext>() {
+	private LinkedHashMap<String, ChannelHandlerContext> aliveMap = new LinkedHashMap<String, ChannelHandlerContext>() {
 		@Override
 		protected boolean removeEldestEntry(Map.Entry<String, ChannelHandlerContext> eldest) {
 			return size() > MAX_NODE;
 		}
 	};
 
-	public static void addTask(String key, ChannelHandlerContext ctx) {
-		if (runAlive.compareAndSet(false, true)) {
-			run();
-		}
-		aliveMap.put(key, ctx);
+
+	private RcpSynRealTimeHandler() {
 	}
-	public static void addMsg(String key, ChannelHandlerContext ctx) {
+	public void remove(String key){
+		aliveMap.remove(key);
+	}
+	/**
+	 * @param key
+	 * @param ctx
+	 */
+	public void addSyn(String key, ChannelHandlerContext ctx) {
 		if (runAlive.compareAndSet(false, true)) {
-			run();
+			runTask();
 		}
 		aliveMap.put(key, ctx);
 	}
 
-	public static void run() {
-		scheduledExecutorService.scheduleAtFixedRate(() -> {
-			for (Map.Entry<String, ChannelHandlerContext> entry : aliveMap.entrySet()) {
-				String key = entry.getKey();
-				try {
-					ChannelHandlerContext channelHandlerContext = entry.getValue();
-					if (!channelHandlerContext.channel().isWritable()){
-						aliveMap.remove(key);
-						PSynHandler.stopSyn(key);
+	/**
+	 * addMsg
+	 *
+	 * @param redisMessage
+	 */
+	public void addMsg(RedisMessage redisMessage) {
+		blockingQueue.add(redisMessage);
+
+	}
+
+	public void runTask() {
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						RedisMessage redisMessage = blockingQueue.take();
+						if (redisMessage != null) {
+							aliveMap.forEach(new BiConsumer<String, ChannelHandlerContext>() {
+								@Override
+								public void accept(String s, ChannelHandlerContext context) {
+									try {
+										context.writeAndFlush(redisMessage);
+									} catch (Exception e) {
+										RcpSynManager.stopSyn(s);
+										LOGGER.error("syn uid:{} error.", s, e);
+									}
+								}
+							});
+						}
+					} catch (Exception e) {
+						LOGGER.error("", e);
 					}
-					RedisMessage redisMessage = RedisMessageFactory.buildPING();
-					channelHandlerContext.writeAndFlush(redisMessage);
-				} catch (Exception e) {
-					LOGGER.error("ping exception:{}", key, e);
-					PSynHandler.stopSyn(key);
-					aliveMap.remove(key);
 				}
-				if (LOGGER.isDebugEnabled()){
-					LOGGER.info("ping : {}", key);
-				}
-
 
 			}
-		}, 10, 10, TimeUnit.SECONDS);
+		});
+		thread.start();
 	}
+
+	private static RcpSynRealTimeHandler realTimeHandler = new RcpSynRealTimeHandler();
+
+	public static RcpSynRealTimeHandler getInstance() {
+		return realTimeHandler;
+	}
+
 }

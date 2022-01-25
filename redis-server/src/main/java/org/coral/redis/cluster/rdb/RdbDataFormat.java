@@ -13,7 +13,7 @@ import java.util.UUID;
  * @createTime 2021/10/28 23:12:00
  */
 
-public class RdbDataStorage {
+public class RdbDataFormat {
 
 	public static byte[] getData() throws IOException {
 		return staticData();
@@ -68,7 +68,5 @@ public class RdbDataStorage {
 				(byte) 0x99, (byte) 0xea};
 		return data;
 	}
-	public static void main(String[] args) throws IOException {
-		System.out.println(getData());
-	}
+
 }

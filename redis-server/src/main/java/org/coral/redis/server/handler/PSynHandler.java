@@ -3,16 +3,10 @@ package org.coral.redis.server.handler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.redis.ArrayRedisMessage;
 import io.netty.handler.codec.redis.RedisMessage;
-import org.coral.redis.cluster.handler.RcpSynStorageHandler;
-import org.coral.redis.cluster.rdb.RdbDataStorage;
-import org.coral.redis.manager.NodeContext;
-import org.coral.redis.task.AliveProcessTask;
+import org.coral.redis.manager.RcpSynManager;
+import org.coral.redis.cluster.rdb.RdbDataFormat;
 import org.coral.redis.manager.NodeContextManager;
 import org.coral.redis.server.RedisMessageFactory;
-import org.coral.redis.storage.entity.data.RcpStringData;
-import org.coral.redis.storage.entity.data.RcpType;
-import org.coral.redis.task.RcpStorageSynTask;
-import org.coral.redis.storage.protostuff.ObjectUtils;
 import org.coral.redis.uils.RedisMsgUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +36,7 @@ public class PSynHandler implements CommandHandler {
 			uid = RedisMsgUtils.getString(req.children().get(1));
 		}
 		uid = NodeContextManager.updateUid(uid);
-		startSyn(uid, ctx);
-		AliveProcessTask.addTask(uid, ctx);
-
+		RcpSynManager.startSyn(uid, ctx);
 		return (NodeContextManager.getContext(uid) != null) ? synAddData() : synFullData(uid);
 	}
 
@@ -58,7 +50,7 @@ public class PSynHandler implements CommandHandler {
 		StringBuilder sb = new StringBuilder();
 		sb.append("FULLRESYNC ").append(uid).append(" 1");
 		RedisMessage redisSync = RedisMessageFactory.buildSimple(sb.toString());
-		RedisMessage redisMessageData = RedisMessageFactory.buildData(RdbDataStorage.getData());
+		RedisMessage redisMessageData = RedisMessageFactory.buildData(RdbDataFormat.getData());
 		return Arrays.asList(redisSync, redisMessageData);
 
 	}
@@ -71,54 +63,6 @@ public class PSynHandler implements CommandHandler {
 		return Arrays.asList(redisSync);
 	}
 
-
-	/**
-	 * startSyn
-	 * @param uid
-	 * @param ctx
-	 */
-	public static void startSyn(String uid, ChannelHandlerContext ctx) {
-		NodeContext nodeContext = NodeContextManager.getContext(uid);
-		if (nodeContext == null){
-			nodeContext = new NodeContext();
-			nodeContext.setRcpSynStorageHandler(new RcpSynStorageHandler(nodeContext.getIndex(), (key, value) -> {
-
-				if (value.getRcpType() == RcpType.STRING) {
-					try {
-						if (!ctx.channel().isWritable()) {
-							stopSyn(uid);
-						}
-						RedisMessage redisMessageCmd = RedisMessageFactory.buildData("set".getBytes());
-						RedisMessage redisMessageKey = RedisMessageFactory.buildData(key.getKey());
-						RcpStringData rcpStringData = ObjectUtils.toObject(value.getContent(), RcpStringData.class);
-						RedisMessage redisMessageValue = RedisMessageFactory.buildData(rcpStringData.getContent());
-						ArrayRedisMessage redisMessage = new ArrayRedisMessage(Arrays.asList(redisMessageCmd, redisMessageKey, redisMessageValue));
-						ctx.writeAndFlush(redisMessage);
-						if (LOGGER.isInfoEnabled()) {
-							LOGGER.info("synData: uid:{} key: {}, value: {}", uid, new String(key.getKey()), new String(rcpStringData.getContent()));
-						}
-						NodeContextManager.updateIndex(uid, key.getKey());
-					} catch (Exception e) {
-						LOGGER.error("synData Exception:{}:{}", uid, ctx.channel().remoteAddress(), e);
-						stopSyn(uid);
-					}
-				}
-			}));
-		}
-
-	}
-
-	/**
-	 * stopSyn
-	 *
-	 * @param uid
-	 */
-	public static void stopSyn(String uid) {
-		NodeContext nodeContext = NodeContextManager.getContext(uid);
-		if (nodeContext == null || nodeContext.getRcpSynStorageHandler() == null) {
-			nodeContext.getRcpSynStorageHandler().stopTask();
-		}
-	}
 
 
 }

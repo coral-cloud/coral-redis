@@ -1,8 +1,12 @@
 package org.coral.redis.cluster.handler;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.redis.RedisMessage;
+import io.netty.util.AbstractReferenceCounted;
 import org.coral.redis.manager.RcpSynManager;
+import org.coral.redis.server.RedisMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,17 +73,21 @@ public class RcpSynRealTimeHandler {
 					try {
 						RedisMessage redisMessage = blockingQueue.take();
 						if (redisMessage != null) {
-							aliveMap.forEach(new BiConsumer<String, ChannelHandlerContext>() {
-								@Override
-								public void accept(String s, ChannelHandlerContext context) {
-									try {
-										context.writeAndFlush(redisMessage);
-									} catch (Exception e) {
-										RcpSynManager.stopSyn(s);
-										LOGGER.error("syn uid:{} error.", s, e);
+							for (Map.Entry<String, ChannelHandlerContext> entry : aliveMap.entrySet()) {
+								String key = entry.getKey();
+								try {
+									if (redisMessage instanceof AbstractReferenceCounted){
+										AbstractReferenceCounted counted = (AbstractReferenceCounted) redisMessage;
+										counted.retain(1);
 									}
+									ChannelHandlerContext channelHandlerContext = entry.getValue();
+									channelHandlerContext.writeAndFlush(redisMessage);
+								} catch (Exception e) {
+									LOGGER.error("runTask exception:{}", key, e);
+									RcpSynManager.stopSyn(key);
 								}
-							});
+
+							}
 						}
 					} catch (Exception e) {
 						LOGGER.error("", e);

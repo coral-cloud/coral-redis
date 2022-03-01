@@ -3,6 +3,7 @@ package org.coral.redis.server;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.redis.*;
+import org.coral.redis.cluster.handler.RcpSynRealTimeHandler;
 import org.coral.redis.command.RedisCommand;
 import org.coral.redis.server.handler.*;
 import org.coral.redis.type.CommandSign;
@@ -34,8 +35,8 @@ public class RedisCommandDispatcher {
 			RedisCommand redisCmd = RedisCommand.getSupportCmd(command);
 			if (redisCmd != null && redisCmd.getCmdHander() != null) {
 				return redisCmd.getCmdHander().process(ctx, command, msg);
-
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

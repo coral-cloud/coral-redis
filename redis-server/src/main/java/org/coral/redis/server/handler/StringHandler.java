@@ -3,6 +3,7 @@ package org.coral.redis.server.handler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.redis.ArrayRedisMessage;
 import io.netty.handler.codec.redis.RedisMessage;
+import org.coral.redis.cluster.handler.RcpSynRealTimeHandler;
 import org.coral.redis.perfmon.RedisCounters;
 import org.coral.redis.server.RedisMessageFactory;
 import org.coral.redis.storage.RcpProxyString;
@@ -44,6 +45,7 @@ public class StringHandler implements CommandHandler {
 
 	@Override
 	public List<RedisMessage> process(ChannelHandlerContext ctx,  String command, RedisMessage msgReq) throws Exception {
+		RcpSynRealTimeHandler.getInstance().addMsg(msgReq);
 		if (command.equalsIgnoreCase("set")) {
 			return processSet(msgReq);
 		}
